@@ -1,0 +1,26 @@
+name: Feature 🚀
+description: 새로운 기능 추가를 위한 이슈 제출
+title: "[RID-@@@][feat]: Please write title "
+labels: [":rocket: Feature"]
+body:
+  - type: textarea
+    attributes:
+      label: 체크리스트
+      description: 이슈 제출 전에 반드시 아래 체크리스트를 확인하세요
+      value: |
+        - [ ] 나는 linear에 해당 이슈를 작업하기 위한 백로그가 존재하는지 확인했다.
+        - [ ] 나는 이슈 제목에 RID 번호를 적었다.
+  - type: textarea
+    id: description
+    attributes:
+      label: 목적
+      description: 만들고자하는 기능의 목적에 대해 설명해주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: 기능 명세
+      description: 목적을 달성하기 위해 어떤 세부 기능이 필요한지 나열해주세요.
+    validations:
+      required: true

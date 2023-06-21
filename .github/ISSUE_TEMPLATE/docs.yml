@@ -1,0 +1,26 @@
+name: Docs 📝
+description: 문서 수정을 위한 이슈 제출
+title: "[RID-@@@][docs]: 제목을 작성해주세요"
+labels: [":pencil2: 수정"]
+body:
+  - type: textarea
+    attributes:
+      label: 체크리스트
+      description: 이슈 제출 전에 반드시 아래 체크리스트를 확인하세요
+      value: |
+        - [ ] 해당 이슈에 대한 백로그가 존재하는지 확인했습니다.
+        - [ ] 이슈 제목에 RID 번호를 적었습니다.
+  - type: textarea
+    id: description
+    attributes:
+      label: 목적
+      description: 수정/제작하고자 하는 문서의 필요성에 대해 설명해주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: 내용
+      description: 문서에는 어떤 내용이 추가되는지 기재해주세요.
+    validations:
+      required: false
