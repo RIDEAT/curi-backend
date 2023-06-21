@@ -37,14 +37,16 @@
     ```sh
     docker run springbootapp
     ```
-   
 Followings are options that you can add! 
-* port option(-p)
-  <br>connect between local network and container inner network.
-* volume option(-v)
-<br>enable inner container to use local files 
+* Port option(-p)
+  <br>Connect between local network and container inner network.
 
+* Volume option(-v)
+<br>Enable inner container to use local files 
+
+### Reference 
 [Here](https://ttl-blog.tistory.com/761 ) is the website that I referred to when building 
 
+### Contact
 If you have any problems, feel free to contact 8514199@gmail.com
 
