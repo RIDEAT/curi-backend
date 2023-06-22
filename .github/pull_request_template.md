@@ -1,5 +1,12 @@
 ## [RID-@@][#00][type] PR title
 
+## Linked Issues
+
+> 여기에 linked issues를 기재하면, 본 PR merge시 issue가 자동으로 닫힙니다.
+> ex. `close : #00`
+
+- close : #@@
+
 ## branch명
 
 `required`
