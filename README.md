@@ -18,7 +18,7 @@
    cd curi_backend
    ```
 
-3. Local Build (you can omit this part.)
+3. Local Build
    ```sh
    ./gradlew build
    ```
