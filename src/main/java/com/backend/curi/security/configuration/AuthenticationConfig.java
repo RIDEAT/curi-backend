@@ -1,0 +1,54 @@
+package com.backend.curi.security.configuration;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@Slf4j
+public class AuthenticationConfig{
+
+
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+    //private final UserService userService;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        return httpSecurity
+                .httpBasic().disable()
+                .csrf().disable()
+                .cors().and()
+                .authorizeRequests()
+                .antMatchers("/api/v1/users/login").permitAll()
+                .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(new JwtFilter(secretKey), UsernamePasswordAuthenticationFilter.class )
+                // username 과 password로 인증하기 전에 jwt 로 인증하는거임
+                .build();
+
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+   
+
+}
