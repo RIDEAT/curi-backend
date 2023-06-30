@@ -4,24 +4,24 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 @Setter
 @Getter
 @Entity
 public class WorkSpace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String workSpaceId;
+    private int workSpaceId;
 
     @Column
     private String name;
 
     @Builder
-    public WorkSpace(String workSpaceId, String name){
+    public WorkSpace(int workSpaceId, String name){
         this.workSpaceId = workSpaceId;
         this.name = name;
     }

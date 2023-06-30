@@ -17,7 +17,7 @@ public class WorkSpaceController {
     private final WorkSpaceService workSpaceService;
 
     @GetMapping("/workSpace/{workSpaceId}")
-    public String getWorkSpaceName(@PathVariable String workSpaceId){
+    public String getWorkSpaceName(@PathVariable int workSpaceId){
         try {
             String workSpaceName = workSpaceService.getWorkSpaceName(workSpaceId);
             return workSpaceName;
