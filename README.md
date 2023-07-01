@@ -17,13 +17,18 @@
    ```sh
    cd curi_backend
    ```
-
-3. Local Build
+3. Make jwt-secret in src/main/resources/application-jwt.properties 
+   ```sh
+   echo 'jwt.secret = your own secret key' >> application-jwt.properties
+   ```
+4. Make  src/main/resources/serviceAccountkey.json to connect firebase
+   
+5. Local Build
    ```sh
    ./gradlew build
    ```
    
-4. Docker Build
+6. Docker Build
     
     ```sh
     // For mac
@@ -33,7 +38,7 @@
     // For window
     docker build . -t springbootapp 
     ```
-5. Docker Run
+7. Docker Run
     ```sh
     docker run springbootapp
     ```
@@ -46,7 +51,4 @@ Followings are options that you can add!
 
 ### Reference 
 [Here](https://ttl-blog.tistory.com/761 ) is the website that I referred to when building 
-
-### Contact
-If you have any problems, feel free to contact 8514199@gmail.com
 
