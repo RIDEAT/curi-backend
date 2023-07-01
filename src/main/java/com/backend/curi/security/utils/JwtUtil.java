@@ -24,9 +24,10 @@ public class JwtUtil {
             return true; // 토큰이 유효하지 않음
         }
     }
-    public static String createJWT(String userName, String secretKey, Long expiredMs){
+    public static String createJWT(String userId, String secretKey, Long expiredMs){
         Claims claims = Jwts.claims();
-        claims.put("userName", userName);
+
+        claims.put("userId", userId);
 
         return Jwts.builder()
                 .setClaims(claims)

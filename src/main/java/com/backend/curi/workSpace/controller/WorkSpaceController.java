@@ -19,7 +19,7 @@ public class WorkSpaceController {
     @GetMapping("/workSpace/{workSpaceId}")
     public String getWorkSpaceName(@PathVariable int workSpaceId){
         try {
-            String workSpaceName = workSpaceService.getWorkSpaceName(workSpaceId);
+            String workSpaceName = workSpaceService.getWorkSpaceNameByWorkSpaceId(workSpaceId);
             return workSpaceName;
 
         } catch (CuriException e){

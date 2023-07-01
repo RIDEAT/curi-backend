@@ -16,12 +16,12 @@ public class WorkSpaceService {
     private final WorkSpaceRepository workSpaceRepository;
 
 
-    public void createWorkSpace(int workSpaceId){
-        WorkSpace workSpace = WorkSpace.builder().workSpaceId(workSpaceId).build();
+    public void createWorkSpace(int workSpaceId, String name){
+        WorkSpace workSpace = WorkSpace.builder().workSpaceId(workSpaceId).name(name).build();
         workSpaceRepository.save(workSpace);
     }
 
-    public String getWorkSpaceName(int workSpaceId){
+    public String getWorkSpaceNameByWorkSpaceId(int workSpaceId){
         return workSpaceRepository.findByWorkSpaceId(workSpaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS)).getName();
 
 
