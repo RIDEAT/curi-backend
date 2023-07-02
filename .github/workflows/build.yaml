@@ -15,6 +15,14 @@ jobs:
         with:
           java-version: 17
 
+      - uses: actions/checkout@v3
+      - run: touch ./src/main/resources/application.properties
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - run: cat ./src/main/resources/application.properties
+
+      - run: touch ./src/main/resources/serviceAccountKey.json
+      - run: echo "${{ secrets.SERVICEACCOUNTKEY }}" > ./src/main/resources/serviceAccountKey.json
+      - run: cat ./src/main/resources/serviceAccountKey.json
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
