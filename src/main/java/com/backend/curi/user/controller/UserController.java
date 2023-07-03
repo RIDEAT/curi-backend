@@ -33,7 +33,7 @@ public class UserController {
             String accessToken = request.getHeader("Authentication");
             log.info("accessToken: {}", accessToken);
             ResponseEntity responseEntity = userService.authorize(accessToken);
-            userService.dbStore(accessToken);
+            // userService.dbStore(accessToken);
 
             return responseEntity;
         } catch (FirebaseAuthException e) {
