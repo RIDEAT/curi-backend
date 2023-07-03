@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,23 +28,15 @@ public class UserService {
     private Long expiredMs = 1000 * 60 * 60l;
     private final UserRepository userRepository;
 
-    public void createUser(User_ u){
-        //  유효성 검사 & 해쉬
-        userRepository.save(u);
-    }
-
-    public int getWorkSpaceIdByUserId (String userId){
-        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getWorkSpaceId();
-
-    }
-
-    public ResponseEntity doAuthorization(String accessToken) throws FirebaseAuthException{
+    public ResponseEntity authorize(String accessToken) throws FirebaseAuthException{
         // Access Token 검증
         FirebaseToken decodedToken = FirebaseAuthentication.verifyAccessToken(accessToken);
 
         // 유효한 Access Token으로부터 사용자 정보 가져오기
         String userId = decodedToken.getUid();
         String email = decodedToken.getEmail();
+
+
 
         log.info("userId : {}", userId);
         log.info("email : {}", email);
@@ -58,7 +51,31 @@ public class UserService {
         log.info("JWT : {}", JWT);
 
         return new ResponseEntity(headers, HttpStatus.ACCEPTED);
+    }
+
+    public void createWorkspace (String userId, int workSpaceId){
+        User_ user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+        user.setWorkSpaceId(workSpaceId);
+        userRepository.save(user);
+    }
+
+    public int getWorkSpaceIdByUserId (String userId){
+        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS)).getWorkSpaceId();
 
     }
+
+    public void dbStore (String accessToken) throws FirebaseAuthException {
+        // Access Token 검증
+        FirebaseToken decodedToken = FirebaseAuthentication.verifyAccessToken(accessToken);
+
+        // 유효한 Access Token으로부터 사용자 정보 가져오기
+        String userId = decodedToken.getUid();
+        String email = decodedToken.getEmail();
+
+        User_ user = User_.builder().userId(userId).email(email).build();
+        userRepository.save(user);
+
+    }
+
 
 }

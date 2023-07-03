@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface WorkSpaceRepository extends JpaRepository<WorkSpace, Integer> {
     Optional<WorkSpace> findByWorkSpaceId(int workSpaceId);
+    Optional<WorkSpace> findByName(String name);
 }
 

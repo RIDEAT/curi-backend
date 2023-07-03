@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -33,14 +34,21 @@ public class AuthenticationConfig{
                 .cors().and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/users/login").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+
+
                 .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(new JwtFilter(secretKey), UsernamePasswordAuthenticationFilter.class )
+
+                .headers()
+                .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 // username 과 password로 인증하기 전에 jwt 로 인증하는거임
-                .build();
+                .and().build();
 
     }
 

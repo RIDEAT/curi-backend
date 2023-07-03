@@ -8,6 +8,10 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
+    public static String getUserId(String token, String secretKey){
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("userId", String.class);
+    }
+
     public static boolean isExpired(String token, String secretKey){
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
@@ -24,9 +28,10 @@ public class JwtUtil {
             return true; // 토큰이 유효하지 않음
         }
     }
-    public static String createJWT(String userId, String secretKey, Long expiredMs){
+    public static String createJWT(String userId,String secretKey, Long expiredMs){
         Claims claims = Jwts.claims();
 
+        log.info("userId : {}", userId);
         claims.put("userId", userId);
 
         return Jwts.builder()
