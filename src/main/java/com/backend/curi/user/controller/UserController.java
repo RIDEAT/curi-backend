@@ -1,6 +1,7 @@
 package com.backend.curi.user.controller;
 
 import com.backend.curi.exception.CuriException;
+import com.backend.curi.exception.ErrorType;
 import com.backend.curi.firebase.FirebaseAuthentication;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
@@ -55,6 +56,8 @@ public class UserController {
             int workSpaceId = userService.getWorkSpaceIdByUserId(userId);
 
             //redirect to workspace/{workSpaceId}
+            if (workSpaceId == 0) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
+
 
             return new ResponseEntity((Integer)workSpaceId, HttpStatus.ACCEPTED);
             //  authentication.getPrincipal();
