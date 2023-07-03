@@ -60,7 +60,7 @@ public class UserService {
     }
 
     public int getWorkSpaceIdByUserId (String userId){
-        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS)).getWorkSpaceId();
+        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getWorkSpaceId();
 
     }
 
