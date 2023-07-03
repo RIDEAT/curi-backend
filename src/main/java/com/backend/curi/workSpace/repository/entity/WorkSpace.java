@@ -20,6 +20,7 @@ public class WorkSpace {
     @Column
     private String name;
 
+    public WorkSpace(){}
     @Builder
     public WorkSpace(int workSpaceId, String name){
         this.workSpaceId = workSpaceId;

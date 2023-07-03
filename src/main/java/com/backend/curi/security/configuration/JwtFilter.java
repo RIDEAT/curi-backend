@@ -62,12 +62,13 @@ public class JwtFilter extends OncePerRequestFilter {
         // UserName Token에서 꺼내기
 
 
-        String userName = "";
+        String userId = JwtUtil.getUserId(token, secretKey);
+        log.info("userId: {}", userId);
 
         // 권한 부여
 
         //credential 함 보기
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority(("USER"))));
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(("USER"))));
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
