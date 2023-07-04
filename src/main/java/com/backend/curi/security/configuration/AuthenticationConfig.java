@@ -37,9 +37,6 @@ public class AuthenticationConfig{
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/users/login").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-
-
                 .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()
                 .and()
                 .sessionManagement()
