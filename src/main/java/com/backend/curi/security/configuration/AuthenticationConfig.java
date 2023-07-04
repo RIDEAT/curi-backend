@@ -25,8 +25,11 @@ public class AuthenticationConfig{
 
 
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    @Value("${jwt.authSecretKey}")
+    private String authSecretKey;
+
+    @Value("${jwt.refreshSecretKey}")
+    private String refreshSecretKey;
     //private final UserService userService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -45,7 +48,7 @@ public class AuthenticationConfig{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtFilter(secretKey), UsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore(new JwtFilter(authSecretKey, refreshSecretKey), UsernamePasswordAuthenticationFilter.class )
 
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(
@@ -64,10 +67,11 @@ public class AuthenticationConfig{
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

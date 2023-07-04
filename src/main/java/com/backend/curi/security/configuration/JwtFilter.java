@@ -25,8 +25,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     //private final UserService userService;
-    @Value("${jwt.secret}")
-    private final String secretKey;
+    private final String authSecretKey;
+    private final String refreshSecretKey;
+
 
 
     // 권한을 부여.
@@ -44,25 +45,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         // Token 꺼내기
-        String token = authorization.split(" ")[1];
+        String authToken = authorization.split(" ")[1];
 
-        log.info("발급받은 토큰: {}" , token);
-        log.info("secret key: {}", secretKey);
+        log.info("발급받은 토큰: {}" , authToken);
 
 
-        // Token expired 되었는지 여부
-        // Token 유효성 검사해야함
-
-        if(JwtUtil.isExpired(token, secretKey)){
-            log.error("token이 만료되었습니다. ", authorization);
+        // authToken 유효성 검사
+        if (JwtUtil.isInvalid(authToken, authSecretKey)){
+            log.error("auth token이 유효하지 않습니다. ", authToken);
             filterChain.doFilter(request, response);
             return;
         }
 
-        // UserName Token에서 꺼내기
+        // authToken expired 되었는지 여부
+        if(JwtUtil.isExpired(authToken, authSecretKey)){
+            log.error("auth token이 만료되었습니다. ", authToken);
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        // UserId Token에서 꺼내기
 
-        String userId = JwtUtil.getUserId(token, secretKey);
+        String userId = JwtUtil.getUserId(authToken, authSecretKey);
         log.info("userId: {}", userId);
 
         // 권한 부여
