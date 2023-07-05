@@ -12,24 +12,16 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("userId", String.class);
     }
 
-    public static boolean isExpired(String token, String secretKey){
+    public static boolean isValid(String token, String secretKey){
         try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
+            return !Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
 
 
         } catch (ExpiredJwtException e) {
             log.error("Expired token");
-            return true; // 토큰이 만료됨
-        }
-    }
-
-    public static boolean isInvalid(String token, String secretKey){
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-            return true;
+            return false; // 토큰이 만료됨
         } catch (JwtException e) {
-            log.error("not valid token");
-            return true; // 토큰이 유효하지 않음
+            return false; // 토큰이 유효하지 않음
         }
     }
 
