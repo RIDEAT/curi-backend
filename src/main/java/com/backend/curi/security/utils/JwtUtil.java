@@ -28,7 +28,6 @@ public class JwtUtil {
     public static String createJWT(String userId,String secretKey, Long expiredMs){
         Claims claims = Jwts.claims();
 
-        log.info("userId : {}", userId);
         claims.put("userId", userId);
 
         return Jwts.builder()

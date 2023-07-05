@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 
 @RequiredArgsConstructor
-@RequestMapping("/workFlow")
+@RequestMapping("/workflow")
 public class WorkflowController {
     private WorkflowService workflowService;
 

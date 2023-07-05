@@ -81,6 +81,10 @@ public class UserService {
 
     }
 
+    public String getEmailByUserId (String userId){
+        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getEmail();
+    }
+
     public void dbStore (String userId, String email) {
         // 이미 유저가 있는 경우는 빼야하나?
         User_ user = User_.builder().userId(userId).email(email).build();
