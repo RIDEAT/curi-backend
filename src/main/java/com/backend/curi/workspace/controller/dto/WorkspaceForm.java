@@ -1,4 +1,4 @@
-package com.backend.curi.workSpace.controller.dto;
+package com.backend.curi.workspace.controller.dto;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
-public class WorkSpaceForm {
+public class WorkspaceForm {
 
     @NotNull
     @Size(max = 64)
