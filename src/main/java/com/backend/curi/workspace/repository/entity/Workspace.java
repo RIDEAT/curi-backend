@@ -1,4 +1,4 @@
-package com.backend.curi.workSpace.repository.entity;
+package com.backend.curi.workspace.repository.entity;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,18 +12,18 @@ import javax.persistence.GenerationType;
 @Setter
 @Getter
 @Entity
-public class WorkSpace {
+public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int workSpaceId;
+    private int workspaceId;
 
     @Column
     private String name;
 
-    public WorkSpace(){}
+    public Workspace(){}
     @Builder
-    public WorkSpace(int workSpaceId, String name){
-        this.workSpaceId = workSpaceId;
+    public Workspace(int workspaceId, String name){
+        this.workspaceId = workspaceId;
         this.name = name;
     }
 
