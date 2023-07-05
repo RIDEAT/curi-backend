@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
@@ -27,7 +28,7 @@ public class WorkSpaceController {
 
 
     @PostMapping("/create")
-    public ResponseEntity createWorkSpace (@RequestBody @Valid WorkSpaceForm workSpaceForm, Authentication authentication){
+    public ResponseEntity createWorkSpace (@RequestBody @Valid WorkSpaceForm workSpaceForm, Authentication authentication,  HttpServletResponse response){
         try{
             //workspaceForm 에 대한 유효성 검사 필요함
             int workSpaceId = workSpaceService.createWorkSpace(workSpaceForm);

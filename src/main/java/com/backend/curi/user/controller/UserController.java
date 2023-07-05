@@ -57,6 +57,10 @@ public class UserController {
 
             Cookie cookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
             cookie.setMaxAge(refreshExpiredMs.intValue()/1000);
+
+            //cookie.setSecure(true);
+            //cookie.setHttpOnly(true);
+
             cookie.setPath("/");
             response.addCookie(cookie);
 
@@ -77,6 +81,8 @@ public class UserController {
     @GetMapping("/enter")
     public ResponseEntity<Integer> enterWorkSpace(Authentication authentication){
         try {
+            // authentication 이 null일 때 수행하는 로직
+
             String userId = authentication.getPrincipal().toString();
             int workSpaceId = userService.getWorkSpaceIdByUserId(userId);
 
