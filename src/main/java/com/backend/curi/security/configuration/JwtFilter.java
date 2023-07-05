@@ -54,7 +54,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("authorization: {}", authorization);
 
-        if (authorization == null || !authorization.startsWith("Bearer ")){
+
+        if (!authorization.startsWith("Bearer ")){
             log.error("authorization 을 잘못 보냈습니다. ", authorization);
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             filterChain.doFilter(request, response);
@@ -70,6 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         log.info("제출한 auth 토큰: {}" , authToken);
+        log.info("refresh 토큰: {}",refreshToken);
 
 
         // authToken 유효성 검사
