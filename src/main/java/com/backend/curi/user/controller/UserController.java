@@ -45,10 +45,11 @@ public class UserController {
 
             // 유효한 Access Token으로부터 사용자 정보 가져오기
             String userId = decodedToken.getUid();
+            String userEmail =decodedToken.getEmail();
 
             TokenDto tokenDto = userService.authorize(userId);
 
-            userService.dbStore(accessToken);
+            userService.dbStore(userId, userEmail);
 
             // Put JWT in header
             HttpHeaders headers = new HttpHeaders();

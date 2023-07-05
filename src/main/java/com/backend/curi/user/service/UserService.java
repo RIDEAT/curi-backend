@@ -81,14 +81,8 @@ public class UserService {
 
     }
 
-    public void dbStore (String accessToken) throws FirebaseAuthException {
-        // Access Token 검증
-        FirebaseToken decodedToken = FirebaseAuthentication.verifyAccessToken(accessToken);
-
-        // 유효한 Access Token으로부터 사용자 정보 가져오기
-        String userId = decodedToken.getUid();
-        String email = decodedToken.getEmail();
-
+    public void dbStore (String userId, String email) {
+        // 이미 유저가 있는 경우는 빼야하나?
         User_ user = User_.builder().userId(userId).email(email).build();
         userRepository.save(user);
 
