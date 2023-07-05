@@ -8,30 +8,42 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
           java-version: 17
 
-      - uses: actions/checkout@v3
-      - run: touch ./src/main/resources/application.properties
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - name: Set up Resources
+        run: |
+          touch ./src/main/resources/application.properties
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+          touch ./src/main/resources/serviceAccountKey.json
+          echo ${{ secrets.SERVICEACCOUNTKEY }} > ./src/main/resources/serviceAccountKey.json
 
-      - run: touch ./src/main/resources/serviceAccountKey.json
-      - run: echo "${{ secrets.SERVICEACCOUNTKEY }}" > ./src/main/resources/serviceAccountKey.json
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
