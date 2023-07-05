@@ -14,6 +14,10 @@ public class JwtUtil {
 
     public static boolean isValid(String token, String secretKey){
         try {
+            if (token == null) {
+                log.error("토큰이 null입니다.");
+                return false;
+            }
             return !Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
 
 
