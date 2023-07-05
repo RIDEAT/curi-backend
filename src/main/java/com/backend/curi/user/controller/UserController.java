@@ -67,8 +67,8 @@ public class UserController {
             Cookie cookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
             //cookie.setMaxAge(refreshExpiredMs.intValue()/1000);
             log.info("Cookie 에 담은 refreshToken: ", tokenDto.getRefreshToken());
-            //cookie.setSecure(true);
-            //cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);
 

@@ -51,6 +51,8 @@ public class UserService {
         //make refresh JWT
         String refreshJWT = JwtUtil.createJWT(userId, refreshSecretKey, refreshExpiredMs);
 
+        log.info("userId : {} 기 만든 refreshJWT : {}", userId, refreshJWT);
+
 
         //refresh 토큰이 있는지 확인
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserId(userId);
