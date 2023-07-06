@@ -3,7 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '2.7.14-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'jacoco'
-	id 'com.google.cloud.tools.jib' version '3.1.4'
+	id 'com.google.cloud.tools.jib' version '3.3.2'
 }
 
 group = 'com.backend'
@@ -71,6 +71,7 @@ jib {
 	to {
 		image = "332543631386.dkr.ecr.ap-northeast-2.amazonaws.com/spring/curi-app"
 		tags = ["latest", inputTag]
+		credHelper = 'ecr-login'
 	}
 	container {
 		creationTime = "USE_CURRENT_TIMESTAMP"
