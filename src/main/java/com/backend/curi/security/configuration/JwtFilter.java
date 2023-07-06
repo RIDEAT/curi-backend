@@ -50,13 +50,15 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+
+
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         log.info("authorization: {}", authorization);
 
 
-        if (!authorization.startsWith("Bearer ")){
-            log.error("authorization 을 잘못 보냈습니다. ", authorization);
+        if (authorization == null || !authorization.startsWith("Bearer ")){
+            log.error("authorization 은 Bearer로 시작해야 합니다. ", authorization);
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             filterChain.doFilter(request, response);
 

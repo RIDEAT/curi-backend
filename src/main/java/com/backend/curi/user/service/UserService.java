@@ -70,19 +70,6 @@ public class UserService {
         return new TokenDto(authJWT, refreshJWT);
     }
 
-
-
-    public void createWorkspace (String userId, int workSpaceId){
-        User_ user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        user.setWorkSpaceId(workSpaceId);
-        userRepository.save(user);
-    }
-
-    public int getWorkSpaceIdByUserId (String userId){
-        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getWorkSpaceId();
-
-    }
-
     public String getEmailByUserId (String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getEmail();
     }

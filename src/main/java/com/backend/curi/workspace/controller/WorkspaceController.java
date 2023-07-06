@@ -6,6 +6,7 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workspace.controller.dto.WorkspaceForm;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -39,13 +41,10 @@ public class WorkspaceController {
 
             //workspaceForm 에 대한 유효성 검사 필요함
 
-            int workspaceId = workspaceService.createWorkspace(workspaceForm);
-
-
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
             log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
 
-            userService.createWorkspace(currentUser.getUserId(), workspaceId);
+            int workspaceId = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
 
             //userdb , workspace db 에 둘다 추가해줘야 합니다.
             //userId 에 대한 정보를 authentication 에서 얻어야 한다.
@@ -75,16 +74,17 @@ public class WorkspaceController {
         try {
             if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
 
-            String workspaceName = workspaceService.getWorkSpaceNameByWorkspaceId(workspaceId);
-
-            // workspace 의 userId 와 curretUser 의 id 확인해야함
 
             Map<String, Object> responseBody= new HashMap<>();
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
 
+            // workspace 의 userId 와 curretUser 의 id 확인해야함
+            Workspace workspace = workspaceService.getWorkspaceByWorkspaceId(workspaceId);
+            if (workspace.getUserId() != currentUser.getUserId()) throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.UNAUTHORIZED_WORKSPACE);
+
             responseBody.put("userId", currentUser.getUserId());
             responseBody.put("workspaceId", workspaceId);
-            responseBody.put("workspaceName", workspaceName);
+            responseBody.put("workspaceName", workspace.getName());
 
 
             return new ResponseEntity(responseBody, HttpStatus.ACCEPTED);

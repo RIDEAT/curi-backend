@@ -45,7 +45,7 @@ public class AuthenticationConfig{
                 .csrf().disable()
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .authorizeRequests()
-                .antMatchers("/user/authorize").permitAll()
+                .antMatchers("/user/authorize", "/h2-console/*").permitAll()
                 .antMatchers("*").authenticated()
                 .and()
                 .sessionManagement()
