@@ -21,6 +21,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+          cache: 'gradle'
 
       - name: Set up application.properties
         run: |
@@ -34,14 +35,6 @@ jobs:
           name: "serviceAccountKey.json"
           json: ${{ secrets.SERVICEACCOUNTKEY }}
           dir: "./src/main/resources/"
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -64,7 +57,7 @@ jobs:
           echo VERSION=$VERSION
           echo "::set-output name=version::$VERSION"
 
-      - name: Build With Jib, tag, and push image to Amazon ECR
+      - name: Build With Jib, and push image to Amazon ECR with tag
         id: image-info
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -73,7 +66,7 @@ jobs:
         run: |
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
-          ./gradlew -Djib.to.image=$ECR_REGISTRY -PinputTag=$IMAGE_TAG jib test
+          ./gradlew -Djib.to.image=$ECR_REGISTRY/$ECR_REPOSITORY -PinputTag=$IMAGE_TAG clean jib test --no-daemon
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
