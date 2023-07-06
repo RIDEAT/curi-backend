@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '2.7.14-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'jacoco'
+	id 'com.google.cloud.tools.jib' version '3.1.4'
 }
 
 group = 'com.backend'
@@ -57,5 +58,24 @@ jacocoTestReport {
 	reports {
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+}
+
+
+def inputTag = project.hasProperty('inputTag') ? project.property('inputTag') : '10f48204'
+
+jib {
+	from {
+		image = "openjdk:17-alpine"
+	}
+	to {
+		image = "332543631386.dkr.ecr.ap-northeast-2.amazonaws.com/spring/curi-app"
+		tags = ["latest", inputTag]
+	}
+	container {
+		creationTime = "USE_CURRENT_TIMESTAMP"
+		jvmFlags = ['-XX:+UseContainerSupport', '-Dserver.port=8080', '-Dfile.encoding=UTF-8']
+		ports = ['8080']
+		labels = [maintainer: 'lhc <jahee0717@gmail.com>']
 	}
 }
