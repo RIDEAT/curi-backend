@@ -77,6 +77,5 @@ jib {
 		creationTime = "USE_CURRENT_TIMESTAMP"
 		jvmFlags = ['-XX:+UseContainerSupport', '-Dserver.port=8080', '-Dfile.encoding=UTF-8']
 		ports = ['8080']
-		labels = [maintainer: 'lhc <jahee0717@gmail.com>']
 	}
 }
