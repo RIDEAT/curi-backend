@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.14-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'jacoco'
+	id 'com.google.cloud.tools.jib' version '3.3.2'
 }
 
 group = 'com.backend'
@@ -42,6 +44,38 @@ dependencies {
 
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacoco {
+	toolVersion = "0.8.9"
+}
+
+jacocoTestReport {
+	dependsOn test // tests are required to run before generating the report
+	reports {
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+}
+
+
+def inputTag = project.hasProperty('inputTag') ? project.property('inputTag') : '10f48204'
+
+jib {
+	from {
+		image = "openjdk:17-alpine"
+	}
+	to {
+		image = "332543631386.dkr.ecr.ap-northeast-2.amazonaws.com/spring/curi-app"
+		tags = ["latest", inputTag]
+		credHelper = 'ecr-login'
+	}
+	container {
+		creationTime = "USE_CURRENT_TIMESTAMP"
+		jvmFlags = ['-XX:+UseContainerSupport', '-Dserver.port=8080', '-Dfile.encoding=UTF-8']
+		ports = ['8080']
+	}
 }

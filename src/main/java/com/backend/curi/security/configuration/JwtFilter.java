@@ -56,7 +56,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-
             ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
 
             // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.

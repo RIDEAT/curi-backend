@@ -59,7 +59,8 @@ public class UserController {
 
             userService.dbStore(userId, userEmail);
 
-            Map<String, Object> responseBodyMap= new HashMap<>();
+            
+Map<String, Object> responseBodyMap= new HashMap<>();
             responseBodyMap.put("userId", userId);
             responseBodyMap.put("userEmail", userEmail);
 

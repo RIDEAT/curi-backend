@@ -4,6 +4,12 @@ name: CI Pipeline
 on:
   push:
     branches: [ main ]
+
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,6 +21,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+          cache: 'gradle'
 
       - name: Set up application.properties
         run: |
@@ -40,9 +47,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -61,7 +65,7 @@ jobs:
           echo VERSION=$VERSION
           echo "::set-output name=version::$VERSION"
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build With Jib, and push image to Amazon ECR with tag
         id: image-info
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -70,9 +74,13 @@ jobs:
         run: |
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ./gradlew -Djib.to.image=$ECR_REGISTRY/$ECR_REPOSITORY -PinputTag=$IMAGE_TAG clean jib test --no-daemon
 
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/**/*.xml
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
