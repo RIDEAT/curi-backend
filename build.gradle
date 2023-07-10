@@ -69,7 +69,7 @@ jib {
 		image = "openjdk:17-alpine"
 	}
 	to {
-		image = "332543631386.dkr.ecr.ap-northeast-2.amazonaws.com/spring/curi-app"
+		image = "your-respository"
 		tags = ["latest", inputTag]
 		credHelper = 'ecr-login'
 	}
