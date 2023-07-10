@@ -25,18 +25,7 @@ public class AuthenticationConfig{
 
 
 
-    @Value("${jwt.authSecretKey}")
-    private String authSecretKey;
 
-    @Value("${jwt.refreshSecretKey}")
-    private String refreshSecretKey;
-
-    @Value("${jwt.authExpiredMs}")
-    private Long authExpiredMs;
-
-    @Value("${jwt.refreshExpiredMs}")
-    private Long refreshExpiredMs;
-    //private final UserService userService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -45,13 +34,14 @@ public class AuthenticationConfig{
                 .csrf().disable()
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .authorizeRequests()
-                .antMatchers("/user/authorize", "/h2-console/*").permitAll()
+                .antMatchers(HttpMethod.POST,"/user").permitAll()
+                .antMatchers("h2-console").permitAll()
                 .antMatchers("*").authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtFilter(authSecretKey, refreshSecretKey, authExpiredMs, refreshExpiredMs), UsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class )
 
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(

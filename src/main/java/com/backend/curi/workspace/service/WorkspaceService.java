@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,10 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
 
 
+    public List<Workspace> getWorkspacesByUserId(String userId){
+        return workspaceRepository.findAllByUserId(userId);
+
+    }
     public int createWorkspace(WorkspaceForm workspaceForm, String userId){
         // 이름 중복 검사
         if(workspaceRepository.findByName(workspaceForm.getName()).isPresent()){
@@ -32,11 +37,7 @@ public class WorkspaceService {
         return workspace.getWorkspaceId();
     }
 
-    public Workspace getWorkspaceByWorkspaceId(int workSpaceId){
-        return workspaceRepository.findByWorkspaceId(workSpaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
 
-
-    }
 
 
 

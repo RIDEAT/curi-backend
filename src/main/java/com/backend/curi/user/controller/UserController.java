@@ -2,91 +2,68 @@ package com.backend.curi.user.controller;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.firebase.FirebaseAuthentication;
-import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.security.dto.TokenDto;
-import com.backend.curi.user.repository.RefreshTokenRepository;
-import com.backend.curi.user.repository.entity.RefreshToken;
-import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
-import lombok.Getter;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
-    @Value("${jwt.refreshExpiredMs}")
-    private Long refreshExpiredMs;
 
     private final UserService userService;
-    private final RefreshTokenRepository refreshTokenRepository;
 
-    @GetMapping("/authorize")
-    public ResponseEntity authorize(HttpServletRequest request, HttpServletResponse response){
+    // 회원가입 하고 보내야함 . 유저 디비에 등록
+    @PostMapping
+    public ResponseEntity register(HttpServletRequest request, HttpServletResponse response){
         try {
-            String accessToken = request.getHeader("Authentication");
-            log.info("accessToken: {}", accessToken);
-            // Access Token 검증
-            FirebaseToken decodedToken = FirebaseAuthentication.verifyAccessToken(accessToken);
+            ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
+            String responseBody = responseEntity.getBody();
+            log.info(responseBody);
 
-            // 유효한 Access Token으로부터 사용자 정보 가져오기
-            String userId = decodedToken.getUid();
-            String userEmail =decodedToken.getEmail();
+            // Parse the responseBody JSON string
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-            TokenDto tokenDto = userService.authorize(userId);
+// Extract userEmail and userId
+            String userEmail = jsonNode.get("userEmail").asText();
+            String userId = jsonNode.get("userId").asText();
 
+// Use userEmail and userId as needed
+            log.info("User Email: {}", userEmail);
+            log.info("User ID: {}", userId);
+            // 이후에 response body 에서 userId, email 꺼내서 저장해야함.
 
             userService.dbStore(userId, userEmail);
 
-            // Put JWT in header
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("AuthToken", tokenDto.getAuthToken());
+            Map<String, Object> responseBodyMap= new HashMap<>();
+            responseBodyMap.put("userId", userId);
+            responseBodyMap.put("userEmail", userEmail);
 
-            Cookie cookie = new Cookie("refreshToken", tokenDto.getRefreshToken());
-            cookie.setMaxAge(refreshExpiredMs.intValue()/1000);
-            log.info("Cookie 에 담은 refreshToken: {}", tokenDto.getRefreshToken());
-           // cookie.setSecure(true);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-
-            Map<String, Object> responseBody= new HashMap<>();
-            responseBody.put("userId", userId);
-            responseBody.put("userEmail", userEmail);
-
-
-            return new ResponseEntity(responseBody, headers, HttpStatus.ACCEPTED);
-        } catch (FirebaseAuthException e) {
-            log.info("FirebaseAuthException");
-            Map<String, Object> errorBody= new HashMap<>();
-            errorBody.put("error", "Firebase access token이 유효하지 않습니다.");
-
-            // Access Token이 유효하지 않은 경우 또는 검증에 실패한 경우 에러 처리
-            return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
-
+            return new ResponseEntity(responseBodyMap, responseEntity.getHeaders(), HttpStatus.ACCEPTED);
 
         } catch(CuriException e){
 
@@ -95,63 +72,35 @@ public class UserController {
             errorBody.put("error", e.getMessage());
 
             return new ResponseEntity(errorBody, e.getHttpStatus());
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (HttpClientErrorException e){
+            log.info(e.getMessage());
+            throw new CuriException(e.getStatusCode(), ErrorType.AUTH_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity logout(Authentication authentication){
-        try {
-            if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserId(currentUser.getUserId());
-            refreshTokenRepository.delete(refreshToken.get());
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("logout userId", currentUser.getUserId());
-            return new ResponseEntity(responseBody, HttpStatus.ACCEPTED);
-        } catch (CuriException e){
-            log.info(e.getMessage());
-            Map<String, Object> errorBody= new HashMap<>();
-            errorBody.put("error", e.getMessage());
 
-            return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
-        }
-        catch (Exception e){
-            log.info(e.getMessage());
-            // 여기 추가해야 한다.
-            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+    private ResponseEntity communicateWithAuthServer(HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
 
+        HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
+        URI requestUri = URI.create(AUTH_SERVER.concat("/auth/authorize"));
+        HttpHeaders requestHeaders = new HttpHeaders();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            requestHeaders.add(headerName, headerValue);
         }
+        RequestEntity<Void> requestEntity = new RequestEntity<>(requestHeaders, httpMethod, requestUri);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+
+        return responseEntity;
     }
-
-    // user/validate
-    @GetMapping("/validate")
-    public ResponseEntity validate(Authentication authentication){
-        try {
-            if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-            String userId = currentUser.getUserId();
-            String email = userService.getEmailByUserId(userId);
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("userId", userId);
-            responseBody.put("email", email);
-            responseBody.put("result", "valid");
-            return new ResponseEntity(responseBody, HttpStatus.ACCEPTED);
-
-        }
-        catch (CuriException e){
-            log.info(e.getMessage());
-            Map<String, Object> errorBody= new HashMap<>();
-            errorBody.put("error", e.getMessage());
-
-            return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
-
-        }
-
-
-    }
-
-
 
 
 
