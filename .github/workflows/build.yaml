@@ -28,14 +28,6 @@ jobs:
           touch ./src/main/resources/application.properties
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
 
-      - name: Set up serviceAccountKey.json
-        id: create-json
-        uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: "serviceAccountKey.json"
-          json: ${{ secrets.SERVICEACCOUNTKEY }}
-          dir: "./src/main/resources/"
-
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
