@@ -6,20 +6,29 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workspace.controller.dto.WorkspaceForm;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,22 +39,53 @@ public class WorkspaceController {
     private final WorkspaceService workspaceService;
     private final UserService userService;
 
+    @GetMapping
+    public ResponseEntity getList ( Authentication authentication){
+        try {
+            if (authentication == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("transactionId", 11);
+
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            String userId = currentUser.getUserId();
+            List<Workspace> workspaces = workspaceService.getWorkspacesByUserId(userId);
+            if (workspaces.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
+            responseBody.put("list", workspaces);
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
 
 
-    @PostMapping("/create")
-    public ResponseEntity createWorkspace (@RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication){
+
+    @PostMapping
+    public ResponseEntity createWorkspace (@RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication){
         try{
             if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
 
-            //workspaceForm 에 대한 유효성 검사 필요함
-
-            int workspaceId = workspaceService.createWorkspace(workspaceForm);
-
+            //workspaceForm 에 대한 유효성 검사
+            if (bindingResult.hasErrors()) {
+                // 유효성 검사 실패한 필드 및 에러 메시지 확인
+                List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+                Map<String, Object> errorBody = new HashMap<>();
+                errorBody.put("error", "폼이 유효하지 않습니다.");
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                return new ResponseEntity<>(errorBody, responseHeaders, HttpStatus.BAD_REQUEST);
+            }
 
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
             log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
 
-            userService.createWorkspace(currentUser.getUserId(), workspaceId);
+            int workspaceId = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
 
             //userdb , workspace db 에 둘다 추가해줘야 합니다.
             //userId 에 대한 정보를 authentication 에서 얻어야 한다.
@@ -66,31 +106,8 @@ public class WorkspaceController {
             errorBody.put("error", e.getMessage());
 
             return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
-        }
-
-    }
-
-    @GetMapping("/enter/{workspaceId}")
-    public ResponseEntity getWorkspaceName(@PathVariable int workspaceId, Authentication authentication){
-        try {
-            if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-
-            String workspaceName = workspaceService.getWorkSpaceNameByWorkspaceId(workspaceId);
-
-            // workspace 의 userId 와 curretUser 의 id 확인해야함
-
-            Map<String, Object> responseBody= new HashMap<>();
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-
-            responseBody.put("userId", currentUser.getUserId());
-            responseBody.put("workspaceId", workspaceId);
-            responseBody.put("workspaceName", workspaceName);
-
-
-            return new ResponseEntity(responseBody, HttpStatus.ACCEPTED);
-
-        } catch (CuriException e){
-            log.error(e.getMessage());
+        } catch (HttpClientErrorException e){
+            log.info(e.getMessage());
             Map<String, Object> errorBody= new HashMap<>();
             errorBody.put("error", e.getMessage());
 
@@ -98,4 +115,6 @@ public class WorkspaceController {
         }
 
     }
+
+
 }

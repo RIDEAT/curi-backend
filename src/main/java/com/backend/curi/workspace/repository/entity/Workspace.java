@@ -20,11 +20,14 @@ public class Workspace {
     @Column
     private String name;
 
+    @Column String userId;
+
     public Workspace(){}
     @Builder
-    public Workspace(int workspaceId, String name){
+    public Workspace(int workspaceId, String name, String userId){
         this.workspaceId = workspaceId;
         this.name = name;
+        this.userId = userId;
     }
 
 
