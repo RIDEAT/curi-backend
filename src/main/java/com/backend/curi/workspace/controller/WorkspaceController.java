@@ -149,12 +149,39 @@ public class WorkspaceController {
             // 업데이트된 작업 공간 정보 반환
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("transactionId", 1134);
-            responseBody.put("workspaceName", existingWorkspace.getName());
-            responseBody.put("workspaceId", existingWorkspace.getWorkspaceId());
+            responseBody.put("name", existingWorkspace.getName());
+            responseBody.put("id", existingWorkspace.getWorkspaceId());
             responseBody.put("emailId", existingWorkspace.getEmail());
            // responseBody.put("createDate", existingWorkspace.getCreateDate());
             responseBody.put("creator", currentUser);
 
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+
+    @DeleteMapping("/{workspaceId}")
+    public ResponseEntity deleteWorkspace(@PathVariable int workspaceId, Authentication authentication) {
+        try {
+            if (authentication == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
+
+            // 작업 공간 삭제 로직 수행
+            workspaceService.deleteWorkspace(workspaceId, currentUser.getUserId());
+
+            // 삭제 성공 응답 반환
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("message", "Workspace deleted successfully");
+            responseBody.put("workspaceId", workspaceId);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (CuriException e) {
             log.error(e.getMessage());

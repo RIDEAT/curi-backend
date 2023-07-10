@@ -79,7 +79,10 @@ Map<String, Object> responseBodyMap= new HashMap<>();
             throw new RuntimeException(e);
         } catch (HttpClientErrorException e){
             log.info(e.getMessage());
-            throw new CuriException(e.getStatusCode(), ErrorType.AUTH_SERVER_ERROR);
+            Map<String, Object> errorBody= new HashMap<>();
+            errorBody.put("error", ErrorType.AUTH_SERVER_ERROR.getMessage());
+
+            return new ResponseEntity(errorBody, HttpStatus.UNAUTHORIZED);
         }
     }
 
