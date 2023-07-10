@@ -20,6 +20,9 @@ public class Workspace {
     @Column
     private String name;
 
+    @Column
+    private String email;
+
     @Column String userId;
 
     public Workspace(){}

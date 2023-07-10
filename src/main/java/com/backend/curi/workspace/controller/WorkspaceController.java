@@ -116,5 +116,53 @@ public class WorkspaceController {
 
     }
 
+    @PutMapping("/{workspaceId}")
+    public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication) {
+        try {
+            if (authentication == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+
+            //workspaceForm 에 대한 유효성 검사
+            if (bindingResult.hasErrors()) {
+                // 유효성 검사 실패한 필드 및 에러 메시지 확인
+                List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+                Map<String, Object> errorBody = new HashMap<>();
+                errorBody.put("error", "폼이 유효하지 않습니다.");
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                return new ResponseEntity<>(errorBody, responseHeaders, HttpStatus.BAD_REQUEST);
+            }
+
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            log.info("User {} is updating workspace {}", currentUser.getUserId(), workspaceId);
+
+            Workspace existingWorkspace = workspaceService.getWorkspaceById(workspaceId);
+
+            // 업데이트할 작업 공간 정보 설정
+            existingWorkspace.setName(workspaceForm.getName());
+            existingWorkspace.setEmail(workspaceForm.getEmail());
+            // ... 다른 업데이트할 필드들 설정
+
+            workspaceService.updateWorkspace(existingWorkspace);
+
+            // 업데이트된 작업 공간 정보 반환
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("transactionId", 1134);
+            responseBody.put("workspaceName", existingWorkspace.getName());
+            responseBody.put("workspaceId", existingWorkspace.getWorkspaceId());
+            responseBody.put("emailId", existingWorkspace.getEmail());
+           // responseBody.put("createDate", existingWorkspace.getCreateDate());
+            responseBody.put("creator", currentUser);
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
 
 }
