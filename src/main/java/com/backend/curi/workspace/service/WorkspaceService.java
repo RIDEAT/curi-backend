@@ -34,7 +34,7 @@ public class WorkspaceService {
         // 하나의 유저가 여러 개의 워크스페이스를 만들 수 있다?
 
 
-        Workspace workspace = Workspace.builder().name(workspaceForm.getName()).userId(userId).build();
+        Workspace workspace = Workspace.builder().name(workspaceForm.getName()).userId(userId).email(workspaceForm.getEmail()).build();
         // workspace db 에 id 가 순서대로 올라가는지 확인해야한다.
         workspaceRepository.save(workspace);
         return workspace.getWorkspaceId();
@@ -46,10 +46,28 @@ public class WorkspaceService {
         //refresh 토큰이 있는지 확인
         Optional<Workspace> workspaceInDB = workspaceRepository.findById(workspaceId);
 
+        if (workspaceInDB.isPresent()){
+            workspaceRepository.save(workspaceInDB.get().update(workspace));
+        } else{
+            throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
+        }
 
-        // 있다면 새토큰 발급후 업데이트
-        // 없다면 새로 만들고 디비 저장
       return 0;
+    }
+
+    public int deleteWorkspace(int workspaceId, String userId){
+
+        Workspace existingWorkspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+
+        if(!existingWorkspace.getUserId().equals(userId)){
+            throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.UNAUTHORIZED_WORKSPACE);
+        }
+        // 작업 공간 삭제
+        workspaceRepository.delete(existingWorkspace);
+
+        return workspaceId;
+
     }
 
 

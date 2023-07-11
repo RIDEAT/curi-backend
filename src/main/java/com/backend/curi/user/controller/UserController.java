@@ -8,6 +8,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -38,6 +43,15 @@ public class UserController {
 
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
+    @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 일어나면 됩니다. ",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
     public ResponseEntity register(HttpServletRequest request, HttpServletResponse response){
         try {
             ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
@@ -79,7 +93,10 @@ Map<String, Object> responseBodyMap= new HashMap<>();
             throw new RuntimeException(e);
         } catch (HttpClientErrorException e){
             log.info(e.getMessage());
-            throw new CuriException(e.getStatusCode(), ErrorType.AUTH_SERVER_ERROR);
+            Map<String, Object> errorBody= new HashMap<>();
+            errorBody.put("error", ErrorType.AUTH_SERVER_ERROR.getMessage());
+
+            return new ResponseEntity(errorBody, HttpStatus.UNAUTHORIZED);
         }
     }
 

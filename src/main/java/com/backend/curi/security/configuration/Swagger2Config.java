@@ -20,12 +20,12 @@ public class Swagger2Config {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .components(new Components()
-                        .addSecuritySchemes("bearer-key",
+                        .addSecuritySchemes("Auth-token",
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .addSecurityItem(securityRequirement)
                 .info(new Info()
-                        .title("Curi Auth API")
-                        .description("Documentation of Curi Auth API")
+                        .title("Curi Backend API")
+                        .description("Documentation of Curi Backend API")
                         .version("1.0")
                 );
 
