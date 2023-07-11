@@ -33,7 +33,7 @@ public class AuthenticationConfig{
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/user").permitAll()
                 .antMatchers("h2-console").permitAll()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .antMatchers("/backend-api-docs/**", "/swagger-ui/**").permitAll()
                 .antMatchers("*").authenticated()
                 .and()
                 .sessionManagement()
