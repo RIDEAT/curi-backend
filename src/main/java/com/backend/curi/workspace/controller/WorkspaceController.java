@@ -8,6 +8,11 @@ import com.backend.curi.user.service.UserService;
 import com.backend.curi.workspace.controller.dto.WorkspaceForm;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +45,15 @@ public class WorkspaceController {
     private final UserService userService;
 
     @GetMapping
+    @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
     public ResponseEntity getList ( Authentication authentication){
         try {
             if (authentication == null) {
@@ -67,6 +81,15 @@ public class WorkspaceController {
 
 
     @PostMapping
+    @Operation(summary = "create workepace", description = "workspace 를 생성합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
     public ResponseEntity createWorkspace (@RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication){
         try{
             if (authentication == null) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
@@ -117,6 +140,15 @@ public class WorkspaceController {
     }
 
     @PutMapping("/{workspaceId}")
+    @Operation(summary = "update workepace", description = "workspace 를 변경합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
     public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication) {
         try {
             if (authentication == null) {
@@ -166,6 +198,15 @@ public class WorkspaceController {
 
 
     @DeleteMapping("/{workspaceId}")
+    @Operation(summary = "delete workepace", description = "workspace 를 삭제합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
     public ResponseEntity deleteWorkspace(@PathVariable int workspaceId, Authentication authentication) {
         try {
             if (authentication == null) {

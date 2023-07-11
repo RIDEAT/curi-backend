@@ -27,10 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.backend.curi.security.configuration.Constants.AUTH_HEADER;
 import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
@@ -55,6 +52,19 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
+
+
+            Cookie[] cookies = request.getCookies();
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    log.info("Name: {}" , cookie.getName());
+                    log.info("value: {}", cookie.getValue());
+
+                }
+            } else log.info("cookie is null");
+
+
             ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
 
             // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
