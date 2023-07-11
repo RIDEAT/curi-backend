@@ -20,6 +20,7 @@ public class Swagger2Config {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .components(new Components()
+                        .addSecuritySchemes("basicAuth", auth)
                         .addSecuritySchemes("Auth-token",
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .addSecurityItem(securityRequirement)

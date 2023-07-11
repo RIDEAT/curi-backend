@@ -53,6 +53,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
+            // h2-console 할 때는 패스!
+            if (request.getRequestURI().startsWith("/swagger-ui") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // h2-console 할 때는 패스!
+            if (request.getRequestURI().startsWith("/backend-api-docs") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
+            log.info(request.getRequestURI());
 
             Cookie[] cookies = request.getCookies();
 
