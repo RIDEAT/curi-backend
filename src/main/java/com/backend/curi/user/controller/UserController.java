@@ -43,7 +43,7 @@ public class UserController {
 
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
-    @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 일어나면 됩니다. ",
+    @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 일어나면 됩니다.",
             parameters = {
                     @Parameter(
                             name = "refreshToken",

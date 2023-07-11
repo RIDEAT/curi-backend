@@ -80,8 +80,8 @@ public class WorkspaceController {
 
 
 
-    @PostMapping
-    @Operation(summary = "create workepace", description = "workspace 를 생성합니다.",
+    @PostMapping(consumes = { "application/json", "application/xml", "application/x-www-form-urlencoded" })
+    @Operation(summary = "create workspace", description = "workspace 를 생성합니다.",
             parameters = {
                     @Parameter(
                             name = "refreshToken",
@@ -139,8 +139,9 @@ public class WorkspaceController {
 
     }
 
-    @PutMapping("/{workspaceId}")
-    @Operation(summary = "update workepace", description = "workspace 를 변경합니다.",
+    @PutMapping(value = "/{workspaceId}",
+            consumes = { "application/json", "application/xml", "application/x-www-form-urlencoded" })
+    @Operation(summary = "update workspace", description = "workspace 를 변경합니다.",
             parameters = {
                     @Parameter(
                             name = "refreshToken",
@@ -198,7 +199,7 @@ public class WorkspaceController {
 
 
     @DeleteMapping("/{workspaceId}")
-    @Operation(summary = "delete workepace", description = "workspace 를 삭제합니다.",
+    @Operation(summary = "delete workspace", description = "workspace 를 삭제합니다.",
             parameters = {
                     @Parameter(
                             name = "refreshToken",
