@@ -31,7 +31,6 @@ public class AuthenticationConfig{
                 .csrf().disable()
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/user").permitAll()
                 .antMatchers("h2-console").permitAll()
                 .antMatchers("/backend-api-docs/**", "/swagger-ui/**").permitAll()
                 .antMatchers("*").authenticated()

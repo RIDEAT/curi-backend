@@ -5,6 +5,7 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
+import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.controller.dto.WorkspaceForm;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
@@ -30,10 +31,7 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ import java.util.Optional;
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
-    private final UserService userService;
+    private final UserworkspaceService userworkspaceService;
 
     @GetMapping
     @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.",
@@ -64,9 +62,11 @@ public class WorkspaceController {
 
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
             String userId = currentUser.getUserId();
-            List<Workspace> workspaces = workspaceService.getWorkspacesByUserId(userId);
-            if (workspaces.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
-            responseBody.put("list", workspaces);
+            List<Integer> workspaceIdList = userworkspaceService.getWorkspaceIdListByUserId(userId);
+            if (workspaceIdList.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
+
+
+            responseBody.put("list", convertToWorkspace(workspaceIdList));
 
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (CuriException e) {
@@ -74,7 +74,7 @@ public class WorkspaceController {
             Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", e.getMessage());
 
-            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
         }
     }
 
@@ -109,6 +109,7 @@ public class WorkspaceController {
             log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
 
             int workspaceId = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
+            userworkspaceService.create (currentUser.getUserId(), workspaceId);
 
             //userdb , workspace db 에 둘다 추가해줘야 합니다.
             //userId 에 대한 정보를 authentication 에서 얻어야 한다.
@@ -121,20 +122,20 @@ public class WorkspaceController {
 
 
 
-            return new ResponseEntity(responseBody,HttpStatus.ACCEPTED);
+            return new ResponseEntity(responseBody,HttpStatus.CREATED);
 
         } catch (CuriException e){
             log.error(e.getMessage());
             Map<String, Object> errorBody= new HashMap<>();
             errorBody.put("error", e.getMessage());
 
-            return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity(errorBody, e.getHttpStatus());
         } catch (HttpClientErrorException e){
             log.info(e.getMessage());
             Map<String, Object> errorBody= new HashMap<>();
             errorBody.put("error", e.getMessage());
 
-            return new ResponseEntity(errorBody, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity(errorBody, e.getStatusCode());
         }
 
     }
@@ -170,7 +171,15 @@ public class WorkspaceController {
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
             log.info("User {} is updating workspace {}", currentUser.getUserId(), workspaceId);
 
+
+            // 수정 권한이 있는 사람만 확인하는 로직
+            if (!userworkspaceService.exist(currentUser.getUserId(), workspaceId)) {
+                throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
+            }
+
+
             Workspace existingWorkspace = workspaceService.getWorkspaceById(workspaceId);
+
 
             // 업데이트할 작업 공간 정보 설정
             existingWorkspace.setName(workspaceForm.getName());
@@ -193,7 +202,7 @@ public class WorkspaceController {
             log.error(e.getMessage());
             Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", e.getMessage());
-            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
         }
     }
 
@@ -215,10 +224,17 @@ public class WorkspaceController {
             }
 
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+
+            // 수정 권한이 있는 사람만 확인하는 로직
+            if (!userworkspaceService.exist(currentUser.getUserId(), workspaceId)) {
+                throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
+            }
+
             log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
 
             // 작업 공간 삭제 로직 수행
             workspaceService.deleteWorkspace(workspaceId, currentUser.getUserId());
+            userworkspaceService.delete(currentUser.getUserId(), workspaceId);
 
             // 삭제 성공 응답 반환
             Map<String, Object> responseBody = new HashMap<>();
@@ -229,9 +245,19 @@ public class WorkspaceController {
             log.error(e.getMessage());
             Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", e.getMessage());
-            return new ResponseEntity<>(errorBody, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
         }
     }
+
+    private List<Workspace> convertToWorkspace(List<Integer> workspaceIdList){
+        List<Workspace> workspaceList = new ArrayList<>();
+        for (Integer workspaceId : workspaceIdList){
+            workspaceList.add(workspaceService.getWorkspaceById(workspaceId));
+        }
+        return workspaceList;
+    }
+
+
 
 
 }

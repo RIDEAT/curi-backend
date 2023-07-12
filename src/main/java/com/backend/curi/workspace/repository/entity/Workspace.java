@@ -23,14 +23,12 @@ public class Workspace {
     @Column
     private String email;
 
-    @Column String userId;
 
     public Workspace(){}
     @Builder
-    public Workspace(int workspaceId, String name, String userId, String email){
+    public Workspace(int workspaceId, String name, String email){
         this.workspaceId = workspaceId;
         this.name = name;
-        this.userId = userId;
         this.email = email;
     }
 
@@ -38,7 +36,6 @@ public class Workspace {
         this.workspaceId = workspace.getWorkspaceId();
         this.name = workspace.getName();
         this.email= workspace.getEmail();
-        this.userId = workspace.getUserId();
         return this;
     }
 

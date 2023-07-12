@@ -17,11 +17,6 @@ import java.util.Optional;
 public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
 
-
-    public List<Workspace> getWorkspacesByUserId(String userId){
-        return workspaceRepository.findAllByUserId(userId);
-    }
-
     public Workspace getWorkspaceById(int workspaceId){
         return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
@@ -34,7 +29,8 @@ public class WorkspaceService {
         // 하나의 유저가 여러 개의 워크스페이스를 만들 수 있다?
 
 
-        Workspace workspace = Workspace.builder().name(workspaceForm.getName()).userId(userId).email(workspaceForm.getEmail()).build();
+
+        Workspace workspace = Workspace.builder().name(workspaceForm.getName()).email(workspaceForm.getEmail()).build();
         // workspace db 에 id 가 순서대로 올라가는지 확인해야한다.
         workspaceRepository.save(workspace);
         return workspace.getWorkspaceId();
@@ -60,9 +56,10 @@ public class WorkspaceService {
         Workspace existingWorkspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
 
+        /*
         if(!existingWorkspace.getUserId().equals(userId)){
             throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
+        }*/
         // 작업 공간 삭제
         workspaceRepository.delete(existingWorkspace);
 

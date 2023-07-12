@@ -2,8 +2,14 @@ package com.backend.curi.user.controller;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.controller.dto.UserForm;
+import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
+import com.backend.curi.userworkspace.repository.entity.Userworkspace;
+import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +22,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +33,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 
@@ -40,10 +44,10 @@ import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 public class UserController {
 
     private final UserService userService;
+    private final UserworkspaceService userworkspaceService;
 
-    // 회원가입 하고 보내야함 . 유저 디비에 등록
-    @PostMapping
-    @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 일어나면 됩니다.",
+    @GetMapping(value = "/{workspaceId}")
+    @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.",
             parameters = {
                     @Parameter(
                             name = "refreshToken",
@@ -52,51 +56,160 @@ public class UserController {
                     )
             })
     @SecurityRequirement(name = "Auth-token")
-    public ResponseEntity register(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity getUserList(@PathVariable int workspaceId, Authentication authentication) {
         try {
-            ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
-            String responseBody = responseEntity.getBody();
-            log.info(responseBody);
+            if (authentication == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("transactionId", 11);
 
-            // Parse the responseBody JSON string
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            String userId = currentUser.getUserId();
+            //String userEmail = currentUser.getUserEmail();
 
-// Extract userEmail and userId
-            String userEmail = jsonNode.get("userEmail").asText();
-            String userId = jsonNode.get("userId").asText();
+            List<String> userIdList = userworkspaceService.getUserIdListByWorkspaceId(workspaceId);
 
-// Use userEmail and userId as needed
-            log.info("User Email: {}", userEmail);
-            log.info("User ID: {}", userId);
-            // 이후에 response body 에서 userId, email 꺼내서 저장해야함.
+            if (!userIdList.contains(userId)) {
+                throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
+            }
+
+            // 비웠을 때는 따로 예외처리 해주어야 하나.
+            // 헤더에 auth 토큰 넣어야 하는데.
+
+            List<User_> userList = convertToUser(userIdList);
+            responseBody.put("user list", userList);
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
+        }
+
+    }
+
+
+    // 회원가입 하고 보내야함 . 유저 디비에 등록
+    @PostMapping
+    @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 자동로그인하고 일어나는 게 좋을듯!",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
+    public ResponseEntity register(Authentication authentication, @RequestBody UserForm userForm, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            String userId = currentUser.getUserId();
+            String userEmail = userForm.getEmail();
+
 
             userService.dbStore(userId, userEmail);
 
-            
-Map<String, Object> responseBodyMap= new HashMap<>();
+
+            Map<String, Object> responseBodyMap = new HashMap<>();
             responseBodyMap.put("userId", userId);
             responseBodyMap.put("userEmail", userEmail);
 
-            return new ResponseEntity(responseBodyMap, responseEntity.getHeaders(), HttpStatus.ACCEPTED);
 
-        } catch(CuriException e){
+            return new ResponseEntity(responseBodyMap, HttpStatus.ACCEPTED);
+
+        } catch (CuriException e) {
 
             log.info(e.getMessage());
-            Map<String, Object> errorBody= new HashMap<>();
+            Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", e.getMessage());
 
             return new ResponseEntity(errorBody, e.getHttpStatus());
-        } catch (JsonMappingException e) {
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             log.info(e.getMessage());
-            Map<String, Object> errorBody= new HashMap<>();
+            Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", ErrorType.AUTH_SERVER_ERROR.getMessage());
 
             return new ResponseEntity(errorBody, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PutMapping(value = "/{userId}")
+    @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
+    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserForm userForm) {
+        try {
+            User_ existingUser = userService.getUserByUserId(userId);
+
+            if (existingUser == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+
+            // Update the necessary fields of the existing user
+
+            existingUser.setEmail(userForm.getEmail());
+
+            User_ updatedUser = userService.updateUser(existingUser);
+
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
+        }
+    }
+
+    @DeleteMapping(value = "/{userId}")
+    @Operation(summary = "delete user", description = "유저를 삭제합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "refreshToken",
+                            in = ParameterIn.COOKIE,
+                            schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "userId",
+                            in = ParameterIn.PATH,
+                            description = "삭제할 유저의 ID",
+                            schema = @Schema(implementation = String.class)
+                    )
+            })
+    @SecurityRequirement(name = "Auth-token")
+    public ResponseEntity deleteUser(@PathVariable String userId, Authentication authentication) {
+        try {
+            User_ existingUser = userService.getUserByUserId(userId);
+
+            if (existingUser == null) {
+                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
+            }
+
+
+            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+            String currentUserUserId = currentUser.getUserId();
+            //String userEmail = currentUser.getUserEmail();
+
+            if (!currentUserUserId.equals(userId)) throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_USER);
+
+            userService.deleteUser(existingUser);
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("message", "User deleted successfully.");
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return new ResponseEntity<>(errorBody, e.getHttpStatus());
         }
     }
 
@@ -118,6 +231,14 @@ Map<String, Object> responseBodyMap= new HashMap<>();
         ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
 
         return responseEntity;
+    }
+
+    private List<User_> convertToUser(List<String> userIdList) {
+        List<User_> userList = new ArrayList<>();
+        for (String userId : userIdList) {
+            userList.add(userService.getUserByUserId(userId));
+        }
+        return userList;
     }
 
 
