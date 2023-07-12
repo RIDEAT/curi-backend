@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CurrentUser {
-    String email, userId, newAuthToken;
+    String userEmail, userId, newAuthToken;
 
 }

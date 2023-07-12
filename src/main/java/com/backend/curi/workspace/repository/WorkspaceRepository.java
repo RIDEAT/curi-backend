@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Integer> {
-    List<Workspace> findAllByUserId(String userId);
     Optional<Workspace> findByName(String name);
 }
 

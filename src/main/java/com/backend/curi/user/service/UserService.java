@@ -15,9 +15,22 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
+    public User_ getUserByUserId(String userId){
+        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+    }
     public String getEmailByUserId (String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getEmail();
     }
+
+    public User_ updateUser(User_ user){
+        User_ updatedUser = userRepository.save(user);
+        return updatedUser;
+    }
+
+    public void deleteUser(User_ user){
+        userRepository.delete(user);
+    }
+
 
     public void dbStore (String userId, String email) {
         // 이미 유저가 있는 경우는 빼야하나?

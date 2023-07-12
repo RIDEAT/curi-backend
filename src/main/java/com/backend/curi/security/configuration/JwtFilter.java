@@ -4,6 +4,7 @@ package com.backend.curi.security.configuration;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,17 +37,11 @@ import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            // user 등록할 때는 패스~
-            if ("/user".equals(request.getRequestURI()) && request.getMethod().equals("POST")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
             // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/h2-console")){
                 filterChain.doFilter(request, response);
@@ -82,6 +77,9 @@ public class JwtFilter extends OncePerRequestFilter {
             // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
 
             String responseBody = responseEntity.getBody();
+
+            // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
+            response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
             log.info(responseBody);
 
             // Parse the responseBody JSON string
@@ -90,10 +88,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // Extract userId
             String userId = jsonNode.get("userId").asText();
+            //String userEmail = jsonNode.get("userEmail").asText();
 
 
             CurrentUser currentUser = new CurrentUser();
             currentUser.setUserId(userId);
+            currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
             // 여기에 security context 인증 정보 넣어야 할지도 .

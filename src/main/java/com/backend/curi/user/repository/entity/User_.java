@@ -16,8 +16,6 @@ public class User_ {
     @Column
     private String email;
 
-    // workspaceId 는 자연수이다.
-    // workspaceId 가 0 인 경우, workspaceId를 아직 할당하지 못한 경우이다.
 
     public User_(){}
 
