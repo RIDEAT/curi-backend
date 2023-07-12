@@ -10,4 +10,6 @@ import lombok.Setter;
 public class CurrentUser {
     String userEmail, userId, newAuthToken;
 
+    public CurrentUser(){}
+
 }
