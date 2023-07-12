@@ -62,6 +62,11 @@ public class WorkspaceController {
 
             CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
             String userId = currentUser.getUserId();
+
+            Map<String, Object> user = new HashMap<>();
+            user.put("id", userId);
+            responseBody.put("user", user);
+
             List<Integer> workspaceIdList = userworkspaceService.getWorkspaceIdListByUserId(userId);
             if (workspaceIdList.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
 
@@ -114,12 +119,17 @@ public class WorkspaceController {
             //userdb , workspace db 에 둘다 추가해줘야 합니다.
             //userId 에 대한 정보를 authentication 에서 얻어야 한다.
             //바디에 userId, workspaceId 를 담아서 리턴합니다.
-            Map<String, Object> responseBody= new HashMap<>();
+            Map<String, Object> responseBody = new HashMap<>();
 
-            responseBody.put("userId", currentUser.getUserId());
-            responseBody.put("workspaceId", workspaceId);
-            responseBody.put("workspaceName", workspaceForm.getName());
+            Map<String, Object> creator = new HashMap<>();
+            creator.put("id", currentUser.getUserId());
 
+            Map<String, Object> workspace = new HashMap<>();
+            workspace.put("id", workspaceId);
+            workspace.put("name", workspaceForm.getName());
+
+            responseBody.put("creator", creator);
+            responseBody.put("workspace", workspace);
 
 
             return new ResponseEntity(responseBody,HttpStatus.CREATED);
