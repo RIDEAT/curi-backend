@@ -1,8 +1,11 @@
 package com.backend.curi.userworkspace.service;
 
+import com.backend.curi.exception.CuriException;
+import com.backend.curi.exception.ErrorType;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.userworkspace.repository.UserworkspaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +21,16 @@ public class UserworkspaceService {
     }
 
     public List<Integer> getWorkspaceIdListByUserId(String userId) {
-        List<Userworkspace> userworkspaceList = userworkspaceRepository.findAllByUserId(userId);
-        return userworkspaceList.stream().map(Userworkspace::getWorkspaceId).collect(Collectors.toList());
+        var workspaceIdList = userworkspaceRepository
+                .findAllByUserId(userId)
+                .stream()
+                .map(Userworkspace::getWorkspaceId)
+                .collect(Collectors.toList());
+
+        if (workspaceIdList.isEmpty())
+            throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
+
+        return workspaceIdList;
     }
 
     public List<Integer> getWorkspaceIdListByUserEmails(String userEmail){
@@ -28,7 +39,8 @@ public class UserworkspaceService {
     }
 
     public List<String> getUserIdListByWorkspaceId(int workspaceId){
-        List<Userworkspace> userworkspaceList = userworkspaceRepository.findAllByWorkspaceId(workspaceId);
+        var userworkspaceList = userworkspaceRepository.findAllByWorkspaceId(workspaceId);
+
         return userworkspaceList.stream().map(Userworkspace::getUserId).collect(Collectors.toList());
     }
 

@@ -57,37 +57,26 @@ public class UserController {
             })
     @SecurityRequirement(name = "Auth-token")
     public ResponseEntity getUserList(@PathVariable int workspaceId, Authentication authentication) {
-        try {
-            if (authentication == null) {
-                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-            }
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("transactionId", 11);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("transactionId", 11);
 
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-            String userId = currentUser.getUserId();
-            //String userEmail = currentUser.getUserEmail();
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        String userId = currentUser.getUserId();
+        //String userEmail = currentUser.getUserEmail();
 
-            List<String> userIdList = userworkspaceService.getUserIdListByWorkspaceId(workspaceId);
+        List<String> userIdList = userworkspaceService.getUserIdListByWorkspaceId(workspaceId);
 
-            if (!userIdList.contains(userId)) {
-                throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-            }
-
-            // 비웠을 때는 따로 예외처리 해주어야 하나.
-            // 헤더에 auth 토큰 넣어야 하는데.
-
-            List<User_> userList = convertToUser(userIdList);
-            responseBody.put("user list", userList);
-
-            return new ResponseEntity<>(responseBody, HttpStatus.OK);
-        } catch (CuriException e) {
-            log.error(e.getMessage());
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", e.getMessage());
-            return new ResponseEntity<>(errorBody, e.getHttpStatus());
+        if (!userIdList.contains(userId)) {
+            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
+        // 비웠을 때는 따로 예외처리 해주어야 하나.
+        // 헤더에 auth 토큰 넣어야 하는데.
+
+        List<User_> userList = convertToUser(userIdList);
+        responseBody.put("user list", userList);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
 
@@ -103,36 +92,20 @@ public class UserController {
             })
     @SecurityRequirement(name = "Auth-token")
     public ResponseEntity register(Authentication authentication, @RequestBody UserForm userForm, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-            String userId = currentUser.getUserId();
-            String userEmail = userForm.getEmail();
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        String userId = currentUser.getUserId();
+        String userEmail = userForm.getEmail();
 
 
-            userService.dbStore(userId, userEmail);
+        userService.dbStore(userId, userEmail);
 
 
-            Map<String, Object> responseBodyMap = new HashMap<>();
-            responseBodyMap.put("userId", userId);
-            responseBodyMap.put("userEmail", userEmail);
+        Map<String, Object> responseBodyMap = new HashMap<>();
+        responseBodyMap.put("userId", userId);
+        responseBodyMap.put("userEmail", userEmail);
 
 
-            return new ResponseEntity(responseBodyMap, HttpStatus.ACCEPTED);
-
-        } catch (CuriException e) {
-
-            log.info(e.getMessage());
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", e.getMessage());
-
-            return new ResponseEntity(errorBody, e.getHttpStatus());
-        } catch (HttpClientErrorException e) {
-            log.info(e.getMessage());
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", ErrorType.AUTH_SERVER_ERROR.getMessage());
-
-            return new ResponseEntity(errorBody, HttpStatus.UNAUTHORIZED);
-        }
+        return new ResponseEntity(responseBodyMap, HttpStatus.ACCEPTED);
     }
 
     @PutMapping(value = "/{userId}")
@@ -146,26 +119,15 @@ public class UserController {
             })
     @SecurityRequirement(name = "Auth-token")
     public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserForm userForm) {
-        try {
-            User_ existingUser = userService.getUserByUserId(userId);
+        User_ existingUser = userService.getUserByUserId(userId);
 
-            if (existingUser == null) {
-                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-            }
+        // Update the necessary fields of the existing user
 
-            // Update the necessary fields of the existing user
+        existingUser.setEmail(userForm.getEmail());
 
-            existingUser.setEmail(userForm.getEmail());
+        User_ updatedUser = userService.updateUser(existingUser);
 
-            User_ updatedUser = userService.updateUser(existingUser);
-
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } catch (CuriException e) {
-            log.error(e.getMessage());
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", e.getMessage());
-            return new ResponseEntity<>(errorBody, e.getHttpStatus());
-        }
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{userId}")
@@ -185,52 +147,21 @@ public class UserController {
             })
     @SecurityRequirement(name = "Auth-token")
     public ResponseEntity deleteUser(@PathVariable String userId, Authentication authentication) {
-        try {
-            User_ existingUser = userService.getUserByUserId(userId);
+        User_ existingUser = userService.getUserByUserId(userId);
 
-            if (existingUser == null) {
-                throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS);
-            }
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        String currentUserUserId = currentUser.getUserId();
+        //String userEmail = currentUser.getUserEmail();
 
+        if (!currentUserUserId.equals(userId))
+            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_USER);
 
-            CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-            String currentUserUserId = currentUser.getUserId();
-            //String userEmail = currentUser.getUserEmail();
+        userService.deleteUser(existingUser);
 
-            if (!currentUserUserId.equals(userId)) throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_USER);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "User deleted successfully.");
 
-            userService.deleteUser(existingUser);
-
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("message", "User deleted successfully.");
-
-            return new ResponseEntity<>(responseBody, HttpStatus.OK);
-        } catch (CuriException e) {
-            log.error(e.getMessage());
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", e.getMessage());
-            return new ResponseEntity<>(errorBody, e.getHttpStatus());
-        }
-    }
-
-
-    private ResponseEntity communicateWithAuthServer(HttpServletRequest request) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(AUTH_SERVER.concat("/auth/authorize"));
-        HttpHeaders requestHeaders = new HttpHeaders();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            requestHeaders.add(headerName, headerValue);
-        }
-        RequestEntity<Void> requestEntity = new RequestEntity<>(requestHeaders, httpMethod, requestUri);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
-
-        return responseEntity;
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     private List<User_> convertToUser(List<String> userIdList) {
@@ -240,7 +171,6 @@ public class UserController {
         }
         return userList;
     }
-
 
 
 }
