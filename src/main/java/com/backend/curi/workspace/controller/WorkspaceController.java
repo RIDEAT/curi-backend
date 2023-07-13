@@ -42,15 +42,7 @@ public class WorkspaceController {
     private final UserworkspaceService userworkspaceService;
 
     @GetMapping
-    @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.",
-            parameters = {
-                    @Parameter(
-                            name = "refreshToken",
-                            in = ParameterIn.COOKIE,
-                            schema = @Schema(implementation = String.class)
-                    )
-            })
-    @SecurityRequirement(name = "Auth-token")
+    @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.")
     public ResponseEntity getList(Authentication authentication) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("transactionId", 11);
@@ -72,15 +64,7 @@ public class WorkspaceController {
 
 
     @PostMapping(consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
-    @Operation(summary = "create workspace", description = "workspace 를 생성합니다.",
-            parameters = {
-                    @Parameter(
-                            name = "refreshToken",
-                            in = ParameterIn.COOKIE,
-                            schema = @Schema(implementation = String.class)
-                    )
-            })
-    @SecurityRequirement(name = "Auth-token")
+    @Operation(summary = "create workspace", description = "workspace 를 생성합니다.")
     public ResponseEntity createWorkspace(@RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication) {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
@@ -110,15 +94,7 @@ public class WorkspaceController {
 
     @PutMapping(value = "/{workspaceId}",
             consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
-    @Operation(summary = "update workspace", description = "workspace 를 변경합니다.",
-            parameters = {
-                    @Parameter(
-                            name = "refreshToken",
-                            in = ParameterIn.COOKIE,
-                            schema = @Schema(implementation = String.class)
-                    )
-            })
-    @SecurityRequirement(name = "Auth-token")
+    @Operation(summary = "update workspace", description = "workspace 를 변경합니다.")
     public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication) {
 
 
@@ -156,15 +132,7 @@ public class WorkspaceController {
 
 
     @DeleteMapping("/{workspaceId}")
-    @Operation(summary = "delete workspace", description = "workspace 를 삭제합니다.",
-            parameters = {
-                    @Parameter(
-                            name = "refreshToken",
-                            in = ParameterIn.COOKIE,
-                            schema = @Schema(implementation = String.class)
-                    )
-            })
-    @SecurityRequirement(name = "Auth-token")
+    @Operation(summary = "delete workspace", description = "workspace 를 삭제합니다.")
     public ResponseEntity deleteWorkspace(@PathVariable int workspaceId, Authentication authentication) {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
