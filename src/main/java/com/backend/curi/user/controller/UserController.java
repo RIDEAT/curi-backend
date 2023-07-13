@@ -3,22 +3,13 @@ package com.backend.curi.user.controller;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.user.controller.dto.UserForm;
+import com.backend.curi.user.controller.dto.UserRequest;
+import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
-import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workspace.repository.entity.Workspace;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -29,15 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import java.net.URI;
 import java.util.*;
 
-import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
-
-@Controller
+@RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -75,26 +60,20 @@ public class UserController {
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
     @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 자동로그인하고 일어나는 게 좋을듯!")
-    public ResponseEntity register(Authentication authentication, @RequestBody UserForm userForm, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity register(Authentication authentication, @RequestBody UserRequest userForm, HttpServletRequest request, HttpServletResponse response) {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         String userId = currentUser.getUserId();
         String userEmail = userForm.getEmail();
 
 
-        userService.dbStore(userId, userEmail);
+        UserResponse userResponse = userService.dbStore(userId, userEmail);
 
-
-        Map<String, Object> responseBodyMap = new HashMap<>();
-        responseBodyMap.put("userId", userId);
-        responseBodyMap.put("userEmail", userEmail);
-
-
-        return new ResponseEntity(responseBodyMap, HttpStatus.ACCEPTED);
+        return new ResponseEntity(userResponse, HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{userId}")
     @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
-    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserForm userForm) {
+    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserRequest userForm) {
         User_ existingUser = userService.getUserByUserId(userId);
 
         // Update the necessary fields of the existing user

@@ -15,12 +15,10 @@ public class UserResponse {
 
     private String id;
     private String email;
-    private Date createdAt;
 
     @Builder
-    public UserResponse(String id, String email, Date createdAt){
+    public UserResponse(String id, String email){
         this.id = id;
         this.email = email;
-        this.createdAt = createdAt;
     }
 }
