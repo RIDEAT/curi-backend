@@ -164,26 +164,6 @@ public class UserController {
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
-
-    private ResponseEntity communicateWithAuthServer(HttpServletRequest request) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(AUTH_SERVER.concat("/auth/authorize"));
-        HttpHeaders requestHeaders = new HttpHeaders();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            requestHeaders.add(headerName, headerValue);
-        }
-        RequestEntity<Void> requestEntity = new RequestEntity<>(requestHeaders, httpMethod, requestUri);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
-
-        return responseEntity;
-    }
-
     private List<User_> convertToUser(List<String> userIdList) {
         List<User_> userList = new ArrayList<>();
         for (String userId : userIdList) {

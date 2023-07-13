@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -82,17 +81,7 @@ public class WorkspaceController {
                     )
             })
     @SecurityRequirement(name = "Auth-token")
-    public ResponseEntity createWorkspace(@RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication) {
-        //workspaceForm 에 대한 유효성 검사
-        if (bindingResult.hasErrors()) {
-            // 유효성 검사 실패한 필드 및 에러 메시지 확인
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", "폼이 유효하지 않습니다.");
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            return new ResponseEntity<>(errorBody, responseHeaders, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity createWorkspace(@RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication) {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
@@ -130,18 +119,8 @@ public class WorkspaceController {
                     )
             })
     @SecurityRequirement(name = "Auth-token")
-    public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, BindingResult bindingResult, Authentication authentication) {
+    public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication) {
 
-        //workspaceForm 에 대한 유효성 검사
-        if (bindingResult.hasErrors()) {
-            // 유효성 검사 실패한 필드 및 에러 메시지 확인
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            Map<String, Object> errorBody = new HashMap<>();
-            errorBody.put("error", "폼이 유효하지 않습니다.");
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            return new ResponseEntity<>(errorBody, responseHeaders, HttpStatus.BAD_REQUEST);
-        }
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("User {} is updating workspace {}", currentUser.getUserId(), workspaceId);
