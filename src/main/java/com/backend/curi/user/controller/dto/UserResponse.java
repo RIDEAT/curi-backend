@@ -1,24 +1,23 @@
 package com.backend.curi.user.controller.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.backend.curi.user.repository.entity.User_;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class UserResponse {
-
+    private String status;
     private String id;
     private String email;
 
-    @Builder
-    public UserResponse(String id, String email){
-        this.id = id;
-        this.email = email;
+    public static UserResponse ofSuccess(User_ user) {
+        return new UserResponse("success",
+                user.getUserId(),
+                user.getEmail());
     }
 }
