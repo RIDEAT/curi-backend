@@ -1,35 +1,42 @@
 package com.backend.curi.userworkspace.repository.entity;
 
+import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.user.repository.entity.User_;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
 @Entity
-public class Userworkspace {
+@NoArgsConstructor
+public class Userworkspace extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userworkspaceId;
+    private Long id;
 
-    @Column
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User_ user;
+    @Column (nullable = false, updatable = false)
+    String userEmail;
 
-    @Column String userEmail;
-
-    @Column
-    private int workspaceId;
-
-    public Userworkspace() {}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id",nullable = false, updatable = false)
+    private Workspace workspace;
 
     @Builder
-    public Userworkspace(int userworkspaceId, String userId, String userEmail, int workspaceId){
-        this.userworkspaceId = userworkspaceId;
-        this.userId = userId;
+    public Userworkspace(Long id, User_ user, String userEmail, Workspace workspace){
+        this.id = id;
+        this.user = user;
         this.userEmail = userEmail;
-        this.workspaceId = workspaceId;
+        this.workspace = workspace;
     }
 
+    public void setUser(User_ user){
+        this.user = user;
+    }
 }

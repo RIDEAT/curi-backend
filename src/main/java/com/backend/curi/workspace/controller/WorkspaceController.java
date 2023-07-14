@@ -4,6 +4,7 @@ package com.backend.curi.workspace.controller;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.controller.dto.WorkspaceForm;
@@ -38,6 +39,7 @@ import java.util.*;
 @RequestMapping("/workspace")
 public class WorkspaceController {
 
+    private final UserService userService;
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
@@ -57,15 +59,10 @@ public class WorkspaceController {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         String userId = currentUser.getUserId();
+        var user = userService.getUserByUserId(userId);
+        List<Workspace> workspaceList = userworkspaceService.getWorkspaceListByUser(user);
 
-        Map<String, Object> user = new HashMap<>();
-        user.put("id", userId);
-        responseBody.put("user", user);
-
-        List<Integer> workspaceIdList = userworkspaceService.getWorkspaceIdListByUserId(userId);
-
-
-        responseBody.put("list", convertToWorkspace(workspaceIdList));
+        responseBody.put("list", workspaceList);
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
@@ -86,22 +83,16 @@ public class WorkspaceController {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
 
-        int workspaceId = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
-        userworkspaceService.create(currentUser.getUserId(), workspaceId);
+        var user = userService.getUserByUserId(currentUser.getUserId());
+        var workspace = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
+        userworkspaceService.create(user, workspace);
 
         //userdb , workspace db 에 둘다 추가해줘야 합니다.
         //userId 에 대한 정보를 authentication 에서 얻어야 한다.
         //바디에 userId, workspaceId 를 담아서 리턴합니다.
         Map<String, Object> responseBody = new HashMap<>();
 
-        Map<String, Object> creator = new HashMap<>();
-        creator.put("id", currentUser.getUserId());
-
-        Map<String, Object> workspace = new HashMap<>();
-        workspace.put("id", workspaceId);
-        workspace.put("name", workspaceForm.getName());
-
-        responseBody.put("creator", creator);
+        responseBody.put("creator", user);
         responseBody.put("workspace", workspace);
 
 
@@ -125,29 +116,28 @@ public class WorkspaceController {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("User {} is updating workspace {}", currentUser.getUserId(), workspaceId);
 
+        var user = userService.getUserByUserId(currentUser.getUserId());
+        var workspace = workspaceService.getWorkspaceById(workspaceId);
 
         // 수정 권한이 있는 사람만 확인하는 로직
-        if (!userworkspaceService.exist(currentUser.getUserId(), workspaceId)) {
+        if (!userworkspaceService.exist(user, workspace)) {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
 
-        Workspace existingWorkspace = workspaceService.getWorkspaceById(workspaceId);
-
-
         // 업데이트할 작업 공간 정보 설정
-        existingWorkspace.setName(workspaceForm.getName());
-        existingWorkspace.setEmail(workspaceForm.getEmail());
+        workspace.setName(workspaceForm.getName());
+        workspace.setEmail(workspaceForm.getEmail());
         // ... 다른 업데이트할 필드들 설정
 
-        workspaceService.updateWorkspace(existingWorkspace);
+        workspaceService.updateWorkspace(workspace);
 
         // 업데이트된 작업 공간 정보 반환
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("transactionId", 1134);
-        responseBody.put("name", existingWorkspace.getName());
-        responseBody.put("id", existingWorkspace.getWorkspaceId());
-        responseBody.put("emailId", existingWorkspace.getEmail());
+        responseBody.put("name", workspace.getName());
+        responseBody.put("id", workspace.getWorkspaceId());
+        responseBody.put("emailId", workspace.getEmail());
         // responseBody.put("createDate", existingWorkspace.getCreateDate());
         responseBody.put("creator", currentUser);
 
@@ -169,8 +159,11 @@ public class WorkspaceController {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
 
+        var user = userService.getUserByUserId(currentUser.getUserId());
+        var workspace = workspaceService.getWorkspaceById(workspaceId);
+
         // 수정 권한이 있는 사람만 확인하는 로직
-        if (!userworkspaceService.exist(currentUser.getUserId(), workspaceId)) {
+        if (!userworkspaceService.exist(user, workspace)) {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
@@ -178,7 +171,7 @@ public class WorkspaceController {
 
         // 작업 공간 삭제 로직 수행
         workspaceService.deleteWorkspace(workspaceId, currentUser.getUserId());
-        userworkspaceService.delete(currentUser.getUserId(), workspaceId);
+        userworkspaceService.delete(user, workspace);
 
         // 삭제 성공 응답 반환
         Map<String, Object> responseBody = new HashMap<>();

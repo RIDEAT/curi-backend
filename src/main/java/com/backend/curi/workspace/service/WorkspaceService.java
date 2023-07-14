@@ -20,7 +20,7 @@ public class WorkspaceService {
     public Workspace getWorkspaceById(int workspaceId){
         return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
-    public int createWorkspace(WorkspaceForm workspaceForm, String userId){
+    public Workspace createWorkspace(WorkspaceForm workspaceForm, String userId){
         // 이름 중복 검사
         if(workspaceRepository.findByName(workspaceForm.getName()).isPresent()){
             throw new CuriException(HttpStatus.CONFLICT, ErrorType.DUPLICATED_WORKSPACE_NAME);
@@ -33,7 +33,7 @@ public class WorkspaceService {
         Workspace workspace = Workspace.builder().name(workspaceForm.getName()).email(workspaceForm.getEmail()).build();
         // workspace db 에 id 가 순서대로 올라가는지 확인해야한다.
         workspaceRepository.save(workspace);
-        return workspace.getWorkspaceId();
+        return workspace;
     }
 
     public int updateWorkspace (Workspace workspace){

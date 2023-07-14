@@ -10,6 +10,7 @@ import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.repository.entity.Workspace;
+import com.backend.curi.workspace.service.WorkspaceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +44,7 @@ import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 @RequestMapping("/user")
 public class UserController {
 
+    private final WorkspaceService workspaceService;
     private final UserService userService;
     private final UserworkspaceService userworkspaceService;
 
@@ -64,16 +66,17 @@ public class UserController {
         String userId = currentUser.getUserId();
         //String userEmail = currentUser.getUserEmail();
 
-        List<String> userIdList = userworkspaceService.getUserIdListByWorkspaceId(workspaceId);
+        var user = userService.getUserByUserId(userId);
+        var workspace = workspaceService.getWorkspaceById(workspaceId);
+        List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
 
-        if (!userIdList.contains(userId)) {
+        if (!userList.contains(user)) {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
         // 비웠을 때는 따로 예외처리 해주어야 하나.
         // 헤더에 auth 토큰 넣어야 하는데.
 
-        List<User_> userList = convertToUser(userIdList);
         responseBody.put("user list", userList);
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
