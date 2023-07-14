@@ -39,9 +39,7 @@ import java.util.*;
 @RequestMapping("/workspace")
 public class WorkspaceController {
 
-    private final UserService userService;
     private final WorkspaceService workspaceService;
-    private final UserworkspaceService userworkspaceService;
 
     @GetMapping
     @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.",
@@ -58,10 +56,7 @@ public class WorkspaceController {
         responseBody.put("transactionId", 11);
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-        String userId = currentUser.getUserId();
-        var user = userService.getUserByUserId(userId);
-        List<Workspace> workspaceList = userworkspaceService.getWorkspaceListByUser(user);
-
+        var workspaceList = workspaceService.getWorkspaceList(currentUser);
         responseBody.put("list", workspaceList);
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
@@ -83,16 +78,13 @@ public class WorkspaceController {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("current User Id {} make workspace {}", currentUser.getUserId(), workspaceForm.getName());
 
-        var user = userService.getUserByUserId(currentUser.getUserId());
-        var workspace = workspaceService.createWorkspace(workspaceForm, currentUser.getUserId());
-        userworkspaceService.create(user, workspace);
+        var workspace = workspaceService.createWorkspace(workspaceForm, currentUser);
 
         //userdb , workspace db 에 둘다 추가해줘야 합니다.
         //userId 에 대한 정보를 authentication 에서 얻어야 한다.
         //바디에 userId, workspaceId 를 담아서 리턴합니다.
         Map<String, Object> responseBody = new HashMap<>();
-
-        responseBody.put("creator", user);
+        responseBody.put("creator", currentUser);
         responseBody.put("workspace", workspace);
 
 
@@ -112,25 +104,11 @@ public class WorkspaceController {
     @SecurityRequirement(name = "Auth-token")
     public ResponseEntity updateWorkspace(@PathVariable int workspaceId, @RequestBody @Valid WorkspaceForm workspaceForm, Authentication authentication) {
 
-
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         log.info("User {} is updating workspace {}", currentUser.getUserId(), workspaceId);
 
-        var user = userService.getUserByUserId(currentUser.getUserId());
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
-
-        // 수정 권한이 있는 사람만 확인하는 로직
-        if (!userworkspaceService.exist(user, workspace)) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
-
-
-        // 업데이트할 작업 공간 정보 설정
-        workspace.setName(workspaceForm.getName());
-        workspace.setEmail(workspaceForm.getEmail());
         // ... 다른 업데이트할 필드들 설정
-
-        workspaceService.updateWorkspace(workspace);
+        var workspace = workspaceService.updateWorkspace(workspaceId, currentUser, workspaceForm);
 
         // 업데이트된 작업 공간 정보 반환
         Map<String, Object> responseBody = new HashMap<>();
@@ -158,20 +136,8 @@ public class WorkspaceController {
     public ResponseEntity deleteWorkspace(@PathVariable int workspaceId, Authentication authentication) {
 
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-
-        var user = userService.getUserByUserId(currentUser.getUserId());
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
-
-        // 수정 권한이 있는 사람만 확인하는 로직
-        if (!userworkspaceService.exist(user, workspace)) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
-
-        log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
-
         // 작업 공간 삭제 로직 수행
-        workspaceService.deleteWorkspace(workspaceId, currentUser.getUserId());
-        userworkspaceService.delete(user, workspace);
+        workspaceService.deleteWorkspace(workspaceId, currentUser);
 
         // 삭제 성공 응답 반환
         Map<String, Object> responseBody = new HashMap<>();

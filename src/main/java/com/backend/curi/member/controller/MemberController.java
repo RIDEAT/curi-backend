@@ -5,6 +5,9 @@ import com.backend.curi.member.controller.dto.*;
 import com.backend.curi.member.repository.entity.Manager;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.service.UserService;
+import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-
+    private final UserService userService;
+    private final UserworkspaceService userworkspaceService;
+    private final WorkspaceService workspaceService;
 
     @GetMapping("/employee")
     public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable int workspaceId,

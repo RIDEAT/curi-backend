@@ -44,9 +44,7 @@ import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 @RequestMapping("/user")
 public class UserController {
 
-    private final WorkspaceService workspaceService;
     private final UserService userService;
-    private final UserworkspaceService userworkspaceService;
 
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.",
@@ -66,14 +64,9 @@ public class UserController {
         String userId = currentUser.getUserId();
         //String userEmail = currentUser.getUserEmail();
 
-        var user = userService.getUserByUserId(userId);
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
-        List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
 
-        if (!userList.contains(user)) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
 
+        var userList = userService.getAllUsers(workspaceId, currentUser);
         // 비웠을 때는 따로 예외처리 해주어야 하나.
         // 헤더에 auth 토큰 넣어야 하는데.
 
