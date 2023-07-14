@@ -23,7 +23,7 @@ public class UserworkspaceService {
     private final UserRepository userRepository;
     public Userworkspace create (String userId, Workspace workspace){
         var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        return userworkspaceRepository.save(Userworkspace.builder().user(user).workspace(workspace).build());
+        return userworkspaceRepository.save(Userworkspace.builder().user(user).userEmail(user.getEmail()).workspace(workspace).build());
     }
 
     public List<Workspace> getWorkspaceListByUser(String userId) {
