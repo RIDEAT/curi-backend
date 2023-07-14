@@ -18,6 +18,7 @@ public enum ErrorType {
     DUPLICATED_WORKSPACE_NAME ("WORKSPACE-002", "중복된 워크 스페이스 이름입니다."),
     UNAUTHORIZED_WORKSPACE ("WORKSPACE-003", "해당 워크스페이스에 접근권한이 없습니다."),
 
+    MEMBER_NOT_EXISTS ("MEMBER-001", "존재하지 않는 직원입니다."),
     AUTH_SERVER_ERROR ("AUTHSERVER-001", "인증 서버가 정상적으로 동작하지 않습니다. (firebase token, auth token, refresh token 확인요망) "),
 
     USER_NOT_EXISTS ("USER-001", "존재하지 않는 유저입니다."),

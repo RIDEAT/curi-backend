@@ -1,10 +1,12 @@
 package com.backend.curi.user.repository.entity;
 
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -23,5 +25,18 @@ public class User_ {
     public User_(String userId, String email){
         this.userId = userId;
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User_ user = (User_) o;
+        return Objects.equals(userId, user.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
     }
 }

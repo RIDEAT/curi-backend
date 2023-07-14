@@ -9,6 +9,12 @@ import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
 import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workspace.repository.entity.Workspace;
+import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +36,6 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-    private final UserworkspaceService userworkspaceService;
 
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
@@ -42,18 +47,13 @@ public class UserController {
         String userId = currentUser.getUserId();
         //String userEmail = currentUser.getUserEmail();
 
-        List<String> userIdList = userworkspaceService.getUserIdListByWorkspaceId(workspaceId);
 
-        if (!userIdList.contains(userId)) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
 
+        var userList = userService.getAllUsers(workspaceId, currentUser);
         // 비웠을 때는 따로 예외처리 해주어야 하나.
         // 헤더에 auth 토큰 넣어야 하는데.
 
-
-        List<UserResponse> userResponseList = convertToUserResponse (userIdList);
-        responseBody.put("user_list", userResponseList);
+        responseBody.put("user list", userList);
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
