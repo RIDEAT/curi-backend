@@ -1,16 +1,17 @@
 package com.backend.curi.member.controller.dto;
 
-
 import com.backend.curi.member.repository.entity.Employee;
+import com.backend.curi.member.repository.entity.Manager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-@AllArgsConstructor
+
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class EmployeeResponse {
+public class ManagerResponse {
     private String status;
 
     private Long id;
@@ -19,12 +20,12 @@ public class EmployeeResponse {
     private String phoneNum;
     private String startDate;
 
-    public static EmployeeResponse ofSuccess(Employee employee) {
-        return new EmployeeResponse("success",
-                employee.getId(),
-                employee.getName(),
-                employee.getEmail(),
-                employee.getPhoneNum(),
-                employee.getStartDate().toString());
+    public static ManagerResponse ofSuccess(Manager manager) {
+        return new ManagerResponse("success",
+                manager.getId(),
+                manager.getName(),
+                manager.getEmail(),
+                manager.getPhoneNum(),
+                manager.getStartDate().toString());
     }
 }

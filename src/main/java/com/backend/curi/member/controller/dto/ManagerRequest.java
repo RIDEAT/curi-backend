@@ -1,5 +1,6 @@
 package com.backend.curi.member.controller.dto;
 
+
 import com.backend.curi.exception.sequence.ValidationGroups;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,12 +10,11 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeRequest {
-
+@Getter
+@Setter
+public class ManagerRequest {
     private Long id;
 
     @NotBlank(message = "이름을 입력해주세요.")
@@ -34,4 +34,6 @@ public class EmployeeRequest {
             message = "날짜 형식이 올바르지 않습니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String startDate;
+
+    private String department;
 }

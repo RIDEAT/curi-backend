@@ -1,9 +1,8 @@
 package com.backend.curi.member.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
-import com.backend.curi.member.controller.dto.EmployeeListResponse;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.EmployeeResponse;
+import com.backend.curi.member.controller.dto.*;
+import com.backend.curi.member.repository.entity.Manager;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class MemberController {
 
     @GetMapping("/employee")
     public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable int workspaceId,
-                                                         @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
+                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.getEmployee(currentUser, workspaceId, employeeRequest);
@@ -41,28 +40,72 @@ public class MemberController {
     }
     @PostMapping("/employee")
     public ResponseEntity<EmployeeResponse> createEmployee(@PathVariable int workspaceId,
-                                                           @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
+                                                           @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.createEmployee(currentUser, workspaceId, employeeRequest);
+        var response = memberService.createEmployee(currentUser, workspaceId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/employee")
     public ResponseEntity<EmployeeResponse> modifyEmployee(@PathVariable int workspaceId,
-                                                           @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
+                                                           @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.modifyEmployee(currentUser, workspaceId, employeeRequest);
+        var response = memberService.modifyEmployee(currentUser, workspaceId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/employee")
     public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable int workspaceId,
-                                                           @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
+                                                           @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.deleteEmployee(currentUser, workspaceId, employeeRequest);
+        var response = memberService.deleteEmployee(currentUser, workspaceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+
+    @GetMapping("/manager")
+    public ResponseEntity<ManagerResponse> getEmployee(@PathVariable int workspaceId,
+                                                       @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
+                                                       Authentication authentication) {
+        var currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = memberService.getManager(currentUser, workspaceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("/managers/")
+    public ResponseEntity<ManagerListResponse> getManagers(@PathVariable int workspaceId,
+                                                           Authentication authentication) {
+        var currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = memberService.getManagerList(currentUser, workspaceId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PostMapping("/manager")
+    public ResponseEntity<ManagerResponse> createManager(@PathVariable int workspaceId,
+                                                           @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
+                                                           Authentication authentication) {
+        var currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = memberService.createManager(currentUser, workspaceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("/manager")
+    public ResponseEntity<ManagerResponse> modifyManager(@PathVariable int workspaceId,
+                                                           @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
+                                                           Authentication authentication) {
+        var currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = memberService.modifyManager(currentUser, workspaceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/manager")
+    public ResponseEntity<ManagerResponse> deleteManager(@PathVariable int workspaceId,
+                                                           @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
+                                                           Authentication authentication) {
+        var currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = memberService.deleteManager(currentUser, workspaceId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

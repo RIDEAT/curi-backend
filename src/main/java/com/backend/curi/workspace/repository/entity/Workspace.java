@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.util.Objects;
+
 @Setter
 @Getter
 @Entity
@@ -39,6 +41,16 @@ public class Workspace {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Workspace workspace = (Workspace) o;
+        return Objects.equals(workspaceId, workspace.workspaceId);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(workspaceId);
+    }
 }
