@@ -21,17 +21,25 @@ public class UserService {
     public User_ getUserByUserId(String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }
+
+    public UserResponse getUserResponseByUserId (String userId){
+        User_ user =  userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+        return UserResponse.builder().id(user.getUserId()).email(user.getEmail()).build();
+    }
     public String getEmailByUserId (String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getEmail();
     }
 
-    public User_ updateUser(User_ user){
+    public UserResponse updateUser(User_ user){
         User_ updatedUser = userRepository.save(user);
-        return updatedUser;
+        UserResponse userResponse = UserResponse.builder().id(updatedUser.getUserId()).email(updatedUser.getEmail()).build();
+        return userResponse;
     }
 
-    public void deleteUser(User_ user){
+    public UserResponse deleteUser(User_ user){
+        UserResponse deletedUser = UserResponse.builder().id(user.getUserId()).email(user.getEmail()).build();
         userRepository.delete(user);
+        return deletedUser;
     }
 
 
