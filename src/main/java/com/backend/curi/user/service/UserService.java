@@ -3,6 +3,7 @@ package com.backend.curi.user.service;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.controller.dto.UserListResponse;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
@@ -28,7 +29,7 @@ public class UserService {
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }
 
-    public List<User_> getAllUsers(int workspaceId, CurrentUser currentUser){
+    public UserListResponse getAllUsers(int workspaceId, CurrentUser currentUser){
         var user = getUserByUserId(currentUser.getUserId());
         var workspace = workspaceService.getWorkspaceById(workspaceId);
         List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
@@ -37,12 +38,12 @@ public class UserService {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
-        return userList;
+        return UserListResponse.ofSuccess(userList);
     }
 
     public UserResponse getUserResponseByUserId (String userId){
         User_ user =  userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        return UserResponse.builder().id(user.getUserId()).email(user.getEmail()).build();
+        return UserResponse.ofSuccess(user);
     }
     
     public String getEmailByUserId (String userId){
@@ -51,12 +52,12 @@ public class UserService {
 
     public UserResponse updateUser(User_ user){
         User_ updatedUser = userRepository.save(user);
-        UserResponse userResponse = UserResponse.builder().id(updatedUser.getUserId()).email(updatedUser.getEmail()).build();
+        UserResponse userResponse = UserResponse.ofSuccess(updatedUser);
         return userResponse;
     }
 
     public UserResponse deleteUser(User_ user){
-        UserResponse deletedUser = UserResponse.builder().id(user.getUserId()).email(user.getEmail()).build();
+        UserResponse deletedUser = UserResponse.ofSuccess(user);
         userRepository.delete(user);
         return deletedUser;
     }
@@ -65,7 +66,7 @@ public class UserService {
     public UserResponse dbStore (String userId, String email) {
         User_ user = User_.builder().userId(userId).email(email).build();
         userRepository.save(user);
-        UserResponse userResponse = UserResponse.builder().id(userId).email(email).build();
+        UserResponse userResponse = UserResponse.ofSuccess(user);
         return userResponse;
     }
 

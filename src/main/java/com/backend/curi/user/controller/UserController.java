@@ -8,9 +8,7 @@ import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
-import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import com.backend.curi.workspace.service.WorkspaceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,9 +42,7 @@ public class UserController {
         responseBody.put("transactionId", 11);
 
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = currentUser.getUserId();
         //String userEmail = currentUser.getUserEmail();
-
 
 
         var userList = userService.getAllUsers(workspaceId, currentUser);
