@@ -5,24 +5,24 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class Swagger2Config {
+public class SwaggerConfig {
 
-    SecurityScheme auth = new SecurityScheme()
+    SecurityScheme refreshToken = new SecurityScheme()
             .type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.COOKIE).name("refreshToken");
-    SecurityRequirement securityRequirement = new SecurityRequirement().addList("basicAuth");
+
+    SecurityScheme authToken = new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT");
+    SecurityRequirement securityRequirement = new SecurityRequirement().addList("refreshToken").addList("authToken");
 
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .components(new Components()
-                        .addSecuritySchemes("basicAuth", auth)
-                        .addSecuritySchemes("Auth-token",
-                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
+                        .addSecuritySchemes("refreshToken", refreshToken)
+                        .addSecuritySchemes("authToken", authToken))
                 .addSecurityItem(securityRequirement)
                 .info(new Info()
                         .title("Curi Backend API")

@@ -2,12 +2,15 @@ package com.backend.curi.user.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +35,11 @@ public class UserService {
     }
 
 
-    public void dbStore (String userId, String email) {
-        // 이미 유저가 있는 경우는 빼야하나?
+    public UserResponse dbStore (String userId, String email) {
         User_ user = User_.builder().userId(userId).email(email).build();
         userRepository.save(user);
-
+        UserResponse userResponse = UserResponse.builder().id(userId).email(email).build();
+        return userResponse;
     }
 
 
