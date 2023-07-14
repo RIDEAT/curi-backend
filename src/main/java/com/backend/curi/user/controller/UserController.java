@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,8 +61,8 @@ public class UserController {
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
     @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 자동로그인하고 일어나는 게 좋을듯!")
-    public ResponseEntity register(Authentication authentication, @RequestBody UserRequest userForm, HttpServletRequest request, HttpServletResponse response) {
-        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+    public ResponseEntity register(@RequestBody UserRequest userForm, HttpServletRequest request, HttpServletResponse response) {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getUserId();
         String userEmail = userForm.getEmail();
 
