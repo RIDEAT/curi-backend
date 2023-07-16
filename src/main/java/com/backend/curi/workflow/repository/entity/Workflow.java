@@ -1,32 +1,37 @@
 package com.backend.curi.workflow.repository.entity;
 
+import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
+
+@NoArgsConstructor
 @Getter
-@Setter
 @Entity
-public class Workflow {
+public class Workflow extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int workflowId;
+    private Long id;
 
     @Column
     private String name;
 
-    @Column
-    private Long workspaceId;
 
-    public Workflow(){}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id")
+    private Workspace workspace;
 
     @Builder
-    public Workflow(int workflowId, String name, Long workspaceId){
-        this.workflowId = workflowId;
+    public Workflow(Long workflowId, String name, Workspace workspace){
+        this.id = workflowId;
         this.name = name;
-        this.workspaceId = workspaceId;
+        this.workspace = workspace;
     }
 
 }

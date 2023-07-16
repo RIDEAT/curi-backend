@@ -11,16 +11,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EmployeeResponse {
-    private String status;
-
     private Long id;
     private String name;
     private String email;
     private String phoneNum;
     private String startDate;
 
-    public static EmployeeResponse ofSuccess(Employee employee) {
-        return new EmployeeResponse("success",
+    public static EmployeeResponse of(Employee employee) {
+        return new EmployeeResponse(
                 employee.getId(),
                 employee.getName(),
                 employee.getEmail(),

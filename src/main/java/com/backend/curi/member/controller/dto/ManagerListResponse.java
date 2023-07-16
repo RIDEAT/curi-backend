@@ -18,9 +18,9 @@ public class ManagerListResponse {
     private String status;
     private List<ManagerResponse> managerList;
 
-    public static ManagerListResponse ofSuccess(List<Manager> managerList) {
+    public static ManagerListResponse of(List<Manager> managerList) {
         var responseList = managerList.stream()
-                .map(ManagerResponse::ofSuccess)
+                .map(ManagerResponse::of)
                 .collect(Collectors.toList());
         return new ManagerListResponse("success", responseList);
     }

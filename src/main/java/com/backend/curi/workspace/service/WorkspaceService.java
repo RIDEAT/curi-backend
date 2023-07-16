@@ -25,7 +25,7 @@ public class WorkspaceService {
 
     public WorkspaceResponse getWorkspaceById(Long id){
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
-        return WorkspaceResponse.ofSuccess(workspace);
+        return WorkspaceResponse.of(workspace);
     }
 
     @Transactional
@@ -41,9 +41,9 @@ public class WorkspaceService {
         Workspace workspace = Workspace.builder().name(request.getName()).email(request.getEmail()).build();
         // workspace db 에 id 가 순서대로 올라가는지 확인해야한다.
         workspaceRepository.save(workspace);
-        userworkspaceService.create(currentUser.getUserId(), workspace);
+        userworkspaceService.create(currentUser, workspace);
 
-        return WorkspaceResponse.ofSuccess(workspace);
+        return WorkspaceResponse.of(workspace);
     }
 
     @Transactional
@@ -51,19 +51,19 @@ public class WorkspaceService {
         var workspace = getWorkspaceEntityById(workspaceId);
 
         // 수정 권한이 있는 사람만 확인하는 로직
-        userworkspaceService.checkAuthentication(currentUser.getUserId(), workspace);
+        userworkspaceService.checkAuthentication(currentUser, workspace);
 
         workspace.setName(request.getName());
         workspace.setEmail(request.getEmail());
 
-        return WorkspaceResponse.ofSuccess(workspace);
+        return WorkspaceResponse.of(workspace);
     }
 
     @Transactional
     public WorkspaceResponse deleteWorkspace(Long workspaceId, CurrentUser currentUser){
         var workspace = getWorkspaceEntityById(workspaceId);
         // 수정 권한이 있는 사람만 확인하는 로직
-        userworkspaceService.checkAuthentication(currentUser.getUserId(), workspace);
+        userworkspaceService.checkAuthentication(currentUser, workspace);
 
         log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
 
@@ -74,14 +74,14 @@ public class WorkspaceService {
         // 작업 공간 삭제
         workspaceRepository.delete(workspace);
 
-        return WorkspaceResponse.ofSuccess(workspace);
+        return WorkspaceResponse.of(workspace);
 
     }
 
     public WorkspaceListResponse getWorkspaceList(CurrentUser currentUser){
-        var workspaceList = userworkspaceService.getWorkspaceListByUser(currentUser.getUserId());
+        var workspaceList = userworkspaceService.getWorkspaceListByUser(currentUser);
 
-        return WorkspaceListResponse.ofSuccess(workspaceList);
+        return WorkspaceListResponse.of(workspaceList);
     }
 
     public Workspace getWorkspaceEntityById(Long id){

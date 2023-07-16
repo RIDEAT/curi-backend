@@ -38,12 +38,12 @@ public class UserService {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
-        return UserListResponse.ofSuccess(userList);
+        return UserListResponse.of(userList);
     }
 
     public UserResponse getUserResponseByUserId (String userId){
         User_ user =  userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        return UserResponse.ofSuccess(user);
+        return UserResponse.of(user);
     }
     
     public String getEmailByUserId (String userId){
@@ -52,12 +52,12 @@ public class UserService {
 
     public UserResponse updateUser(User_ user){
         User_ updatedUser = userRepository.save(user);
-        UserResponse userResponse = UserResponse.ofSuccess(updatedUser);
+        UserResponse userResponse = UserResponse.of(updatedUser);
         return userResponse;
     }
 
     public UserResponse deleteUser(User_ user){
-        UserResponse deletedUser = UserResponse.ofSuccess(user);
+        UserResponse deletedUser = UserResponse.of(user);
         userRepository.delete(user);
         return deletedUser;
     }
@@ -66,7 +66,7 @@ public class UserService {
     public UserResponse dbStore (String userId, String email) {
         User_ user = User_.builder().userId(userId).email(email).build();
         userRepository.save(user);
-        UserResponse userResponse = UserResponse.ofSuccess(user);
+        UserResponse userResponse = UserResponse.of(user);
         return userResponse;
     }
 
