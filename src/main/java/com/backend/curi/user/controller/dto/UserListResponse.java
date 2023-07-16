@@ -16,9 +16,9 @@ public class UserListResponse {
     List<UserResponse> userList;
 
 
-    public static UserListResponse ofSuccess(List<User_> userList) {
+    public static UserListResponse of(List<User_> userList) {
         var responseList = userList.stream()
-                .map(UserResponse::ofSuccess)
+                .map(UserResponse::of)
                 .collect(Collectors.toList());
         return new UserListResponse("success", responseList);
     }

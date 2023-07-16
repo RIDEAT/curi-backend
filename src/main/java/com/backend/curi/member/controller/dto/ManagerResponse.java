@@ -12,16 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ManagerResponse {
-    private String status;
-
     private Long id;
     private String name;
     private String email;
     private String phoneNum;
     private String startDate;
 
-    public static ManagerResponse ofSuccess(Manager manager) {
-        return new ManagerResponse("success",
+    public static ManagerResponse of(Manager manager) {
+        return new ManagerResponse(
                 manager.getId(),
                 manager.getName(),
                 manager.getEmail(),

@@ -11,12 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WorkspaceResponse {
-    private String status;
+    private Long id;
     private String name;
     private String email;
 
-    public static WorkspaceResponse ofSuccess(Workspace workspace){
-        return new WorkspaceResponse("success",
+    public static WorkspaceResponse of(Workspace workspace){
+        return new WorkspaceResponse(
+                workspace.getId(),
                 workspace.getName(),
                 workspace.getEmail());
     }

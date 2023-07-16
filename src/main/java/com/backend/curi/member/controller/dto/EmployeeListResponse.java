@@ -18,9 +18,9 @@ public class EmployeeListResponse {
     private String status;
     private List<EmployeeResponse> employeeList;
 
-    public static EmployeeListResponse ofSuccess(List<Employee> employeeList) {
+    public static EmployeeListResponse of(List<Employee> employeeList) {
         var responseList = employeeList.stream()
-                .map(EmployeeResponse::ofSuccess)
+                .map(EmployeeResponse::of)
                 .collect(Collectors.toList());
         return new EmployeeListResponse("success", responseList);
     }

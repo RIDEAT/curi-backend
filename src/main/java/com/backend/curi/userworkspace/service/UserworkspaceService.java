@@ -2,6 +2,7 @@ package com.backend.curi.userworkspace.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
@@ -21,13 +22,13 @@ import java.util.stream.Collectors;
 public class UserworkspaceService {
     private final UserworkspaceRepository userworkspaceRepository;
     private final UserRepository userRepository;
-    public Userworkspace create (String userId, Workspace workspace){
-        var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+    public Userworkspace create (CurrentUser currentUser, Workspace workspace){
+        var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         return userworkspaceRepository.save(Userworkspace.builder().user(user).userEmail(user.getEmail()).workspace(workspace).build());
     }
 
-    public List<Workspace> getWorkspaceListByUser(String userId) {
-        var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+    public List<Workspace> getWorkspaceListByUser(CurrentUser currentUser) {
+        var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         var workspaceList = userworkspaceRepository
                 .findAllByUser(user)
                 .stream()
@@ -51,15 +52,14 @@ public class UserworkspaceService {
         return userworkspaceList.stream().map(Userworkspace::getUser).collect(Collectors.toList());
     }
 
-    public void checkAuthentication (String userId, Workspace workspace){
-        var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+    public void checkAuthentication (CurrentUser currentUser, Workspace workspace){
+        var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         if (userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty()) {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
     }
 
-    public void delete (String userId, Workspace workspace){
-        var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+    public void delete (User_ user, Workspace workspace){
         userworkspaceRepository.deleteAll(userworkspaceRepository.findAllByUserAndWorkspace(user, workspace));
         return;
     }

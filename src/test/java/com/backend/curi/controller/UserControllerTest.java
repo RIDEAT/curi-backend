@@ -76,7 +76,7 @@ class UserControllerTest {
 //    void testGetUserList() throws Exception {
 //        Long workspaceId = 1;
 //        List<String> userIdList = Collections.singletonList(userId);
-//        UserResponse userResponse = UserResponse.ofSuccess(
+//        UserResponse userResponse = UserResponse.of(
 //                User_.builder()
 //                        .userId(userId)
 //                        .email(userEmail)
@@ -96,7 +96,7 @@ class UserControllerTest {
 //
 //    @Test
 //    void testRegister() throws Exception {
-//        UserResponse userResponse = UserResponse.ofSuccess(
+//        UserResponse userResponse = UserResponse.of(
 //                User_.builder()
 //                        .userId(userId)
 //                        .email(userEmail)
@@ -126,7 +126,7 @@ class UserControllerTest {
 //        UserRequest updatedUserRequest = new UserRequest();
 //        updatedUserRequest.setEmail("new_email@example.com");
 //
-//        UserResponse updatedUserResponse = UserResponse.ofSuccess(
+//        UserResponse updatedUserResponse = UserResponse.of(
 //                User_.builder()
 //                        .userId(userId)
 //                        .email(updatedUserRequest.getEmail())
@@ -152,7 +152,7 @@ class UserControllerTest {
 //        existingUser.setUserId(userId);
 //        existingUser.setEmail(userEmail);
 //
-//        UserResponse deletedUserResponse = UserResponse.ofSuccess(
+//        UserResponse deletedUserResponse = UserResponse.of(
 //                User_.builder()
 //                        .userId(userId)
 //                        .email(userEmail)

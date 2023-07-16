@@ -11,12 +11,11 @@ import java.util.Date;
 @Getter
 @Setter
 public class UserResponse {
-    private String status;
     private String id;
     private String email;
 
-    public static UserResponse ofSuccess(User_ user) {
-        return new UserResponse("success",
+    public static UserResponse of(User_ user) {
+        return new UserResponse(
                 user.getUserId(),
                 user.getEmail());
     }
