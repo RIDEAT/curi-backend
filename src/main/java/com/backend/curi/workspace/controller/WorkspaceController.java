@@ -1,36 +1,18 @@
 package com.backend.curi.workspace.controller;
 
 
-import com.backend.curi.exception.CuriException;
-import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.user.repository.entity.User_;
-import com.backend.curi.user.service.UserService;
-import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workspace.controller.dto.WorkspaceForm;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
-import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.*;
 

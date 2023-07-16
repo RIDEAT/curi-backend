@@ -4,7 +4,6 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workspace.controller.dto.WorkspaceForm;
 import com.backend.curi.workspace.controller.dto.WorkspaceListResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
