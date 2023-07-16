@@ -37,7 +37,7 @@ public class UserController {
 
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
-    public ResponseEntity getUserList(@PathVariable int workspaceId) {
+    public ResponseEntity getUserList(@PathVariable Long workspaceId) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("transactionId", 11);
 

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface WorkspaceRepository extends JpaRepository<Workspace, Integer> {
+public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
     Optional<Workspace> findByName(String name);
 }
 

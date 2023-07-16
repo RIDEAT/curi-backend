@@ -51,9 +51,11 @@ public class UserworkspaceService {
         return userworkspaceList.stream().map(Userworkspace::getUser).collect(Collectors.toList());
     }
 
-    public boolean exist (String userId, Workspace workspace){
+    public void checkAuthentication (String userId, Workspace workspace){
         var user = userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        return !userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty();
+        if (userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty()) {
+            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
+        }
     }
 
     public void delete (String userId, Workspace workspace){

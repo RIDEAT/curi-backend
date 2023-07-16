@@ -74,7 +74,7 @@ class UserControllerTest {
 //
 //    @Test
 //    void testGetUserList() throws Exception {
-//        int workspaceId = 1;
+//        Long workspaceId = 1;
 //        List<String> userIdList = Collections.singletonList(userId);
 //        UserResponse userResponse = UserResponse.ofSuccess(
 //                User_.builder()
@@ -173,7 +173,7 @@ class UserControllerTest {
 //
 //    @Test
 //    void testUnauthorizedUserGetUserList() throws Exception {
-//        int workspaceId = 1;
+//        Long workspaceId = 1;
 //
 //        setCurrentUser(currentUser);
 //

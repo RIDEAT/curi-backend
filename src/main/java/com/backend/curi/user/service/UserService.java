@@ -29,9 +29,9 @@ public class UserService {
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }
 
-    public UserListResponse getAllUsers(int workspaceId, CurrentUser currentUser){
+    public UserListResponse getAllUsers(Long workspaceId, CurrentUser currentUser){
         var user = getUserByUserId(currentUser.getUserId());
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
 
         if (!userList.contains(user)) {

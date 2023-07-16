@@ -18,12 +18,12 @@ public class Workflow {
     private String name;
 
     @Column
-    private int workspaceId;
+    private Long workspaceId;
 
     public Workflow(){}
 
     @Builder
-    public Workflow(int workflowId, String name, int workspaceId){
+    public Workflow(int workflowId, String name, Long workspaceId){
         this.workflowId = workflowId;
         this.name = name;
         this.workspaceId = workspaceId;

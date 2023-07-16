@@ -8,9 +8,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
-@Schema(description = "workspace Form")
-public class WorkspaceForm {
-
+public class WorkspaceRequest {
+    private Long id;
     @NotNull
     @Size(min = 2, max = 20)
     @Schema(description = "name")
@@ -19,6 +18,4 @@ public class WorkspaceForm {
     @Email
     @Schema(description = "email")
     private String email;
-
-
 }
