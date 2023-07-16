@@ -27,8 +27,8 @@ public class MemberService {
     private final ManagerRepository managerRepository;
     private final WorkspaceService workspaceService;
 
-    public EmployeeResponse createEmployee(CurrentUser currentUser, int workspaceId, EmployeeRequest request) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    public EmployeeResponse createEmployee(CurrentUser currentUser, Long workspaceId, EmployeeRequest request) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
         Employee employee = Employee.builder()
                 .workspace(workspace)
@@ -42,32 +42,32 @@ public class MemberService {
         return EmployeeResponse.ofSuccess(employee);
     }
 
-    public EmployeeResponse getEmployee(CurrentUser currentUser, int workspaceId, EmployeeRequest request) {
+    public EmployeeResponse getEmployee(CurrentUser currentUser, Long workspaceId, EmployeeRequest request) {
         var employee = getEmployeeEntity(request.getId(), workspaceId);
         return EmployeeResponse.ofSuccess(employee);
     }
 
-    public EmployeeListResponse getEmployeeList(CurrentUser currentUser, int workspaceId) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    public EmployeeListResponse getEmployeeList(CurrentUser currentUser, Long workspaceId) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var employeeList = employeeRepository.findAllByWorkspace(workspace);
         return EmployeeListResponse.ofSuccess(employeeList);
     }
 
     @Transactional
-    public EmployeeResponse modifyEmployee(CurrentUser currentUser, int workspaceId, EmployeeRequest request) {
+    public EmployeeResponse modifyEmployee(CurrentUser currentUser, Long workspaceId, EmployeeRequest request) {
         var employee = getEmployeeEntity(request.getId(), workspaceId);
         employee.modifyInformation(request.getName(), request.getEmail(), request.getPhoneNum(), LocalDate.parse(request.getStartDate()));
         return EmployeeResponse.ofSuccess(employee);
     }
 
-    public EmployeeResponse deleteEmployee(CurrentUser currentUser, int workspaceId, EmployeeRequest request) {
+    public EmployeeResponse deleteEmployee(CurrentUser currentUser, Long workspaceId, EmployeeRequest request) {
         var employee = getEmployeeEntity(request.getId(), workspaceId);
         employeeRepository.delete(employee);
         return EmployeeResponse.ofSuccess(employee);
     }
 
-    private Employee getEmployeeEntity(Long id, int workspaceId) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    private Employee getEmployeeEntity(Long id, Long workspaceId) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
         if (!employee.getWorkspace().equals(workspace))
@@ -77,8 +77,8 @@ public class MemberService {
     }
 
 
-    public ManagerResponse createManager(CurrentUser currentUser, int workspaceId, ManagerRequest request) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    public ManagerResponse createManager(CurrentUser currentUser, Long workspaceId, ManagerRequest request) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
         Manager manager = Manager.builder()
                 .workspace(workspace)
@@ -93,32 +93,32 @@ public class MemberService {
         return ManagerResponse.ofSuccess(manager);
     }
 
-    public ManagerResponse getManager(CurrentUser currentUser, int workspaceId, ManagerRequest request) {
+    public ManagerResponse getManager(CurrentUser currentUser, Long workspaceId, ManagerRequest request) {
         var employee = getManagerEntity(request.getId(), workspaceId);
         return ManagerResponse.ofSuccess(employee);
     }
 
-    public ManagerListResponse getManagerList(CurrentUser currentUser, int workspaceId) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    public ManagerListResponse getManagerList(CurrentUser currentUser, Long workspaceId) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var managerList = managerRepository.findAllByWorkspace(workspace);
         return ManagerListResponse.ofSuccess(managerList);
     }
 
     @Transactional
-    public ManagerResponse modifyManager(CurrentUser currentUser, int workspaceId, ManagerRequest request) {
+    public ManagerResponse modifyManager(CurrentUser currentUser, Long workspaceId, ManagerRequest request) {
         var manager = getManagerEntity(request.getId(), workspaceId);
         manager.modifyInformation(request.getName(), request.getEmail(), request.getPhoneNum(), LocalDate.parse(request.getStartDate()), request.getDepartment());
         return ManagerResponse.ofSuccess(manager);
     }
 
-    public ManagerResponse deleteManager(CurrentUser currentUser, int workspaceId, ManagerRequest request) {
+    public ManagerResponse deleteManager(CurrentUser currentUser, Long workspaceId, ManagerRequest request) {
         var manager = getManagerEntity(request.getId(), workspaceId);
         managerRepository.delete(manager);
         return ManagerResponse.ofSuccess(manager);
     }
 
-    private Manager getManagerEntity(Long id, int workspaceId) {
-        var workspace = workspaceService.getWorkspaceById(workspaceId);
+    private Manager getManagerEntity(Long id, Long workspaceId) {
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var manager = managerRepository.findById(id)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
         if (!manager.getWorkspace().equals(workspace))

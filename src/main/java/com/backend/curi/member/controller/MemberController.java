@@ -29,7 +29,7 @@ public class MemberController {
     private final WorkspaceService workspaceService;
 
     @GetMapping("/employee")
-    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable int workspaceId,
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable Long workspaceId,
                                                          @RequestBody @Validated(ValidationSequence.class) EmployeeRequest employeeRequest,
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -37,14 +37,14 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/employees/")
-    public ResponseEntity<EmployeeListResponse> getEmployees(@PathVariable int workspaceId,
+    public ResponseEntity<EmployeeListResponse> getEmployees(@PathVariable Long workspaceId,
                                                               Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.getEmployeeList(currentUser, workspaceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @PostMapping("/employee")
-    public ResponseEntity<EmployeeResponse> createEmployee(@PathVariable int workspaceId,
+    public ResponseEntity<EmployeeResponse> createEmployee(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -53,7 +53,7 @@ public class MemberController {
     }
 
     @PutMapping("/employee")
-    public ResponseEntity<EmployeeResponse> modifyEmployee(@PathVariable int workspaceId,
+    public ResponseEntity<EmployeeResponse> modifyEmployee(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -62,7 +62,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/employee")
-    public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable int workspaceId,
+    public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -73,7 +73,7 @@ public class MemberController {
 
 
     @GetMapping("/manager")
-    public ResponseEntity<ManagerResponse> getEmployee(@PathVariable int workspaceId,
+    public ResponseEntity<ManagerResponse> getEmployee(@PathVariable Long workspaceId,
                                                        @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                        Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -81,14 +81,14 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/managers/")
-    public ResponseEntity<ManagerListResponse> getManagers(@PathVariable int workspaceId,
+    public ResponseEntity<ManagerListResponse> getManagers(@PathVariable Long workspaceId,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.getManagerList(currentUser, workspaceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @PostMapping("/manager")
-    public ResponseEntity<ManagerResponse> createManager(@PathVariable int workspaceId,
+    public ResponseEntity<ManagerResponse> createManager(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -97,7 +97,7 @@ public class MemberController {
     }
 
     @PutMapping("/manager")
-    public ResponseEntity<ManagerResponse> modifyManager(@PathVariable int workspaceId,
+    public ResponseEntity<ManagerResponse> modifyManager(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -106,7 +106,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/manager")
-    public ResponseEntity<ManagerResponse> deleteManager(@PathVariable int workspaceId,
+    public ResponseEntity<ManagerResponse> deleteManager(@PathVariable Long workspaceId,
                                                            @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                            Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
