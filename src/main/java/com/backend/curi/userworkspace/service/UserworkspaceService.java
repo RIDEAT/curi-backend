@@ -35,9 +35,10 @@ public class UserworkspaceService {
                 .map(Userworkspace::getWorkspace)
                 .collect(Collectors.toList());
 
+        /*
         if (workspaceList.isEmpty())
             throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS);
-
+*/
         return workspaceList;
     }
 
