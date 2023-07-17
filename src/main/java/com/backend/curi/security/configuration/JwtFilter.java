@@ -138,7 +138,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(AUTH_SERVER.concat("/auth/verify"));
+        URI requestUri = URI.create(AUTH_SERVER.concat("/verify"));
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
