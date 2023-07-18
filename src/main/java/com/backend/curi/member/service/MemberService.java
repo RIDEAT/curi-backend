@@ -52,6 +52,7 @@ public class MemberService {
     }
     public List<MemberResponse> getMemberList (CurrentUser currentUser, Long workspaceId, MemberType memberType){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        userworkspaceService.checkAuthentication(currentUser, workspace);
         var memberList = memberRepository.findAllByWorkspaceAndType(workspace, memberType);
         var responseList = memberList.stream()
                 .map(MemberResponse::of)
@@ -61,8 +62,9 @@ public class MemberService {
 
     @Transactional
     public MemberResponse createMember (CurrentUser currentUser, MemberType type, MemberRequest request){
-
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
+        userworkspaceService.checkAuthentication(currentUser, workspace);
+
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
 
@@ -90,9 +92,6 @@ public class MemberService {
         var workspace = member.getWorkspace();
 
         userworkspaceService.checkAuthentication(currentUser, workspace);
-
-        if (!member.getWorkspace().equals(workspace))
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
 
         return member;
     }

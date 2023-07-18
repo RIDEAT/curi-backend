@@ -22,7 +22,9 @@ public abstract class MemberRequest {
     @NotBlank(message = "이름을 입력해주세요.")
     protected String name;
 
-    @Email(message = "이메일 형식이 올바르지 않습니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$",
+            message = "이메일 형식이 올바르지 않습니다.",
+            groups = ValidationGroups.PatternCheckGroup.class)
     protected String email;
 
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$",
