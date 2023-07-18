@@ -52,12 +52,14 @@ public class Member extends BaseEntity {
         return Member.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .phoneNum(request.getPhoneNum());
+                .phoneNum(request.getPhoneNum())
+                .department(request.getDepartment());
     }
     public void modifyInformation(MemberRequest request) {
         this.name = request.getName();
         this.email = request.getEmail();
         this.phoneNum = request.getPhoneNum();
+        this.department = request.getDepartment();
 
         if(type == MemberType.employee) {
             this.employee.modify(request);
