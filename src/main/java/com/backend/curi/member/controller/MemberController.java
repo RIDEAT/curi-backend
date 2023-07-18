@@ -33,7 +33,7 @@ public class MemberController {
     public ResponseEntity<MemberResponse> createManager(@RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.createMember(currentUser, request);
+        var response = memberService.createMember(currentUser, MemberType.manager, request);
         return ResponseEntity. status(HttpStatus.OK).body(response);
     }
 
@@ -51,7 +51,7 @@ public class MemberController {
     public ResponseEntity<MemberResponse> createEmployee(@RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                        Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.createMember(currentUser, request);
+        var response = memberService.createMember(currentUser, MemberType.employee , request);
         return ResponseEntity. status(HttpStatus.OK).body(response);
     }
 

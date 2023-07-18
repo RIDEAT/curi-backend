@@ -32,6 +32,4 @@ public abstract class MemberRequest {
     protected String phoneNum;
 
     protected String department;
-
-    protected MemberType type;
 }

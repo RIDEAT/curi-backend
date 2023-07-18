@@ -60,11 +60,11 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse createMember (CurrentUser currentUser, MemberRequest request){
+    public MemberResponse createMember (CurrentUser currentUser, MemberType type, MemberRequest request){
 
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
 
-        var memberBuilder = Member.of(request).workspace(workspace);
+        var memberBuilder = Member.of(request).type(type).workspace(workspace);
 
         if(request.getType() == MemberType.employee) {
             var employee = Employee.of(request).build();
