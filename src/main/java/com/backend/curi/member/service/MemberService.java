@@ -66,12 +66,12 @@ public class MemberService {
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
 
-        if(request.getType() == MemberType.employee) {
+        if(type == MemberType.employee) {
             var employee = Employee.of(request).build();
             employeeRepository.save(employee);
             memberBuilder.employee(employee);
         }
-//        else if (request.getType() == MemberType.employee) {
+//        else if (type == MemberType.employee) {
 //            var manager = Manager.of(request).build();
 //            managerRepository.save(manager);
 //            memberBuilder.manager(manager);
