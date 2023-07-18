@@ -1,7 +1,7 @@
 package com.backend.curi.member.controller.dto;
 
-
 import com.backend.curi.exception.sequence.ValidationGroups;
+import com.backend.curi.member.repository.entity.MemberType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +10,13 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class ManagerRequest {
-    private Long id;
+@NoArgsConstructor
+@AllArgsConstructor
+public class MemberRequest {
+
+    private Long wid;
 
     @NotBlank(message = "이름을 입력해주세요.")
     private String name;
@@ -30,12 +31,9 @@ public class ManagerRequest {
             groups = ValidationGroups.PatternCheckGroup.class)
     private String phoneNum;
 
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$",
-            message = "날짜 형식이 올바르지 않습니다.",
-            groups = ValidationGroups.PatternCheckGroup.class)
-
+    private String department;
 
     private String startDate;
 
-    private String department;
+    private MemberType type;
 }

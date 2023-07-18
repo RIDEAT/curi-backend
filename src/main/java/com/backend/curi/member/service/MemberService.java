@@ -6,13 +6,14 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.member.controller.dto.*;
 import com.backend.curi.member.repository.EmployeeRepository;
 import com.backend.curi.member.repository.ManagerRepository;
+import com.backend.curi.member.repository.MemberRepository;
 import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.Manager;
+import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class MemberService {
 
     private final EmployeeRepository employeeRepository;
     private final ManagerRepository managerRepository;
+    private final MemberRepository memberRepository;
     private final WorkspaceService workspaceService;
 
     public EmployeeResponse createEmployee(CurrentUser currentUser, Long workspaceId, EmployeeRequest request) {
@@ -127,5 +129,32 @@ public class MemberService {
         return manager;
     }
 
+
+    public MemberListResponse getMemberList (CurrentUser currentUser, Long workspaceId, MemberType memberType){
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var memberList = memberRepository.findAllByWorkspaceAndType(workspace, memberType);
+        return MemberListResponse.of(memberList);
+    }
+
+    public MemberResponse createMember (CurrentUser currentUser, MemberRequest request){
+
+        var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
+
+        Member member = Member.builder()
+                .workspace(workspace)
+                .name(request.getName())
+                .email(request.getEmail())
+                .phoneNum(request.getPhoneNum())
+                .department(request.getDepartment())
+                .startDate(LocalDate.parse(request.getStartDate()))
+                .type(request.getType())
+                .build();
+
+        memberRepository.save(member);
+
+        // member 가 employee 냐 manager 에 따라 추가 정보 저장해야 함.
+
+        return MemberResponse.of(member);
+    }
 
 }
