@@ -33,20 +33,20 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
-    public MemberResponse getMember(CurrentUser currentUser, Long workspaceId, Long memberId){
-        var member = getMemberEntity(memberId, currentUser, workspaceId);
+    public MemberResponse getMember(CurrentUser currentUser, Long memberId){
+        var member = getMemberEntity(memberId, currentUser);
         return MemberResponse.of(member);
     }
 
-    public MemberResponse deleteMember(CurrentUser currentUser, Long memberId, Long workspaceId){
-        var member = getMemberEntity(memberId, currentUser, workspaceId);
+    public MemberResponse deleteMember(CurrentUser currentUser, Long memberId){
+        var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
         return MemberResponse.of(member);
     }
 
     @Transactional
     public MemberResponse modifyMember(CurrentUser currentUser, Long memberId, MemberRequest request) {
-        var member = getMemberEntity(memberId, currentUser, request.getWid());
+        var member = getMemberEntity(memberId, currentUser);
         member.modifyInformation(request);
         return MemberResponse.of(member);
     }
@@ -84,13 +84,13 @@ public class MemberService {
         return MemberResponse.of(member);
     }
 
-    private Member getMemberEntity(Long id, CurrentUser currentUser, Long workspaceId) {
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+    private Member getMemberEntity(Long id, CurrentUser currentUser) {
+        var member = memberRepository.findById(id)
+                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
+        var workspace = member.getWorkspace();
 
         userworkspaceService.checkAuthentication(currentUser, workspace);
 
-        var member = memberRepository.findById(id)
-                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
         if (!member.getWorkspace().equals(workspace))
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
 

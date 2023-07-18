@@ -19,7 +19,7 @@ public class MemberResponse {
 
     private Long id;
 
-    private Long workspaceId;
+    private Long wid;
 
     private String name;
 
