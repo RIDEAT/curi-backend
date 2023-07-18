@@ -1,27 +1,25 @@
 package com.backend.curi.member.repository.entity;
 
-
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.Generated;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
 @Getter
 @NoArgsConstructor
-@MappedSuperclass
-public abstract class MemberEntity extends BaseEntity {
+@Builder
+@AllArgsConstructor
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspaceId")
@@ -33,12 +31,11 @@ public abstract class MemberEntity extends BaseEntity {
 
     protected String phoneNum;
 
+    protected String department;
+
     protected LocalDate startDate;
 
-    public void modifyInformation(String name, String email, String phoneNum, LocalDate startDate) {
-        this.name = name;
-        this.email = email;
-        this.phoneNum = phoneNum;
-        this.startDate = startDate;
-    }
+    @Enumerated(EnumType.STRING)
+    protected MemberType type;
+    
 }
