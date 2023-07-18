@@ -17,23 +17,28 @@ import java.time.LocalDate;
 @Setter
 public class MemberResponse {
 
-    protected Long id;
+    private Long id;
 
-    protected Long workspaceId;
+    private Long workspaceId;
 
-    protected String name;
+    private String name;
 
-    protected String phoneNum;
+    private String phoneNum;
 
-    protected String email;
+    private String email;
 
-    protected String department;
+    private String department;
 
-    protected String startDate;
+    private String type;
 
-    protected String type;
+    private Object detail;
 
     public static MemberResponse of(Member member) {
+        Object memberDetail = null;
+        if(member.getType() == MemberType.employee)
+            memberDetail = EmployeeDetail.of(member.getEmployee());
+//        else if(member.getType() == MemberType.manager)
+//            memberDetail = new ManagerDetail();
         return new MemberResponse(
                 member.getId(),
                 member.getWorkspace().getId(),
@@ -41,7 +46,7 @@ public class MemberResponse {
                 member.getPhoneNum(),
                 member.getEmail(),
                 member.getDepartment(),
-                member.getStartDate().toString(),
-                member.getType().toString());
+                member.getType().toString(),
+                memberDetail);
     }
 }

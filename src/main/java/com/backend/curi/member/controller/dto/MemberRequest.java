@@ -14,26 +14,22 @@ import javax.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberRequest {
+public abstract class MemberRequest {
 
-    private Long wid;
+    protected Long wid;
 
     @NotBlank(message = "이름을 입력해주세요.")
-    private String name;
+    protected String name;
 
     @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$",
             message = "이메일 형식이 올바르지 않습니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
-    private String email;
+    protected String email;
 
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$",
             message = "전화번호 형식이 올바르지 않습니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
-    private String phoneNum;
+    protected String phoneNum;
 
-    private String department;
-
-    private String startDate;
-
-    private MemberType type;
+    protected String department;
 }
