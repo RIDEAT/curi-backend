@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/member/{workspaceId}")
 public class MemberController {
 

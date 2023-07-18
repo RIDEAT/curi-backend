@@ -45,6 +45,22 @@ dependencies {
 // https://mvnrepository.com/artifact/org.mockito/mockito-core
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
 
+// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+	//implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
+	//implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.1'
+
+
+	//testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.5'
+
+	//implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
+
+
+
 
 }
 
@@ -81,5 +97,10 @@ jib {
 		creationTime = "USE_CURRENT_TIMESTAMP"
 		jvmFlags = ['-XX:+UseContainerSupport', '-Dserver.port=8080', '-Dfile.encoding=UTF-8']
 		ports = ['8080']
+	}
+}
+configurations {
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 	}
 }

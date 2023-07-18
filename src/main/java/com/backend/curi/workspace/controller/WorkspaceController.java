@@ -6,23 +6,25 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.validation.Valid;
 import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/workspace")
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
+    private static Logger log = LogManager.getLogger(WorkspaceController.class.getName());
 
     @GetMapping
     @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.")
