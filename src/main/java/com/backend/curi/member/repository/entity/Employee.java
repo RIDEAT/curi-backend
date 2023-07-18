@@ -1,7 +1,11 @@
 package com.backend.curi.member.repository.entity;
 
 
+import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.member.controller.dto.EmployeeRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,30 +16,24 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Employee extends MemberEntity{
+@AllArgsConstructor
+@Builder
+public class Employee extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @OneToOne(mappedBy = "employee")
+    private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id")
-    private Manager manager;
+    private LocalDate startDate;
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
+    public void modify(MemberRequest request) {
+        var employeeRequest = (EmployeeRequest) request;
+        this.startDate = LocalDate.parse(employeeRequest.getStartDate());
     }
 
-    @Builder
-    public Employee(Long id,
-                    Workspace workspace,
-                    String name,
-                    String email,
-                    String phoneNum,
-                    LocalDate startDate,
-                    Manager manager) {
-        this.id= id;
-        this.workspace = workspace;
-        this.name = name;
-        this.email = email;
-        this.phoneNum = phoneNum;
-        this.startDate = startDate;
-        this.manager = manager;
+    public static EmployeeBuilder of(MemberRequest request) {
+        return Employee.builder()
+                .startDate(LocalDate.parse(((EmployeeRequest) request).getStartDate()));
     }
 }

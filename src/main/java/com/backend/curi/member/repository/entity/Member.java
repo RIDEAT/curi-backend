@@ -1,6 +1,9 @@
 package com.backend.curi.member.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.member.controller.dto.EmployeeRequest;
+import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,23 +22,49 @@ public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspaceId")
-    protected Workspace workspace;
+    private Workspace workspace;
 
-    protected String name;
+    private String name;
 
-    protected String email;
+    private String email;
 
-    protected String phoneNum;
+    private String phoneNum;
 
-    protected String department;
-
-    protected LocalDate startDate;
+    private String department;
 
     @Enumerated(EnumType.STRING)
-    protected MemberType type;
-    
+    private MemberType type;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "employeeId")
+    private Employee employee;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "managerId")
+    private Manager manager;
+
+
+    public static MemberBuilder of(MemberRequest request) {
+        return Member.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .phoneNum(request.getPhoneNum())
+                .type(request.getType());
+    }
+    public void modifyInformation(MemberRequest request) {
+        this.name = request.getName();
+        this.email = request.getEmail();
+        this.phoneNum = request.getPhoneNum();
+        this.type = request.getType();
+
+        if(type == MemberType.employee) {
+            this.employee.modify(request);
+        } else {
+            this.manager.modify(request);
+        }
+    }
 }

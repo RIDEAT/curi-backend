@@ -2,6 +2,7 @@ package com.backend.curi.workspace.repository.entity;
 
 import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.Manager;
+import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.workflow.repository.entity.Workflow;
 import lombok.Builder;
@@ -27,10 +28,7 @@ public class Workspace {
     private String email;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Employee> employees;
-
-    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Manager> managers;
+    private List<Member> members;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workflow> workflows;

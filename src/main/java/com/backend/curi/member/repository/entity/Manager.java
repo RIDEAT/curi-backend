@@ -1,41 +1,38 @@
 package com.backend.curi.member.repository.entity;
 
+import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class Manager extends MemberEntity {
+@AllArgsConstructor
+@Builder
+public class Manager extends BaseEntity {
 
-    private String department;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public void modifyInformation(String name, String email, String phoneNum, LocalDate startDate, String department) {
-        super.modifyInformation(name, email, phoneNum, startDate);
-        this.department = department;
+    @OneToOne(mappedBy = "manager")
+    private Member member;
+
+    public void modify(MemberRequest request) {
+        var managerRequest = (ManagerRequest) request;
     }
 
-    @Builder
-    public Manager(Long id,
-                   Workspace workspace,
-                   String name,
-                   String email,
-                   String phoneNum,
-                   LocalDate startDate,
-                   String department) {
-        this.id = id;
-        this.workspace = workspace;
-        this.name = name;
-        this.email = email;
-        this.phoneNum = phoneNum;
-        this.startDate = startDate;
-        this.department = department;
+    public static ManagerBuilder of(MemberRequest request) {
+        return Manager.builder();
     }
+
 }
