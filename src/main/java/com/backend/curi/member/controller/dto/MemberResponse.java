@@ -37,8 +37,8 @@ public class MemberResponse {
         Object memberDetail = null;
         if(member.getType() == MemberType.employee)
             memberDetail = EmployeeDetail.of(member.getEmployee());
-//        else if(member.getType() == MemberType.manager)
-//            memberDetail = new ManagerDetail();
+        else if(member.getType() == MemberType.manager)
+            memberDetail = ManagerDetail.of(member.getManager());
         return new MemberResponse(
                 member.getId(),
                 member.getWorkspace().getId(),

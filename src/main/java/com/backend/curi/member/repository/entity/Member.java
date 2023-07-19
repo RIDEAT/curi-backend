@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -47,6 +49,18 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "managerId")
     private Manager manager;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Member member = (Member) o;
+        return Objects.equals(id, member.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     public static MemberBuilder of(MemberRequest request) {
         return Member.builder()
@@ -65,6 +79,14 @@ public class Member extends BaseEntity {
             this.employee.modify(request);
         } else {
             this.manager.modify(request);
+        }
+    }
+
+    public List<EmployeeManager> getEmployeeManagers() {
+        if(type == MemberType.employee) {
+            return this.employee.getEmployeeManagers();
+        } else {
+            return this.manager.getEmployeeManagers();
         }
     }
 }
