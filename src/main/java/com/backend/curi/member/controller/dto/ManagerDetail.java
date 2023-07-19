@@ -9,10 +9,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 public class ManagerDetail {
-
+    private String dummy;
     public static ManagerDetail of(Manager manager){
-        return new ManagerDetail();
+        return new ManagerDetail("dummy data");
     }
 }
