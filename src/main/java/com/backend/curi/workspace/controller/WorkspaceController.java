@@ -3,6 +3,8 @@ package com.backend.curi.workspace.controller;
 
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
+import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -17,30 +19,35 @@ import org.apache.logging.log4j.Logger;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/workspace")
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
     private static Logger log = LogManager.getLogger(WorkspaceController.class.getName());
 
-    @GetMapping
-    @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.")
-    public ResponseEntity getList(Authentication authentication) {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("transactionId", 11);
+    @GetMapping("/workspace/{workspaceId}")
+    @Operation(summary = "get", description = "유저의 모든 워크스페이스를 반환합니다.")
+    public ResponseEntity<WorkspaceResponse> get(@PathVariable Long workspaceId, Authentication authentication) {
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        var response = workspaceService.getWorkspaceById(workspaceId);
 
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/workspaces")
+    @Operation(summary = "get List", description = "유저의 모든 워크스페이스를 반환합니다.")
+    public ResponseEntity<List<WorkspaceResponse>> getList(Authentication authentication) {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         var workspaceList = workspaceService.getWorkspaceList(currentUser);
-        responseBody.put("list", workspaceList);
+        var resonseList = workspaceList.stream().map(WorkspaceResponse::of).collect(Collectors.toList());
 
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        return ResponseEntity.ok(resonseList);
     }
 
 
-    @PostMapping(consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
+    @PostMapping(path = "/workspace",consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
     @Operation(summary = "create workspace", description = "workspace 를 생성합니다.")
     public ResponseEntity createWorkspace(@RequestBody @Valid WorkspaceRequest request, Authentication authentication) {
 
@@ -60,7 +67,8 @@ public class WorkspaceController {
         return new ResponseEntity(responseBody, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{workspaceId}",
+    @PutMapping(
+            path ="/workspace/{workspaceId}",
             consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
     @Operation(summary = "update workspace", description = "workspace 를 변경합니다.")
     public ResponseEntity updateWorkspace(@PathVariable Long workspaceId, @RequestBody @Valid WorkspaceRequest reqeust, Authentication authentication) {
@@ -82,7 +90,7 @@ public class WorkspaceController {
     }
 
 
-    @DeleteMapping("/{workspaceId}")
+    @DeleteMapping("workspace/{workspaceId}")
     @Operation(summary = "delete workspace", description = "workspace 를 삭제합니다.")
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId, Authentication authentication) {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();

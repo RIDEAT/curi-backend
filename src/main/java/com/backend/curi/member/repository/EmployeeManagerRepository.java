@@ -9,9 +9,10 @@ import com.backend.curi.workspace.repository.entity.Workspace;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeManagerRepository extends JpaRepository<EmployeeManager, Long> {
     List<EmployeeManager> findAllByEmployee(Employee employee);
     List<EmployeeManager> findAllByManager(Manager manager);
-    List<EmployeeManager> findAllByEmployeeAndManager(Employee employee, Manager manager);
+    Optional<EmployeeManager> findByEmployeeAndManager(Employee employee, Manager manager);
 }

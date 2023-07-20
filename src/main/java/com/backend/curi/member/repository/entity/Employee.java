@@ -33,13 +33,15 @@ public class Employee extends BaseEntity {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<EmployeeManager> employeeManagers;
 
+    /*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        return Objects.equals(id, employee.id);
-    }
+        System.out.println("id: " + id+ "employee.id: " + employee.id);
+        return (id == employee.id);
+    }*/
 
     @Override
     public int hashCode() {

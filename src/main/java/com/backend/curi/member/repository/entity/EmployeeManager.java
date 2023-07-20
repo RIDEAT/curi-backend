@@ -1,5 +1,6 @@
 package com.backend.curi.member.repository.entity;
 
+import com.backend.curi.workspace.repository.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,10 @@ public class EmployeeManager {
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
-    private String relation;
+    // 객체로 교체되어야함
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Override
     public boolean equals(Object o) {
@@ -43,8 +47,8 @@ public class EmployeeManager {
         return Objects.hash(id);
     }
 
-    public void modifyEmployeeManager(Manager manager, String relation) {
+    public void modifyEmployeeManager(Manager manager, Role role) {
         this.manager = manager;
-        this.relation = relation;
+        this.role = role;
     }
 }

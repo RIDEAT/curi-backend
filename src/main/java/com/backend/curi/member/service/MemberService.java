@@ -11,6 +11,8 @@ import com.backend.curi.member.repository.MemberRepository;
 import com.backend.curi.member.repository.entity.*;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workspace.repository.RoleRepository;
+import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ public class MemberService {
     private final ManagerRepository managerRepository;
     private final MemberRepository memberRepository;
     private final EmployeeManagerRepository employeeManagerRepository;
+    private final RoleRepository roleRepository;
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
@@ -48,6 +53,7 @@ public class MemberService {
     public MemberResponse modifyMember(CurrentUser currentUser, Long memberId, MemberRequest request) {
         var member = getMemberEntity(memberId, currentUser);
         member.modifyInformation(request);
+        modifyEmployeeManager(currentUser, member, request);
         return MemberResponse.of(member);
     }
 
@@ -62,12 +68,13 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
+    public String createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
         userworkspaceService.checkAuthentication(currentUser, workspace);
 
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
+
 
         if (type == MemberType.employee) {
             var employee = Employee.of(request).build();
@@ -83,8 +90,8 @@ public class MemberService {
 
         var member = memberBuilder.build();
         memberRepository.save(member);
-
-        return MemberResponse.of(member);
+        setEmployeeManager(currentUser, member, request);
+        return "suceess";
     }
 
     private Member getMemberEntity(Long id, CurrentUser currentUser) {
@@ -98,70 +105,73 @@ public class MemberService {
     }
 
 
-    public MemberResponse setEmployeeManager() {
-        CurrentUser currentUser = new CurrentUser();
-        Long employeeId = new Long(1);
-        Long managerId = new Long(1);
-        String relation = "relation";
-
-        var employee = getMemberEntity(employeeId, currentUser);
-        var manager = getMemberEntity(managerId, currentUser);
-        if(employee.equals(manager)){
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+    @Transactional
+    public void setEmployeeManager(CurrentUser currentUser, Member employee, MemberRequest request) {
+        if(employee.getType() != MemberType.employee){
+            return;
         }
+        var req = (EmployeeRequest)request;
+        var list = req.getManagers();
+        var workspace = employee.getWorkspace();
 
-        if (!employee.getWorkspace().equals(manager.getWorkspace())) {
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+        for(var detail : list){
+            var manager = getMemberEntity(detail.getId(), currentUser);
+            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+            roleRepository.save(role);
+            if(employee.equals(manager)){
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            }
+            if (!employee.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            }
+            var employeeManager = EmployeeManager.builder()
+                    .employee(employee.getEmployee())
+                    .manager(manager.getManager())
+                    .role(role)
+                    .build();
+
+            employeeManagerRepository.save(employeeManager);
         }
-        var employeeManager = EmployeeManager.builder()
-                .employee(employee.getEmployee())
-                .manager(manager.getManager())
-                .relation(relation)
-                .build();
-
-        employeeManagerRepository.save(employeeManager);
-
-        return MemberResponse.of(employee);
-    }
-
-    public List<EmployeeManager> getEmployeeManagerList() {
-        CurrentUser currentUser = new CurrentUser();
-        Long memberId = new Long(1);
-        var member = getMemberEntity(memberId, currentUser);
-
-
-        return member.getEmployeeManagers();
     }
 
     @Transactional
-    public boolean modifyEmployeeManager(){
-        CurrentUser currentUser = new CurrentUser();
-
-        Long employeeManagerId = new Long(1);
-        Long employeeId = new Long(1);
-        Long managerId = new Long(1);
-        String relation = "relation";
-
-
-
-        var employee = getMemberEntity(employeeId, currentUser);
-        var manager = getMemberEntity(managerId, currentUser);
-
-        if(employee.equals(manager)){
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+    public void modifyEmployeeManager(CurrentUser currentUser, Member employeeMember, MemberRequest request) {
+        if(employeeMember.getType() != MemberType.employee){
+            return;
         }
+        var req = (EmployeeRequest)request;
+        var list = req.getManagers();
+        var workspace = employeeMember.getWorkspace();
+        for(var detail : list) {
+            var manager = getMemberEntity(detail.getId(), currentUser);
+            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+            roleRepository.save(role);
 
-        var employManager = employeeManagerRepository.findById(employeeManagerId)
-                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.NOT_ALLOWED_PERMISSION_ERROR));
+            if (employeeMember.equals(manager)) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            }
 
-        if(!employManager.getEmployee().equals(employee)){
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            var employManager = employeeManagerRepository.findByEmployeeAndManager(employeeMember.getEmployee(), manager.getManager());
+
+            if(employManager.isEmpty()) {
+                employManager = Optional.ofNullable(EmployeeManager.builder()
+                        .employee(employeeMember.getEmployee())
+                        .manager(manager.getManager())
+                        .role(role)
+                        .build());
+                employeeManagerRepository.save(employManager.get());
+            }
+
+
+            if (!employManager.get().getEmployee().equals(employeeMember.getEmployee())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            }
+            if (!employeeMember.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            }
+
+            employManager.get().modifyEmployeeManager(manager.getManager(), role);
         }
-
-        employManager.modifyEmployeeManager(manager.getManager(), relation);
-
-
-        return true;
     }
 
     @Transactional

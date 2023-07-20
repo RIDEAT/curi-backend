@@ -36,6 +36,8 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;
 
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+    private List<Role> roles;
     public Workspace(){}
     @Builder
     public Workspace(Long id, String name, String email){
@@ -51,13 +53,13 @@ public class Workspace {
         return this;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Workspace workspace = (Workspace) o;
-        return Objects.equals(id, workspace.id);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Workspace workspace = (Workspace) o;
+//        return Objects.equals(id, workspace.id);
+//    }
 
     @Override
     public int hashCode() {
