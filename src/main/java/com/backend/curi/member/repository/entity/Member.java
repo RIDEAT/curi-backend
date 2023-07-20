@@ -76,7 +76,7 @@ public class Member extends BaseEntity {
         this.department = request.getDepartment();
 
         if(type == MemberType.employee) {
-            this.employee.modify(request);
+            getEmployee().modify(request);
         } else {
             this.manager.modify(request);
         }
@@ -84,7 +84,7 @@ public class Member extends BaseEntity {
 
     public List<EmployeeManager> getEmployeeManagers() {
         if(type == MemberType.employee) {
-            return this.employee.getEmployeeManagers();
+            return getEmployee().getEmployeeManagers();
         } else {
             return this.manager.getEmployeeManagers();
         }

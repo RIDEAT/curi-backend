@@ -7,6 +7,8 @@ import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.controller.dto.WorkspaceListResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
+import com.backend.curi.workspace.repository.RoleRepository;
+import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,7 +25,7 @@ import javax.transaction.Transactional;
 public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserworkspaceService userworkspaceService;
-
+    private final RoleRepository roleRepository;
     public WorkspaceResponse getWorkspaceById(Long id){
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
         return WorkspaceResponse.of(workspace);
@@ -78,14 +81,16 @@ public class WorkspaceService {
 
     }
 
-    public WorkspaceListResponse getWorkspaceList(CurrentUser currentUser){
-        var workspaceList = userworkspaceService.getWorkspaceListByUser(currentUser);
-
-        return WorkspaceListResponse.of(workspaceList);
+    public List<Workspace> getWorkspaceList(CurrentUser currentUser){
+        return userworkspaceService.getWorkspaceListByUser(currentUser);
     }
 
     public Workspace getWorkspaceEntityById(Long id){
         return workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+    }
+
+    public Role getRoleEntityByIdAndWorkspace(Long id, Workspace workspace){
+        return roleRepository.findByIdAndWorkspace(id, workspace).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.NOT_ALLOWED_PERMISSION_ERROR));
     }
 
 }
