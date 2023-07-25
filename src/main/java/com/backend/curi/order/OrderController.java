@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/orders")
 
-
 public class OrderController {
-
     Logger log = LoggerFactory.getLogger("com.terry.logging.controller.OrderController");
 
     @RequestMapping(value="/{id}",method= RequestMethod.GET)
