@@ -7,11 +7,14 @@ import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.userworkspace.repository.UserworkspaceRepository;
+import com.backend.curi.workspace.repository.WorkspaceRepository;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.hibernate.jdbc.Work;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserworkspaceService {
     private final UserworkspaceRepository userworkspaceRepository;
     private final UserRepository userRepository;
+    private final WorkspaceRepository workspaceRepository;
     public Userworkspace create (CurrentUser currentUser, Workspace workspace){
         var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         return userworkspaceRepository.save(Userworkspace.builder().user(user).userEmail(user.getEmail()).workspace(workspace).build());
@@ -56,6 +60,17 @@ public class UserworkspaceService {
     public void checkAuthentication (CurrentUser currentUser, Workspace workspace){
         var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         if (userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty()) {
+            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
+        }
+    }
+
+    public void belongstoWorkspace(Long workspaceId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        String userId = currentUser.getUserId();
+        User_ user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+        if(userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty()){
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
     }

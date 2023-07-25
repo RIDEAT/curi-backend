@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +77,11 @@ public class WorkflowService {
         workflowRepository.delete(workflow);
 
         return WorkflowResponse.of(workflow);
+    }
+
+    public Workflow getWorkflowById(Long workflowId){
+        Optional<Workflow> workflowOptional = workflowRepository.findById(workflowId);
+        return workflowOptional.orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
 }
