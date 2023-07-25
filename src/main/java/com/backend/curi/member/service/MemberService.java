@@ -178,8 +178,8 @@ public class MemberService {
     public boolean deleteEmployeeManager(){
         CurrentUser currentUser = new CurrentUser();
 
-        Long employeeManagerId = new Long(1);
-        Long employeeId = new Long(1);
+        Long employeeManagerId = 1L;
+        Long employeeId = 1L;
 
 
         var employManager = employeeManagerRepository.findById(employeeManagerId)
@@ -194,5 +194,9 @@ public class MemberService {
         employeeManagerRepository.delete(employManager);
 
         return true;
+    }
+
+    public Employee getEmployeeById(Long employeeId){
+       return employeeRepository.findById(employeeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
     }
 }

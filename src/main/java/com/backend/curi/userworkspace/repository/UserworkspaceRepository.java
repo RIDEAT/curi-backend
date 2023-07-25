@@ -15,4 +15,5 @@ public interface UserworkspaceRepository extends JpaRepository<Userworkspace, In
     List<Userworkspace> findAllByWorkspace(Workspace workspace);
 
     List<Userworkspace> findAllByUserAndWorkspace(User_ user, Workspace workspace);
+
 }
