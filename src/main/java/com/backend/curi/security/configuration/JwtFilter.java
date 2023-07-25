@@ -42,8 +42,8 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            supposeThereIsNoIssue(request, response, filterChain);
-            /*
+           // supposeThereIsNoIssue(request, response, filterChain);
+
             // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/h2-console")){
                 filterChain.doFilter(request, response);
@@ -105,7 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);
-            return;*/
+            return;
         }
         catch (JsonMappingException e) {
             throw new RuntimeException(e);
