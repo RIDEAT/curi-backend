@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}")
-// 앞 단에서 공통적으로 workspace에 접근 권한을 확인
 @RequiredArgsConstructor
 public class LaunchedSequenceController {
 
