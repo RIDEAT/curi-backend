@@ -46,6 +46,11 @@ public class WorkspaceService {
         workspaceRepository.save(workspace);
         userworkspaceService.create(currentUser, workspace);
 
+        var employeeRole = Role.builder().workspace(workspace).name("신입 사원").build();
+        var managerRole = Role.builder().workspace(workspace).name("HR 매니저").build();
+        roleRepository.save(employeeRole);
+        roleRepository.save(managerRole);
+
         return WorkspaceResponse.of(workspace);
     }
 

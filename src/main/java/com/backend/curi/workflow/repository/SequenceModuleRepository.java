@@ -9,5 +9,4 @@ import java.util.Optional;
 
 public interface SequenceModuleRepository extends JpaRepository<SequenceModule, Long> {
     Optional<SequenceModule> findBySequenceAndModule(Sequence sequence, Module module);
-
 }

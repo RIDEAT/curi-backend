@@ -28,9 +28,9 @@ public class SequenceModule extends BaseEntity {
     @JoinColumn(name = "module_id")
     private Module module;
 
-    private Integer order;
+    private Integer orderNum;
 
     public void modify(ModuleRequest request){
-        this.order = request.getOrder();
+        this.orderNum = request.getOrder();
     }
 }

@@ -47,7 +47,7 @@ public class ModuleService {
         var sequenceModule = SequenceModule.builder()
                 .sequence(sequence)
                 .module(module)
-                .order(request.getOrder())
+                .orderNum(request.getOrder())
                 .build();
         sequenceModuleRepository.save(sequenceModule);
     }

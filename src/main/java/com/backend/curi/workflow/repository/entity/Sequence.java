@@ -36,10 +36,6 @@ public class Sequence extends BaseEntity {
 
     @OneToMany(mappedBy = "sequence", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<WorkflowSequence> workflowSequences = new ArrayList<>();
-
-    @OneToMany(mappedBy = "sequence", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private List<SequenceModule> sequenceModules = new ArrayList<>();
 
     public static Sequence of(SequenceRequest request, Role role, Workspace workspace) {

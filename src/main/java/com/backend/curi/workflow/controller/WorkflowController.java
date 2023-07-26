@@ -33,8 +33,8 @@ public class WorkflowController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WorkflowResponse>> getWorkflows(@PathVariable Long workflowId) {
-        var response = workflowService.getWorkflows(workflowId);
+    public ResponseEntity<List<WorkflowResponse>> getWorkflows(@PathVariable Long workspaceId) {
+        var response = workflowService.getWorkflows(workspaceId);
         return ResponseEntity.ok(response);
     }
 
@@ -59,10 +59,9 @@ public class WorkflowController {
     }
 
     @DeleteMapping("/{workflowId}")
-    public ResponseEntity<Void> deleteWorkflow(@PathVariable Long workspaceId,
-                                               @PathVariable Long workflowId,
+    public ResponseEntity<Void> deleteWorkflow(@PathVariable Long workflowId,
                                                Authentication authentication) {
-        workflowService.deleteWorkflow(workspaceId, workflowId);
+        workflowService.deleteWorkflow(workflowId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

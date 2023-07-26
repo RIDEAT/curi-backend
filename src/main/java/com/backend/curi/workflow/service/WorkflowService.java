@@ -58,7 +58,7 @@ public class WorkflowService {
         workflow.modify(request);
     }
 
-    public void deleteWorkflow (Long workspaceId, Long workflowId){
+    public void deleteWorkflow (Long workflowId){
         var workflow = workflowRepository.findById(workflowId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
         workflowRepository.delete(workflow);
     }

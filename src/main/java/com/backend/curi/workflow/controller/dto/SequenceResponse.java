@@ -26,7 +26,7 @@ public class SequenceResponse {
     public static SequenceResponse of(Sequence sequence) {
         var modules =
                 sequence.getSequenceModules();
-        modules.sort((a, b) -> a.getOrder() - b.getOrder());
+        modules.sort((a, b) -> a.getOrderNum() - b.getOrderNum());
         var responseList = modules.stream()
                 .map(SequenceModule::getModule)
                 .map(ModuleResponse::of)
