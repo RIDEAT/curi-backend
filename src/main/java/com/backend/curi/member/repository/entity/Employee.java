@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -58,3 +59,4 @@ public class Employee extends BaseEntity {
                 .startDate(LocalDate.parse(((EmployeeRequest) request).getStartDate()));
     }
 }
+

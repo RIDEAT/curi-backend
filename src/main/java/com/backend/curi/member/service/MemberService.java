@@ -15,6 +15,7 @@ import com.backend.curi.workspace.repository.RoleRepository;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
+    private final MongoTemplate mongoTemplate;
     public MemberResponse getMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         return MemberResponse.of(member);
@@ -46,6 +48,8 @@ public class MemberService {
     public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
+        mongoTemplate.insert(member);
+
         return MemberResponse.of(member);
     }
 
@@ -56,6 +60,8 @@ public class MemberService {
         modifyEmployeeManager(currentUser, member, request);
         return MemberResponse.of(member);
     }
+
+
 
     public List<MemberResponse> getMemberList(CurrentUser currentUser, Long workspaceId, MemberType memberType) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
