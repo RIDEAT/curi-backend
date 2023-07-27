@@ -59,7 +59,7 @@ public class WorkflowService {
     }
 
     public void deleteWorkflow (Long workflowId){
-        var workflow = workflowRepository.findById(workflowId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
+        var workflow = getWorkflowEntity(workflowId);
         workflowRepository.delete(workflow);
     }
 
@@ -72,7 +72,8 @@ public class WorkflowService {
     }
 
     public Workflow getWorkflowEntity(Long workflowId){
-        return workflowRepository.findById(workflowId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
+        return workflowRepository.findById(workflowId)
+                .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
 }

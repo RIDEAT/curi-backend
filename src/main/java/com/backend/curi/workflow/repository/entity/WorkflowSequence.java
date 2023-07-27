@@ -15,7 +15,6 @@ import java.util.Optional;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class WorkflowSequence extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +34,17 @@ public class WorkflowSequence extends BaseEntity {
     @JoinColumn(name = "prev_sequence_id")
     private Sequence prevSequence;
 
+    @Builder
+    public WorkflowSequence(Long id, Workflow workflow, Sequence sequence, Integer dayOffset, Optional<Sequence> prevSequence){
+        this.id = id;
+        this.workflow = workflow;
+        this.sequence = sequence;
+        this.dayOffset = dayOffset;
+        if(prevSequence.isPresent())
+            this.prevSequence = prevSequence.get();
+        else
+            this.prevSequence =sequence;
+    }
     public void modify(SequenceRequest request, Optional<Sequence> prevSequence){
         this.dayOffset = request.getDayOffset();
         if(prevSequence.isPresent())

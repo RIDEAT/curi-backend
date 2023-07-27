@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/workspaces/{workspaceId}")
@@ -37,6 +39,12 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/sequences/")
+    public ResponseEntity<List<SequenceResponse>> getSequences(@PathVariable Long workspaceId) {
+        var response = sequenceService.getSequences(workspaceId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PutMapping("/sequences/{sequenceId}")
     public ResponseEntity<Void> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
                                                @PathVariable Long sequenceId) {
@@ -55,6 +63,14 @@ public class SequenceController {
     @DeleteMapping("/sequences/{sequenceId}")
     public ResponseEntity<Void> deleteSequence(@PathVariable Long sequenceId) {
         sequenceService.deleteSequence(sequenceId);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping("workflows/{workflowId}/sequences/{sequenceId}")
+    public ResponseEntity<Void> deleteWorkflowSequence(@PathVariable Long workflowId,
+                                                       @PathVariable Long sequenceId) {
+        sequenceService.deleteWorkflowSequence(workflowId, sequenceId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

@@ -10,12 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/workspaces/{workspaceId}")
 public class ModuleController {
     private final ModuleService moduleService;
 
+    @GetMapping("modules")
+    public ResponseEntity<List<ModuleResponse>> getModules(@PathVariable Long workspaceId) {
+        var response = moduleService.getModules(workspaceId);
+        return ResponseEntity.ok(response);
+    }
     @PostMapping("modules")
     public ResponseEntity<Void> createModule(
             @RequestBody @Validated(ValidationSequence.class) ModuleRequest request,
@@ -53,6 +60,13 @@ public class ModuleController {
     @DeleteMapping("modules/{moduleId}")
     public ResponseEntity<Void> deleteModule(@PathVariable Long moduleId) {
         moduleService.deleteModule(moduleId);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping("sequences/{sequenceId}/modules/{moduleId}")
+    public ResponseEntity<Void> deleteSequenceModule(@PathVariable Long sequenceId, @PathVariable Long moduleId) {
+        moduleService.deleteSequenceModule(sequenceId, moduleId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
