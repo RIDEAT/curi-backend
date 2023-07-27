@@ -1,18 +1,20 @@
 package com.backend.curi.workflow.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Entity
+@Builder
 public class Workflow extends BaseEntity {
 
     @Id
@@ -27,11 +29,13 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
-    @Builder
-    public Workflow(Long workflowId, String name, Workspace workspace){
-        this.id = workflowId;
-        this.name = name;
-        this.workspace = workspace;
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<WorkflowSequence> workflowSequences = new ArrayList<>();
+
+
+    public void modify(WorkflowRequest request){
+        this.name = request.getName();
     }
 
 }

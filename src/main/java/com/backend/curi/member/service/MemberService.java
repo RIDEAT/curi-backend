@@ -15,10 +15,12 @@ import com.backend.curi.workspace.repository.RoleRepository;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -38,6 +40,7 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
+    private final MongoTemplate mongoTemplate;
     public MemberResponse getMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         return MemberResponse.of(member);
@@ -46,6 +49,8 @@ public class MemberService {
     public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
+        mongoTemplate.insert(member);
+
         return MemberResponse.of(member);
     }
 
@@ -56,6 +61,8 @@ public class MemberService {
         modifyEmployeeManager(currentUser, member, request);
         return MemberResponse.of(member);
     }
+
+
 
     public List<MemberResponse> getMemberList(CurrentUser currentUser, Long workspaceId, MemberType memberType) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
@@ -68,30 +75,31 @@ public class MemberService {
     }
 
     @Transactional
-    public String createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
+    public MemberResponse createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
         userworkspaceService.checkAuthentication(currentUser, workspace);
 
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
+        setMemberDetail(memberBuilder, type, request);
+        var member = memberBuilder.build();
+        memberRepository.save(member);
+        setEmployeeManager(currentUser, member, request);
 
+        return MemberResponse.of(member);
+    }
 
+    private void setMemberDetail(Member.MemberBuilder memberbuilder, MemberType type, MemberRequest request) {
         if (type == MemberType.employee) {
             var employee = Employee.of(request).build();
             employeeRepository.save(employee);
-            memberBuilder.employee(employee);
+            memberbuilder.employee(employee);
         }
         else if (type == MemberType.manager) {
             var manager = Manager.of(request).build();
             managerRepository.save(manager);
-            memberBuilder.manager(manager);
+            memberbuilder.manager(manager);
         }
-        // member 가 employee 냐 manager 에 따라 추가 정보 저장해야 함.
-
-        var member = memberBuilder.build();
-        memberRepository.save(member);
-        setEmployeeManager(currentUser, member, request);
-        return "suceess";
     }
 
     private Member getMemberEntity(Long id, CurrentUser currentUser) {
@@ -106,56 +114,60 @@ public class MemberService {
 
 
     @Transactional
-    public void setEmployeeManager(CurrentUser currentUser, Member employee, MemberRequest request) {
-        if(employee.getType() != MemberType.employee){
+    public void setEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
+        if(member.getType() != MemberType.employee){
             return;
         }
         var req = (EmployeeRequest)request;
-        var list = req.getManagers();
-        var workspace = employee.getWorkspace();
+        var managerList = req.getManagers();
+        var workspace = member.getWorkspace();
 
-        for(var detail : list){
-            var manager = getMemberEntity(detail.getId(), currentUser);
-            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+        for(var info : managerList){
+            var manager = getMemberEntity(info.getId(), currentUser);
+            var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
-            if(employee.equals(manager)){
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if(member.equals(manager)){
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
-            if (!employee.getWorkspace().equals(manager.getWorkspace())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (!member.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
+
             }
+
             var employeeManager = EmployeeManager.builder()
-                    .employee(employee.getEmployee())
+                    .employee(member.getEmployee())
                     .manager(manager.getManager())
                     .role(role)
                     .build();
 
             employeeManagerRepository.save(employeeManager);
+            member.getEmployee().getEmployeeManagers().add(employeeManager);
         }
     }
 
     @Transactional
-    public void modifyEmployeeManager(CurrentUser currentUser, Member employeeMember, MemberRequest request) {
-        if(employeeMember.getType() != MemberType.employee){
+    public void modifyEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
+        if(member.getType() != MemberType.employee){
             return;
         }
         var req = (EmployeeRequest)request;
-        var list = req.getManagers();
-        var workspace = employeeMember.getWorkspace();
-        for(var detail : list) {
-            var manager = getMemberEntity(detail.getId(), currentUser);
-            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+        var managerList = req.getManagers();
+        var workspace = member.getWorkspace();
+        for(var info : managerList) {
+            var manager = getMemberEntity(info.getId(), currentUser);
+            var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
 
-            if (employeeMember.equals(manager)) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (member.equals(manager)) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
+
             }
 
-            var employManager = employeeManagerRepository.findByEmployeeAndManager(employeeMember.getEmployee(), manager.getManager());
+            var employManager = employeeManagerRepository.findByEmployeeAndManager(member.getEmployee(), manager.getManager());
 
             if(employManager.isEmpty()) {
                 employManager = Optional.ofNullable(EmployeeManager.builder()
-                        .employee(employeeMember.getEmployee())
+                        .employee(member.getEmployee())
                         .manager(manager.getManager())
                         .role(role)
                         .build());
@@ -163,11 +175,12 @@ public class MemberService {
             }
 
 
-            if (!employManager.get().getEmployee().equals(employeeMember.getEmployee())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (!employManager.get().getEmployee().equals(member.getEmployee())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
-            if (!employeeMember.getWorkspace().equals(manager.getWorkspace())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (!member.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
+
             }
 
             employManager.get().modifyEmployeeManager(manager.getManager(), role);
@@ -188,7 +201,7 @@ public class MemberService {
         var employee = getMemberEntity(employeeId, currentUser);
 
         if(!employManager.getEmployee().equals(employee)){
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
         }
 
         employeeManagerRepository.delete(employManager);

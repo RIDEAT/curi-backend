@@ -5,78 +5,76 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workflow.controller.dto.WorkflowListResponse;
+import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.WorkflowRepository;
+import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workflow.repository.entity.WorkflowSequence;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
-    private final UserService userService;
     private final WorkspaceService workspaceService;
-    private final UserworkspaceService userworkspaceService;
-    public WorkflowResponse createWorkflow (CurrentUser currentUser, Long workspaceId, WorkflowRequest request){
+
+    @Transactional
+    public void createWorkflow (Long workspaceId, WorkflowRequest request){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
 
         var workflow = Workflow.builder()
                 .name(request.getName())
                 .workspace(workspace)
                 .build();
-
         workflowRepository.save(workflow);
+    }
+
+    public WorkflowResponse getWorkflow(Long workflowId){
+        var workflow = getWorkflowEntity(workflowId);
 
         return WorkflowResponse.of(workflow);
     }
 
-    public WorkflowResponse getWorkflow(CurrentUser currentUser, Long workspaceId, WorkflowRequest request){
+    public List<WorkflowResponse> getWorkflows(Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
-
-        var workflow = workflowRepository.findById(request.getId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
-
-        return WorkflowResponse.of(workflow);
-    }
-
-    public WorkflowListResponse getWorkflows(CurrentUser currentUser, Long workspaceId){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
-
         var workflowList = workflowRepository.findAllByWorkspace(workspace);
-
-        return WorkflowListResponse.of(workflowList);
+        var responseList = workflowList.stream().map(WorkflowResponse::listOf).collect(Collectors.toList());
+        return responseList;
     }
 
     @Transactional
-    public WorkflowResponse updateWorkflow(CurrentUser currentUser, Long workspaceId, WorkflowRequest request){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
-
-        var workflow = workflowRepository.findById(request.getId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
-
-        //some modify code
-
-        return WorkflowResponse.of(workflow);
+    public void updateWorkflow(Long workflowId, WorkflowRequest request){
+        var workflow = getWorkflowEntity(workflowId);
+        workflow.modify(request);
     }
 
-    public WorkflowResponse deleteWorkflow (CurrentUser currentUser, Long workspaceId, WorkflowRequest request){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
-
-        var workflow = workflowRepository.findById(request.getId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
+    public void deleteWorkflow (Long workflowId){
+        var workflow = getWorkflowEntity(workflowId);
         workflowRepository.delete(workflow);
+    }
 
-        return WorkflowResponse.of(workflow);
+    public List<SequenceResponse> getSequences(Long workflowId){
+        var workflow = getWorkflowEntity(workflowId);
+        var sequenceList = workflow.getWorkflowSequences();
+        sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
+        var responseList = sequenceList.stream().map(WorkflowSequence::getSequence).map(SequenceResponse::of).collect(Collectors.toList());
+        return responseList;
+    }
+
+    public Workflow getWorkflowEntity(Long workflowId){
+        return workflowRepository.findById(workflowId)
+                .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
     public Workflow getWorkflowById(Long workflowId){
