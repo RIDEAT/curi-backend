@@ -126,10 +126,10 @@ public class MemberService {
             var manager = getMemberEntity(info.getId(), currentUser);
             var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
-            if(employee.equals(manager)){
+            if(member.equals(manager)){
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
-            if (!employee.getWorkspace().equals(manager.getWorkspace())) {
+            if (!member.getWorkspace().equals(manager.getWorkspace())) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
 
             }
@@ -158,7 +158,7 @@ public class MemberService {
             var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
 
-            if (employeeMember.equals(manager)) {
+            if (member.equals(manager)) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
 
             }
@@ -175,10 +175,10 @@ public class MemberService {
             }
 
 
-            if (!employManager.get().getEmployee().equals(employeeMember.getEmployee())) {
+            if (!employManager.get().getEmployee().equals(member.getEmployee())) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
-            if (!employeeMember.getWorkspace().equals(manager.getWorkspace())) {
+            if (!member.getWorkspace().equals(manager.getWorkspace())) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
 
             }
