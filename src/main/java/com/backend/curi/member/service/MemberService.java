@@ -15,6 +15,7 @@ import com.backend.curi.workspace.repository.RoleRepository;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
+    private final MongoTemplate mongoTemplate;
     public MemberResponse getMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         return MemberResponse.of(member);
@@ -47,6 +49,8 @@ public class MemberService {
     public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
+        mongoTemplate.insert(member);
+
         return MemberResponse.of(member);
     }
 
@@ -57,6 +61,8 @@ public class MemberService {
         modifyEmployeeManager(currentUser, member, request);
         return MemberResponse.of(member);
     }
+
+
 
     public List<MemberResponse> getMemberList(CurrentUser currentUser, Long workspaceId, MemberType memberType) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
@@ -120,13 +126,12 @@ public class MemberService {
             var manager = getMemberEntity(info.getId(), currentUser);
             var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
-
-            if(member.equals(manager)){
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if(employee.equals(manager)){
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
+            if (!employee.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
 
-            if (!member.getWorkspace().equals(manager.getWorkspace())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
             }
 
             var employeeManager = EmployeeManager.builder()
@@ -153,8 +158,9 @@ public class MemberService {
             var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
 
-            if (member.equals(manager)) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (employeeMember.equals(manager)) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
+
             }
 
             var employManager = employeeManagerRepository.findByEmployeeAndManager(member.getEmployee(), manager.getManager());
@@ -169,11 +175,12 @@ public class MemberService {
             }
 
 
-            if (!employManager.get().getEmployee().equals(member.getEmployee())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (!employManager.get().getEmployee().equals(employeeMember.getEmployee())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
-            if (!member.getWorkspace().equals(manager.getWorkspace())) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            if (!employeeMember.getWorkspace().equals(manager.getWorkspace())) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
+
             }
 
             employManager.get().modifyEmployeeManager(manager.getManager(), role);
@@ -194,7 +201,7 @@ public class MemberService {
         var employee = getMemberEntity(employeeId, currentUser);
 
         if(!employManager.getEmployee().equals(employee)){
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
         }
 
         employeeManagerRepository.delete(employManager);
