@@ -32,7 +32,8 @@ public class Employee extends BaseEntity {
     private LocalDate startDate;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<EmployeeManager> employeeManagers;
+    @Builder.Default
+    private List<EmployeeManager> employeeManagers = new ArrayList<>();
 
     /*
     @Override
@@ -40,7 +41,6 @@ public class Employee extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        System.out.println("id: " + id+ "employee.id: " + employee.id);
         return (id == employee.id);
     }*/
 

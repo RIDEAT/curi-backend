@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -74,30 +75,31 @@ public class MemberService {
     }
 
     @Transactional
-    public String createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
+    public MemberResponse createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
         userworkspaceService.checkAuthentication(currentUser, workspace);
 
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
+        setMemberDetail(memberBuilder, type, request);
+        var member = memberBuilder.build();
+        memberRepository.save(member);
+        setEmployeeManager(currentUser, member, request);
 
+        return MemberResponse.of(member);
+    }
 
+    private void setMemberDetail(Member.MemberBuilder memberbuilder, MemberType type, MemberRequest request) {
         if (type == MemberType.employee) {
             var employee = Employee.of(request).build();
             employeeRepository.save(employee);
-            memberBuilder.employee(employee);
+            memberbuilder.employee(employee);
         }
         else if (type == MemberType.manager) {
             var manager = Manager.of(request).build();
             managerRepository.save(manager);
-            memberBuilder.manager(manager);
+            memberbuilder.manager(manager);
         }
-        // member 가 employee 냐 manager 에 따라 추가 정보 저장해야 함.
-
-        var member = memberBuilder.build();
-        memberRepository.save(member);
-        setEmployeeManager(currentUser, member, request);
-        return "suceess";
     }
 
     private Member getMemberEntity(Long id, CurrentUser currentUser) {
@@ -112,56 +114,60 @@ public class MemberService {
 
 
     @Transactional
-    public void setEmployeeManager(CurrentUser currentUser, Member employee, MemberRequest request) {
-        if(employee.getType() != MemberType.employee){
+    public void setEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
+        if(member.getType() != MemberType.employee){
             return;
         }
         var req = (EmployeeRequest)request;
-        var list = req.getManagers();
-        var workspace = employee.getWorkspace();
+        var managerList = req.getManagers();
+        var workspace = member.getWorkspace();
 
-        for(var detail : list){
-            var manager = getMemberEntity(detail.getId(), currentUser);
-            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+        for(var info : managerList){
+            var manager = getMemberEntity(info.getId(), currentUser);
+            var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
             if(employee.equals(manager)){
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
             }
             if (!employee.getWorkspace().equals(manager.getWorkspace())) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
+
             }
+
             var employeeManager = EmployeeManager.builder()
-                    .employee(employee.getEmployee())
+                    .employee(member.getEmployee())
                     .manager(manager.getManager())
                     .role(role)
                     .build();
 
             employeeManagerRepository.save(employeeManager);
+            member.getEmployee().getEmployeeManagers().add(employeeManager);
         }
     }
 
     @Transactional
-    public void modifyEmployeeManager(CurrentUser currentUser, Member employeeMember, MemberRequest request) {
-        if(employeeMember.getType() != MemberType.employee){
+    public void modifyEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
+        if(member.getType() != MemberType.employee){
             return;
         }
         var req = (EmployeeRequest)request;
-        var list = req.getManagers();
-        var workspace = employeeMember.getWorkspace();
-        for(var detail : list) {
-            var manager = getMemberEntity(detail.getId(), currentUser);
-            var role = Role.builder().name(detail.getRoleName()).workspace(workspace).build();
+        var managerList = req.getManagers();
+        var workspace = member.getWorkspace();
+        for(var info : managerList) {
+            var manager = getMemberEntity(info.getId(), currentUser);
+            var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
             roleRepository.save(role);
 
             if (employeeMember.equals(manager)) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
+
             }
 
-            var employManager = employeeManagerRepository.findByEmployeeAndManager(employeeMember.getEmployee(), manager.getManager());
+            var employManager = employeeManagerRepository.findByEmployeeAndManager(member.getEmployee(), manager.getManager());
 
             if(employManager.isEmpty()) {
                 employManager = Optional.ofNullable(EmployeeManager.builder()
-                        .employee(employeeMember.getEmployee())
+                        .employee(member.getEmployee())
                         .manager(manager.getManager())
                         .role(role)
                         .build());
@@ -174,6 +180,7 @@ public class MemberService {
             }
             if (!employeeMember.getWorkspace().equals(manager.getWorkspace())) {
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.EMPLOYEE_AND_MANAGER_NOT_IN_SAME_WORKSPACE);
+
             }
 
             employManager.get().modifyEmployeeManager(manager.getManager(), role);
@@ -184,8 +191,8 @@ public class MemberService {
     public boolean deleteEmployeeManager(){
         CurrentUser currentUser = new CurrentUser();
 
-        Long employeeManagerId = new Long(1);
-        Long employeeId = new Long(1);
+        Long employeeManagerId = 1L;
+        Long employeeId = 1L;
 
 
         var employManager = employeeManagerRepository.findById(employeeManagerId)
@@ -200,5 +207,9 @@ public class MemberService {
         employeeManagerRepository.delete(employManager);
 
         return true;
+    }
+
+    public Employee getEmployeeById(Long employeeId){
+       return employeeRepository.findById(employeeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
     }
 }

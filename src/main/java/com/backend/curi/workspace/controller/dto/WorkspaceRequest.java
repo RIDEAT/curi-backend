@@ -9,7 +9,6 @@ import javax.validation.constraints.Size;
 
 @Getter
 public class WorkspaceRequest {
-    private Long id;
     @NotNull
     @Size(min = 2, max = 20)
     @Schema(description = "name")

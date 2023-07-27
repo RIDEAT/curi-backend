@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +75,11 @@ public class WorkflowService {
     public Workflow getWorkflowEntity(Long workflowId){
         return workflowRepository.findById(workflowId)
                 .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
+    }
+
+    public Workflow getWorkflowById(Long workflowId){
+        Optional<Workflow> workflowOptional = workflowRepository.findById(workflowId);
+        return workflowOptional.orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
 }
