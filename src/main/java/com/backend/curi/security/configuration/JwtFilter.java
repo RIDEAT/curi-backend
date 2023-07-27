@@ -37,12 +37,14 @@ import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
+    private final UserService userService;
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-           // supposeThereIsNoIssue(request, response, filterChain);
+            //supposeThereIsNoIssue(request, response, filterChain);
+
 
             // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/h2-console")){
@@ -96,6 +98,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             CurrentUser currentUser = new CurrentUser();
             currentUser.setUserId(userId);
+            currentUser.setUserEmail(getUserEmail(userId));
             currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
@@ -137,6 +140,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
     }
+
     private ResponseEntity communicateWithAuthServer(HttpServletRequest request) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -154,6 +158,10 @@ public class JwtFilter extends OncePerRequestFilter {
         ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
 
         return responseEntity;
+    }
+
+    private String getUserEmail(String userId){
+        return userService.getEmailByUserId(userId);
     }
 
     private void supposeThereIsNoIssue(HttpServletRequest request, HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {

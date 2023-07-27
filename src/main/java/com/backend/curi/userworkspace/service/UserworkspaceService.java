@@ -1,5 +1,6 @@
 package com.backend.curi.userworkspace.service;
 
+import com.backend.curi.CuriApplication;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
@@ -12,6 +13,8 @@ import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.hibernate.jdbc.Work;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserworkspaceService {
+    private static Logger log = LoggerFactory.getLogger(UserworkspaceService.class);
+
     private final UserworkspaceRepository userworkspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceRepository workspaceRepository;
@@ -32,7 +37,9 @@ public class UserworkspaceService {
     }
 
     public List<Workspace> getWorkspaceListByUser(CurrentUser currentUser) {
+        log.info("current UserId: "+currentUser.getUserId());
         var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
+
         var workspaceList = userworkspaceRepository
                 .findAllByUser(user)
                 .stream()

@@ -21,8 +21,8 @@ public class WorkspaceAuthInterceptor implements HandlerInterceptor {
     private final UserworkspaceService userworkspaceService;
 @Override
 public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    //Long workspaceId = extractWorkspaceId(request);
-    //userworkspaceService.belongstoWorkspace(workspaceId);
+    Long workspaceId = extractWorkspaceId(request);
+    userworkspaceService.belongstoWorkspace(workspaceId);
 
     return true;
     }

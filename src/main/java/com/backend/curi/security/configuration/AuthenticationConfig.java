@@ -1,5 +1,6 @@
 package com.backend.curi.security.configuration;
 
+import com.backend.curi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Slf4j
 public class AuthenticationConfig{
 
+    private final UserService userService;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -38,7 +41,7 @@ public class AuthenticationConfig{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class )
 
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(

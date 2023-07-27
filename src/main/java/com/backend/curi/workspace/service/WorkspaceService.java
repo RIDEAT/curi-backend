@@ -34,17 +34,14 @@ public class WorkspaceService {
     @Transactional
     public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
 
-        // 이름 중복 검사
-        if(workspaceRepository.findByName(request.getName()).isPresent()){
-            throw new CuriException(HttpStatus.CONFLICT, ErrorType.DUPLICATED_WORKSPACE_NAME);
-        }
-
-        // 하나의 유저가 여러 개의 워크스페이스를 만들 수 있다?
 
         Workspace workspace = Workspace.builder().name(request.getName()).email(request.getEmail()).build();
-        // workspace db 에 id 가 순서대로 올라가는지 확인해야한다.
-        workspaceRepository.save(workspace);
-        userworkspaceService.create(currentUser, workspace);
+
+
+        Workspace savedWorkspace = workspaceRepository.save(workspace);
+        userworkspaceService.create(currentUser, savedWorkspace);
+
+
 
         var employeeRole = Role.builder().workspace(workspace).name("신입 사원").build();
         var managerRole = Role.builder().workspace(workspace).name("HR 매니저").build();
