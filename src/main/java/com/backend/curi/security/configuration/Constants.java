@@ -6,4 +6,6 @@ public final class Constants {
     // 환경변수로 깃헙에서 빼기
     public static final String AUTH_SERVER = "https://auth.curiboard.com";
 
+    public static final String USER_ID = "floN3PYjxbQ9E3MQJmiHhwDxBwb2";
+
 }

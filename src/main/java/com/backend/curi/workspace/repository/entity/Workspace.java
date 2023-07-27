@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,7 +38,8 @@ public class Workspace {
     private List<Userworkspace> userworkspaces;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
-    private List<Role> roles;
+    @Builder.Default
+    private List<Role> roles = new ArrayList<>();
     public Workspace(){}
     @Builder
     public Workspace(Long id, String name, String email){

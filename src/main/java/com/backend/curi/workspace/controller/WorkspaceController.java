@@ -28,7 +28,7 @@ public class WorkspaceController {
     private final WorkspaceService workspaceService;
     private static Logger log = LogManager.getLogger(WorkspaceController.class.getName());
 
-    @GetMapping("/workspace/{workspaceId}")
+    @GetMapping("/workspaces/{workspaceId}")
     @Operation(summary = "get", description = "유저의 모든 워크스페이스를 반환합니다.")
     public ResponseEntity<WorkspaceResponse> get(@PathVariable Long workspaceId, Authentication authentication) {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
@@ -47,7 +47,7 @@ public class WorkspaceController {
     }
 
 
-    @PostMapping(path = "/workspace",consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
+    @PostMapping(path = "/workspaces",consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
     @Operation(summary = "create workspace", description = "workspace 를 생성합니다.")
     public ResponseEntity createWorkspace(@RequestBody @Valid WorkspaceRequest request, Authentication authentication) {
 
@@ -68,7 +68,7 @@ public class WorkspaceController {
     }
 
     @PutMapping(
-            path ="/workspace/{workspaceId}",
+            path ="/workspaces/{workspaceId}",
             consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
     @Operation(summary = "update workspace", description = "workspace 를 변경합니다.")
     public ResponseEntity updateWorkspace(@PathVariable Long workspaceId, @RequestBody @Valid WorkspaceRequest reqeust, Authentication authentication) {
@@ -90,7 +90,7 @@ public class WorkspaceController {
     }
 
 
-    @DeleteMapping("workspace/{workspaceId}")
+    @DeleteMapping("workspaces/{workspaceId}")
     @Operation(summary = "delete workspace", description = "workspace 를 삭제합니다.")
     public ResponseEntity deleteWorkspace(@PathVariable Long workspaceId, Authentication authentication) {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();

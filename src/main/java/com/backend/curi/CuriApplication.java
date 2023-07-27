@@ -11,18 +11,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CuriApplication {
 
-	private static Logger log = LoggerFactory.getLogger(CuriApplication.class);
 
 	public static void main(String[] args) {
 
-		log.info("Hello slf4j");
-		log.info("Hello json log");
-
-		log.error("This is error");
-
-		log.warn("this is warn");
 
 		SpringApplication.run(CuriApplication.class, args);
 	}
+
+
+
 
 }

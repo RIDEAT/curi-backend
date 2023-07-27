@@ -34,21 +34,17 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'io.rest-assured:rest-assured:4.4.0'
+
 	testRuntimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.h2database:h2'
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
 	runtimeOnly 'org.postgresql:postgresql' // 추가	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
 	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.10'
-// https://mvnrepository.com/artifact/org.mockito/mockito-core
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
 
-// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-	//implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
-	//implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
-// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.1'
