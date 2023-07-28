@@ -1,4 +1,4 @@
-package com.backend.curi.workspace;
+package com.backend.curi.member;
 
 import com.backend.curi.common.Constants;
 import com.backend.curi.security.dto.CurrentUser;
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class WorkspaceAcceptanceTest {
-
+public class MemberAcceptanceTest {
 
     @Autowired
     private UserService userService;
@@ -61,40 +60,46 @@ public class WorkspaceAcceptanceTest {
     }
 
 
-    @DisplayName("유저가 속한 워크스페이스들을 조회할 수 있다.")
+    @DisplayName("워크스페이스에 속한 멤버들을 조회할 수 있다.")
     @Test
-    public void getWorkspaces(){
-
+    public void getMembers(){
         ExtractableResponse<Response> response = 워크스페이스_리스트_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 
     }
 
-    @DisplayName("워크스페이스 아이디를 가지고 워크스페이스를 조회할 수 있다.")
+    @DisplayName("워크스페이스 내에 신입사원을 추가할 수 있다.")
     @Test
-    public void getWorkspace(){
+    public void createEmployee(){
         ExtractableResponse<Response> response = 워크스페이스_조회(workspaceId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("워크스페이스를 생성할 수 있다.")
+    @DisplayName("워크스페이스 내에 기존 직원을 추가할 수 있다.")
     @Test
-    public void createWorkspace(){
+    public void createManager(){
         ExtractableResponse<Response> response = 워크스페이스_생성(getWorkspaceRequest());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    @DisplayName("워크스페이스를 업데이트 할 수 있다.")
+    @DisplayName("신입사원 정보를 수정할 수 있다.")
     @Test
-    public void updateWorkspace(){
+    public void updateEmployee(){
         ExtractableResponse<Response> response = 워크스페이스_수정(getWorkspaceRequest(),workspaceId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("워크스페이스를 삭제 할 수 있다.")
+    @DisplayName("기존 직원 정보를 수정할 수 있다.")
     @Test
-    public void deleteWorkspace(){
+    public void updateManager(){
+        ExtractableResponse<Response> response = 워크스페이스_삭제(workspaceId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @DisplayName("워크 스페이스 내에 멤버를 삭제할 수 있다.")
+    @Test
+    public void deleteMember(){
         ExtractableResponse<Response> response = 워크스페이스_삭제(workspaceId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -181,4 +186,5 @@ public class WorkspaceAcceptanceTest {
     }
 
 }
+
 
