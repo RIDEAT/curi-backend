@@ -35,7 +35,7 @@ public class MemberController {
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.createMember(currentUser, MemberType.manager, request);
-        return ResponseEntity. status(HttpStatus.OK).body(response);
+        return ResponseEntity. status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/member/manager/{mid}")
@@ -53,7 +53,7 @@ public class MemberController {
                                                        Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.createMember(currentUser, MemberType.employee , request);
-        return ResponseEntity. status(HttpStatus.OK).body(response);
+        return ResponseEntity. status(HttpStatus.CREATED).body(response);
     }
     @PutMapping("/member/employee/{mid}")
     public ResponseEntity<MemberResponse> modifyEmployee(@PathVariable("mid") Long memberId,
