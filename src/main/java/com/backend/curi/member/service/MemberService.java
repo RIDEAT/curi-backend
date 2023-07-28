@@ -40,7 +40,6 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
-    private final MongoTemplate mongoTemplate;
     public MemberResponse getMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         return MemberResponse.of(member);
@@ -49,7 +48,6 @@ public class MemberService {
     public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
-       // mongoTemplate.insert(member);
 
         return MemberResponse.of(member);
     }
