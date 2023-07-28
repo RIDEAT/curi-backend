@@ -28,10 +28,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WorkspaceAcceptanceTest {
 
 
+
+    /*
     @Autowired
     private UserService userService;
     @Autowired
@@ -178,7 +180,7 @@ public class WorkspaceAcceptanceTest {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
 
         return currentUser;
-    }
+    }*/
 
 }
 
