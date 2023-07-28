@@ -24,11 +24,11 @@ public class WorkflowController {
     private final WorkflowService workflowService;
 
     @PostMapping
-    public ResponseEntity<Void> createWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
+    public ResponseEntity<WorkflowResponse> createWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
                                                @PathVariable Long workspaceId,
                                                Authentication authentication) {
-        workflowService.createWorkflow(workspaceId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        var response = workflowService.createWorkflow(workspaceId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
 

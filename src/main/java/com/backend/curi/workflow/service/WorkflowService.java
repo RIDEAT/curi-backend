@@ -30,7 +30,7 @@ public class WorkflowService {
     private final WorkspaceService workspaceService;
 
     @Transactional
-    public void createWorkflow (Long workspaceId, WorkflowRequest request){
+    public WorkflowResponse createWorkflow (Long workspaceId, WorkflowRequest request){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
         var workflow = Workflow.builder()
@@ -38,6 +38,8 @@ public class WorkflowService {
                 .workspace(workspace)
                 .build();
         workflowRepository.save(workflow);
+
+        return WorkflowResponse.of(workflow);
     }
 
     public WorkflowResponse getWorkflow(Long workflowId){
