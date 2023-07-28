@@ -60,21 +60,29 @@ public class MemberAcceptanceTest {
     }
 
 
-    @DisplayName("워크스페이스에 속한 멤버들을 조회할 수 있다.")
+    @DisplayName("워크스페이스에 속한 신입사원들을 조회할 수 있다.")
     @Test
-    public void getMembers(){
-        ExtractableResponse<Response> response = 워크스페이스_리스트_조회();
+    public void getEmployees(){
+        ExtractableResponse<Response> response = 워크스페이스내_신입사원_리스트_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 
     }
+    @DisplayName("워크스페이스에 속한 기존직원들을 조회할 수 있다.")
+    @Test
+    public void getManagers(){
+        ExtractableResponse<Response> response = 워크스페이스내_기존직원_리스트_조회();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
+
+    }
+/*
     @DisplayName("워크스페이스 내에 신입사원을 추가할 수 있다.")
     @Test
     public void createEmployee(){
-        ExtractableResponse<Response> response = 워크스페이스_조회(workspaceId);
+        ExtractableResponse<Response> response = 신입사원_생성(workspaceId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
+    }*/
 
     @DisplayName("워크스페이스 내에 기존 직원을 추가할 수 있다.")
     @Test
@@ -107,24 +115,40 @@ public class MemberAcceptanceTest {
 
 
 
-    private ExtractableResponse<Response> 워크스페이스_조회(long workspaceId){
+
+
+    private ExtractableResponse<Response> 워크스페이스내_신입사원_리스트_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}", workspaceId)
+                .get("/workspaces/{workspaceId}/members?type=employee",workspaceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 워크스페이스_리스트_조회(){
+    private ExtractableResponse<Response> 워크스페이스내_기존직원_리스트_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces")
+                .get("/workspaces/{workspaceId}/members?type=manager",workspaceId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 신입사원_생성(WorkspaceRequest workspaceRequest){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(workspaceRequest)
+                .when()
+                .post("/workspaces/{workspaceId}/members")
                 .then()
                 .log()
                 .all()

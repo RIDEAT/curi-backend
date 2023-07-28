@@ -17,12 +17,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/workspaces/{workspaceId}")
 public class MemberController {
 
     private final MemberService memberService;
 
     @GetMapping("/members")
-    public ResponseEntity<List<MemberResponse>> getMemberList (@RequestParam("wid") Long workspaceId, @RequestParam("type")MemberType memberType, Authentication authentication){
+    public ResponseEntity<List<MemberResponse>> getMemberList (@PathVariable("workspaceId") Long workspaceId, @RequestParam("type")MemberType memberType, Authentication authentication){
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.getMemberList(currentUser, workspaceId, memberType);
 
