@@ -49,7 +49,7 @@ public class MemberService {
     public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
         var member = getMemberEntity(memberId, currentUser);
         memberRepository.delete(member);
-        mongoTemplate.insert(member);
+       // mongoTemplate.insert(member);
 
         return MemberResponse.of(member);
     }
