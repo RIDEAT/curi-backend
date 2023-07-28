@@ -5,6 +5,7 @@ import com.backend.curi.member.repository.entity.Manager;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,9 @@ import java.util.Objects;
 @Setter
 @Getter
 @Entity
+@Builder
+@AllArgsConstructor
+
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

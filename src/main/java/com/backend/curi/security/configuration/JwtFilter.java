@@ -43,7 +43,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            //supposeThereIsNoIssue(request, response, filterChain);
 
 
             // h2-console 할 때는 패스!
@@ -164,24 +163,7 @@ public class JwtFilter extends OncePerRequestFilter {
         return userService.getEmailByUserId(userId);
     }
 
-    private void supposeThereIsNoIssue(HttpServletRequest request, HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {
-        String userId = "sdklnadslfmpasodfkpaoskdf[pasdfa";
-        //String userEmail = jsonNode.get("userEmail").asText();
 
-
-        CurrentUser currentUser = new CurrentUser();
-        currentUser.setUserId(userId);
-
-
-
-        // 여기에 security context 인증 정보 넣어야 할지도 .
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-        filterChain.doFilter(request, response);
-        return;
-    }
 
 }
 
