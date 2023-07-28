@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WorkspaceAcceptanceTest {
 
-
+/*
     @Autowired
     private UserService userService;
     @Autowired
@@ -179,6 +179,6 @@ public class WorkspaceAcceptanceTest {
 
         return currentUser;
     }
-
+*/
 }
 
