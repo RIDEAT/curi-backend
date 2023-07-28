@@ -38,8 +38,8 @@ dependencies {
 
 	testRuntimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.h2database:h2'
-	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
-	testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
+	//implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
+	//testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
 
 	runtimeOnly 'org.postgresql:postgresql' // 추가	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
