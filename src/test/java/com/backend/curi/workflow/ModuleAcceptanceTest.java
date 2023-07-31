@@ -1,15 +1,10 @@
-package com.backend.curi;
+package com.backend.curi.workflow;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(locations = "classpath:application-data.properties")
-@SpringBootTest
-class CuriApplicationTests {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 
-	@Test
-	void contextLoads() {
-	}
-
+public class ModuleAcceptanceTest {
 }

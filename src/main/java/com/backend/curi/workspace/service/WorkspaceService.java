@@ -41,14 +41,15 @@ public class WorkspaceService {
         Workspace savedWorkspace = workspaceRepository.save(workspace);
         userworkspaceService.create(currentUser, savedWorkspace);
 
-
-
-        var employeeRole = Role.builder().workspace(workspace).name("신입 사원").build();
+        var directManagerRole = Role.builder().workspace(workspace).name("담당 사수").build();
         var managerRole = Role.builder().workspace(workspace).name("HR 매니저").build();
-        roleRepository.save(employeeRole);
+        roleRepository.save(directManagerRole);
         roleRepository.save(managerRole);
 
-        return WorkspaceResponse.of(workspace);
+        savedWorkspace.getRoles().add(directManagerRole);
+        savedWorkspace.getRoles().add(managerRole);
+
+        return WorkspaceResponse.of(savedWorkspace);
     }
 
     @Transactional

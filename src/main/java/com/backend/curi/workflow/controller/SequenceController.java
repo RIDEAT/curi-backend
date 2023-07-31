@@ -22,9 +22,9 @@ public class SequenceController {
     private final SequenceService sequenceService;
 
     @PostMapping("/sequences")
-    public ResponseEntity<Void> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId) {
-        sequenceService.createSequence(workspaceId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<SequenceResponse> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId) {
+        var createdSequence = sequenceService.createSequence(workspaceId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SequenceResponse.of(createdSequence));
     }
 
     @PostMapping("workflows/{workflowId}/sequences")
@@ -39,7 +39,7 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/sequences/")
+    @GetMapping("/sequences")
     public ResponseEntity<List<SequenceResponse>> getSequences(@PathVariable Long workspaceId) {
         var response = sequenceService.getSequences(workspaceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
