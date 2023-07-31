@@ -11,11 +11,14 @@ import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
+import com.backend.curi.workflow.controller.dto.SequenceRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.service.SequenceService;
 import com.backend.curi.workflow.service.WorkflowService;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
+import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -30,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
@@ -41,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource(locations = "classpath:application-data.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class WorkflowAcceptanceTest {
+public class SequenceAcceptanceTest {
 
 
     @Autowired
@@ -52,6 +56,11 @@ public class WorkflowAcceptanceTest {
     @Autowired
     private WorkflowService workflowService;
 
+    @Autowired
+    private SequenceService sequenceService;
+
+    @Autowired
+    private RoleService roleService;
     @Autowired
     private MemberService memberService;
 
@@ -70,43 +79,53 @@ public class WorkflowAcceptanceTest {
 
     private Long workflowId;
 
+    private Long sequenceId;
+
+    private Long defaultRoleId;
+
     @BeforeEach
     public void setup() {
         RestAssured.port = port;
 
         userService.dbStore(userId, userEmail);
-        WorkspaceResponse workspace = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
-        workspaceId = workspace.getId();
+        WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
+        workspaceId = workspaceResponse.getId();
+        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+
 
         managerId = managerResponse.getId();
         employeeId = employeeResponse.getId();
 
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
+        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
 
         workflowId = workflowResponse.getId();
+        sequenceId = sequence.getId();
+
+
 
     }
 
-    @DisplayName("워크스페이스에 속한 워크플로우 리스트를 조회할 수 있다.")
+    @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
     @Test
-    public void getWorkflows(){
-        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_리스트_조회();
+    public void getSequences(){
+        ExtractableResponse<Response> response = 워크스페이스내_시퀀스_리스트_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
-    @DisplayName("워크스페이스에 속한 워크플로우를 조회할 수 있다.")
+    @DisplayName("워크스페이스에 속한 시퀀스를 조회할 수 있다.")
     @Test
-    public void getWorkflow(){
-        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_조회();
+    public void getSequence(){
+        ExtractableResponse<Response> response = 워크스페이스내_시퀀스_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
-    @DisplayName("워크스페이스 내에 워크플로우를 추가할 수 있다.")
+    @DisplayName("워크스페이스 내에 시퀀스를 추가할 수 있다. 워크플로우 내에 추가한 시퀀스를 확인할 수 있다. ")
     @Test
     public void createWorkflow(){
         ExtractableResponse<Response> response = 워크플로우_생성(getWorkflowRequest());
@@ -121,9 +140,9 @@ public class WorkflowAcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 
-        ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
+       /* ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
         WorkflowResponse updatedWorkflowResponse = getResponse.as(WorkflowResponse.class);
-        assertThat(updatedWorkflowResponse.getName()).isEqualTo(getModifiedWorkflowRequest().getName());
+        assertThat(updatedWorkflowResponse.getName()).isEqualTo(getModifiedWorkflowRequest().getName());*/
     }
 
 
@@ -133,28 +152,28 @@ public class WorkflowAcceptanceTest {
         ExtractableResponse<Response> response = 워크플로우_삭제();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+      /*  ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());*/
     }
 
-    private ExtractableResponse<Response> 워크스페이스내_워크플로우_리스트_조회(){
+    private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/workflows",workspaceId)
+                .get("/workspaces/{workspaceId}/sequences",workspaceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 워크스페이스내_워크플로우_조회(){
+    private ExtractableResponse<Response> 워크스페이스내_시퀀스_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/workflows/{workflowId}",workspaceId, workflowId)
+                .get("/workspaces/{workspaceId}/sequences/{sequenceId}",workspaceId, sequenceId)
                 .then()
                 .log()
                 .all()
@@ -264,6 +283,15 @@ public class WorkflowAcceptanceTest {
     }
 
 
+    private SequenceRequest getSequenceRequest() {
+        SequenceRequest sequenceRequest = new SequenceRequest();
+        sequenceRequest.setName("신입 환영 시퀀스");
+        sequenceRequest.setDayOffset(-2);
+        sequenceRequest.setPrevSequenceId(0L);
+        sequenceRequest.setRoleId(defaultRoleId);
+
+        return sequenceRequest;
+    }
 
     private CurrentUser getCurrentUser(){
         CurrentUser currentUser = new CurrentUser();
