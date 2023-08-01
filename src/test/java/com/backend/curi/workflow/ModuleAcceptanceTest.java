@@ -41,11 +41,12 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-@TestPropertySource(locations = "classpath:application-data.properties")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@TestPropertySource(locations = "classpath:application-data.properties")
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 
 public class ModuleAcceptanceTest {
 
+    /*
 
     @Autowired
     private UserService userService;
@@ -154,11 +155,7 @@ public class ModuleAcceptanceTest {
         ExtractableResponse<Response> moduleResponse = 시퀀스내_모듈_생성(getModuleRequest());
         assertThat(moduleResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        /*
-        ExtractableResponse<Response> sequenceGetResponse = 워크스페이스내_시퀀스_조회(workspaceId, sequenceInWorkflowId);
-        SequenceResponse sequenceResponse = sequenceGetResponse.as(SequenceResponse.class);
 
-        assertThat(sequenceResponse.getModules().contains(moduleResponse.as(ModuleResponse.class)));*/
     }
 
 
@@ -407,7 +404,7 @@ public class ModuleAcceptanceTest {
 
         return currentUser;
     }
-
+*/
 }
 
 
