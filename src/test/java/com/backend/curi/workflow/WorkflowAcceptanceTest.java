@@ -4,9 +4,6 @@ package com.backend.curi.workflow;
 import com.backend.curi.common.Constants;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
-import com.backend.curi.member.controller.dto.MemberResponse;
-import com.backend.curi.member.repository.EmployeeRepository;
-import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -41,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource(locations = "classpath:application-data.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 public class WorkflowAcceptanceTest {
 
 
@@ -240,17 +238,6 @@ public class WorkflowAcceptanceTest {
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
-
-    private ManagerRequest getModifiedManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
-        managerRequest.setWid(workspaceId);
-        managerRequest.setDepartment("front-end");
-        managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
-        managerRequest.setPhoneNum("010-3333-2222");
-        return managerRequest;
-    }
-
     private WorkflowRequest getWorkflowRequest(){
         WorkflowRequest workflowRequest = new WorkflowRequest();
         workflowRequest.setName(workflowName);
@@ -262,8 +249,6 @@ public class WorkflowAcceptanceTest {
         workflowRequest.setName("modifiedName");
         return workflowRequest;
     }
-
-
 
     private CurrentUser getCurrentUser(){
         CurrentUser currentUser = new CurrentUser();

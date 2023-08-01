@@ -11,6 +11,7 @@ import com.backend.curi.workflow.repository.entity.*;
 import com.backend.curi.workflow.repository.entity.Module;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ModuleService {
 
     private final WorkspaceService workspaceService;
@@ -29,6 +31,13 @@ public class ModuleService {
     private final ContentRepository contentRepository;
 
 
+    public ModuleResponse getModule (Long workspaceId, Long moduleId){
+        log.info("get module");
+        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var module = getModuleEntity(moduleId);
+        // var module = moduleRepository.findByWorkspaceAndId(workspace, moduleId).orElseThrow(()-> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS));
+        return ModuleResponse.of(module);
+    }
     public List<ModuleResponse> getModules(Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var modules = moduleRepository.findAllByWorkspace(workspace);
@@ -48,7 +57,7 @@ public class ModuleService {
     }
 
     @Transactional
-    public void createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
+    public Module createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
         var module = createModule(workspaceId, request);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
 
@@ -63,12 +72,15 @@ public class ModuleService {
                 .orderNum(request.getOrder())
                 .build();
         sequenceModuleRepository.save(sequenceModule);
+        return module;
     }
 
     @Transactional
     public Module modifyModule(Long moduleId, ModuleRequest request) {
         var module = getModuleEntity(moduleId);
         module.modify(request);
+
+        log.info("content id: {}", module.getContentId());
 
         var content = contentRepository.findById(module.getContentId())
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
@@ -78,7 +90,7 @@ public class ModuleService {
     }
 
     @Transactional
-    public void modifyModule(Long moduleId, Long sequenceId, ModuleRequest request) {
+    public void modifyModule(Long sequenceId, Long moduleId, ModuleRequest request) {
         var module = modifyModule(moduleId, request);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
 
@@ -101,7 +113,7 @@ public class ModuleService {
         moduleRepository.delete(module);
     }
 
-    public void deleteSequenceModule(Long moduleId, Long sequenceId) {
+    public void deleteSequenceModule(Long sequenceId, Long moduleId) {
         var module = getModuleEntity(moduleId);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
         var sequenceModule = getSequenceModule(sequence, module);
@@ -110,6 +122,7 @@ public class ModuleService {
 
 
     public Module getModuleEntity(Long moduleId) {
+        log.info("module id: {}",moduleId );
         return moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS));
     }

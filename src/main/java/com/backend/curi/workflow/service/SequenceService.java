@@ -53,7 +53,7 @@ public class SequenceService {
     }
 
     @Transactional
-    public void createSequence(Long workspaceId, Long workflowId, SequenceRequest request){
+    public Sequence createSequence(Long workspaceId, Long workflowId, SequenceRequest request){
         var sequence = createSequence(workspaceId, request);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var prevSequence = sequenceRepository.findById(request.getPrevSequenceId());
@@ -70,6 +70,8 @@ public class SequenceService {
                 .build();
 
         workflowSequenceRepository.save(workflowSequence);
+
+        return sequence;
     }
 
     public Sequence modifySequence(Long sequenceId, SequenceRequest request){
@@ -81,7 +83,7 @@ public class SequenceService {
     }
 
     @Transactional
-    public void modifySequence(Long workflowId, Long sequenceId, SequenceRequest request){
+    public Sequence modifySequence(Long workflowId, Long sequenceId, SequenceRequest request){
         var sequence = modifySequence(sequenceId, request);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var workspace = sequence.getWorkspace();
@@ -104,6 +106,8 @@ public class SequenceService {
         else {
             workflowSequence.get().modify(request, prevSequence);
         }
+
+        return sequence;
     }
 
     public void deleteSequence(Long sequenceId){
