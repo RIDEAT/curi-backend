@@ -28,9 +28,9 @@ public class SequenceController {
     }
 
     @PostMapping("workflows/{workflowId}/sequences")
-    public ResponseEntity<Void> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId, @PathVariable Long workflowId) {
-        sequenceService.createSequence(workspaceId, workflowId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<SequenceResponse> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId, @PathVariable Long workflowId) {
+        var createdSequence = sequenceService.createSequence(workspaceId, workflowId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SequenceResponse.of(createdSequence));
     }
 
     @GetMapping("/sequences/{sequenceId}")
@@ -46,18 +46,18 @@ public class SequenceController {
     }
 
     @PutMapping("/sequences/{sequenceId}")
-    public ResponseEntity<Void> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
+    public ResponseEntity<SequenceResponse> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
                                                @PathVariable Long sequenceId) {
-        sequenceService.modifySequence(sequenceId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var updatedSequence = sequenceService.modifySequence(sequenceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(SequenceResponse.of(updatedSequence));
     }
 
     @PutMapping("workflows/{workflowId}/sequences/{sequenceId}")
-    public ResponseEntity<Void> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
+    public ResponseEntity<SequenceResponse> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
                                                @PathVariable Long workflowId,
                                                @PathVariable Long sequenceId) {
-        sequenceService.modifySequence(workflowId, sequenceId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var updatedSequence = sequenceService.modifySequence(workflowId, sequenceId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(SequenceResponse.of(updatedSequence));
     }
 
     @DeleteMapping("/sequences/{sequenceId}")

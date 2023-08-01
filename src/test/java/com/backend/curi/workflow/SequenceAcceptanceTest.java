@@ -4,14 +4,12 @@ package com.backend.curi.workflow;
 import com.backend.curi.common.Constants;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
-import com.backend.curi.member.controller.dto.MemberResponse;
-import com.backend.curi.member.repository.EmployeeRepository;
-import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.SequenceRequest;
+import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.service.SequenceService;
@@ -52,7 +50,6 @@ public class SequenceAcceptanceTest {
     private UserService userService;
     @Autowired
     private WorkspaceService workspaceService;
-
     @Autowired
     private WorkflowService workflowService;
 
@@ -81,6 +78,8 @@ public class SequenceAcceptanceTest {
 
     private Long sequenceId;
 
+    private Long sequenceInWorkflowId;
+
     private Long defaultRoleId;
 
     @BeforeEach
@@ -105,7 +104,8 @@ public class SequenceAcceptanceTest {
         workflowId = workflowResponse.getId();
         sequenceId = sequence.getId();
 
-
+        var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
+        sequenceInWorkflowId = sequenceInWorkflow.getId();
 
     }
 
@@ -125,37 +125,84 @@ public class SequenceAcceptanceTest {
 
     }
 
-    @DisplayName("워크스페이스 내에 시퀀스를 추가할 수 있다. 워크플로우 내에 추가한 시퀀스를 확인할 수 있다. ")
+    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 생성할 수 있다.")
     @Test
-    public void createWorkflow(){
-        ExtractableResponse<Response> response = 워크플로우_생성(getWorkflowRequest());
+    public void createSequence(){
+        ExtractableResponse<Response> response = 시퀀스_생성(getSequenceRequest());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-
-    @DisplayName("워크플로우 정보를 수정할 수 있다.")
+    @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 추가할 수 있다.")
     @Test
-    public void updateWorkflow(){
-        ExtractableResponse<Response> updateResponse = 워크플로우_수정(getModifiedWorkflowRequest());
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+    public void createSequenceInWorkflow(){
+        ExtractableResponse<Response> sequenceResponse = 워크플로우내_시퀀스_생성(getSequenceRequest());
+        assertThat(sequenceResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
+        ExtractableResponse<Response> workflowGetResponse = 워크스페이스내_워크플로우_조회();
+        WorkflowResponse workflowResponse = workflowGetResponse.as(WorkflowResponse.class);
 
-       /* ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
-        WorkflowResponse updatedWorkflowResponse = getResponse.as(WorkflowResponse.class);
-        assertThat(updatedWorkflowResponse.getName()).isEqualTo(getModifiedWorkflowRequest().getName());*/
+        assertThat(workflowResponse.getSequences().contains(sequenceResponse.as(SequenceResponse.class)));
     }
 
 
-    @DisplayName("워크 스페이스 내에 워크 플로우를 삭제할 수 있다.")
+    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 수정할 수 있다.")
     @Test
-    public void deleteEmployee(){
-        ExtractableResponse<Response> response = 워크플로우_삭제();
+    public void updateSequence(){
+        ExtractableResponse<Response> updateResponse = 시퀀스_수정(getModifiedSequenceRequest());
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+
+    @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 수정할 수 있다.")
+    @Test
+    public void updateSequenceInWorkflow(){
+        ExtractableResponse<Response> updatedResponse = 워크플로우내_시퀀스_수정(getModifiedSequenceRequest());
+        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> workflowGetResponse = 워크스페이스내_워크플로우_조회();
+        WorkflowResponse workflowResponse = workflowGetResponse.as(WorkflowResponse.class);
+
+        assertThat(workflowResponse.getSequences().contains(updatedResponse.as(SequenceResponse.class)));
+    }
+
+    @DisplayName("워크 스페이스 내에 템플릿 시퀀스를 삭제할 수 있다.")
+    @Test
+    public void deleteSequence(){
+        ExtractableResponse<Response> response = 시퀀스_삭제();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-      /*  ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());*/
+        ExtractableResponse<Response> getResponse = 워크스페이스내_시퀀스_조회();
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
+    @DisplayName("워크 스페이스 내에 워크플로우 아래에 템플릿 시퀀스를 삭제할 수 있다.")
+    @Test
+    public void deleteSequencInWorkflow(){
+        ExtractableResponse<Response> workflowGetResponseBeforeDeleting = 워크스페이스내_워크플로우_조회();
+        WorkflowResponse workflowResponseBeforeDeleting = workflowGetResponseBeforeDeleting.as(WorkflowResponse.class);
+
+        assertThat(!workflowResponseBeforeDeleting.getSequences().isEmpty());
+
+        ExtractableResponse<Response> response = 워크플로우내_시퀀스_삭제();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> workflowGetResponse = 워크스페이스내_워크플로우_조회();
+        WorkflowResponse workflowResponse = workflowGetResponse.as(WorkflowResponse.class);
+
+        assertThat(workflowResponse.getSequences().isEmpty());
+    }
+
+    private ExtractableResponse<Response> 워크스페이스내_워크플로우_조회(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/workspaces/{workspaceId}/workflows/{workflowId}",workspaceId, workflowId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
         return RestAssured.
                 given()
@@ -180,14 +227,28 @@ public class SequenceAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 워크플로우_생성(WorkflowRequest workflowRequest){
+    private ExtractableResponse<Response> 시퀀스_생성(SequenceRequest sequenceRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(workflowRequest)
+                .body(sequenceRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/workflows", workspaceId)
+                .post("/workspaces/{workspaceId}/sequences", workspaceId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 워크플로우내_시퀀스_생성(SequenceRequest sequenceRequest){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(sequenceRequest)
+                .when()
+                .post("/workspaces/{workspaceId}/workflows/{workflowId}/sequences", workspaceId, workflowId)
                 .then()
                 .log()
                 .all()
@@ -196,27 +257,55 @@ public class SequenceAcceptanceTest {
 
 
 
-    private ExtractableResponse<Response> 워크플로우_수정(WorkflowRequest workflowRequest){
+    private ExtractableResponse<Response> 시퀀스_수정(SequenceRequest sequenceRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(workflowRequest)
+                .body(sequenceRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/workflows/{workflowId}", workspaceId, workflowId)
+                .put("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 워크플로우_삭제(){
+    private ExtractableResponse<Response> 워크플로우내_시퀀스_수정(SequenceRequest sequenceRequest){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(sequenceRequest)
+                .when()
+                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+
+    private ExtractableResponse<Response> 시퀀스_삭제(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/workflows/{workflowId}", workspaceId, workflowId)
+                .delete("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 워크플로우내_시퀀스_삭제(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .when()
+                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
                 .then()
                 .log()
                 .all()
@@ -238,17 +327,6 @@ public class SequenceAcceptanceTest {
         return employeeRequest;
     }
 
-    private EmployeeRequest getModifiedEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
-        employeeRequest.setName("terry cho");
-        employeeRequest.setEmail("terry@gmail.com");
-        employeeRequest.setStartDate("2020-10-09");
-        employeeRequest.setWid(workspaceId);
-        employeeRequest.setDepartment("front-end");
-        employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(new ArrayList<>());
-        return employeeRequest;
-    }
 
     private ManagerRequest getManagerRequest(){
         ManagerRequest managerRequest = new ManagerRequest();
@@ -260,25 +338,10 @@ public class SequenceAcceptanceTest {
         return managerRequest;
     }
 
-    private ManagerRequest getModifiedManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
-        managerRequest.setWid(workspaceId);
-        managerRequest.setDepartment("front-end");
-        managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
-        managerRequest.setPhoneNum("010-3333-2222");
-        return managerRequest;
-    }
 
     private WorkflowRequest getWorkflowRequest(){
         WorkflowRequest workflowRequest = new WorkflowRequest();
         workflowRequest.setName(workflowName);
-        return workflowRequest;
-    }
-
-    private WorkflowRequest getModifiedWorkflowRequest(){
-        WorkflowRequest workflowRequest = new WorkflowRequest();
-        workflowRequest.setName("modifiedName");
         return workflowRequest;
     }
 
@@ -292,6 +355,18 @@ public class SequenceAcceptanceTest {
 
         return sequenceRequest;
     }
+
+    private SequenceRequest getModifiedSequenceRequest() {
+        SequenceRequest sequenceRequest = new SequenceRequest();
+        sequenceRequest.setName("담당 사수와의 미팅");
+        sequenceRequest.setDayOffset(-2);
+        sequenceRequest.setPrevSequenceId(0L);
+        sequenceRequest.setRoleId(defaultRoleId);
+
+        return sequenceRequest;
+    }
+
+
 
     private CurrentUser getCurrentUser(){
         CurrentUser currentUser = new CurrentUser();

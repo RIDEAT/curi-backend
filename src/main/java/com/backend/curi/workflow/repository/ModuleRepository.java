@@ -8,5 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ModuleRepository extends JpaRepository<Module, Long> {
+    Optional <Module> findByWorkspaceAndId(Workspace workspace, Long id);
     List<Module> findAllByWorkspace(Workspace workspace);
 }
