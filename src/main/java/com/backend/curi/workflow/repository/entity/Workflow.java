@@ -1,11 +1,14 @@
 package com.backend.curi.workflow.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,5 +40,7 @@ public class Workflow extends BaseEntity {
     public void modify(WorkflowRequest request){
         this.name = request.getName();
     }
+    
+
 
 }

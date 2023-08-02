@@ -6,6 +6,8 @@ import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenc
 import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceResponse;
 import com.backend.curi.launched.launchedsequence.repository.LaunchedSequenceRepository;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
+import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,12 @@ public class LaunchedSequenceService {
 
         LaunchedSequence newLaunchedSequence = LaunchedSequence.of(createdLaunchedSequence);
         LaunchedSequence savedLaunchedSequence = launchedSequenceRepository.save(newLaunchedSequence);
+        return LaunchedSequenceResponse.of(savedLaunchedSequence);
+    }
+
+
+    public LaunchedSequenceResponse saveLaunchedSequence (LaunchedSequence launchedSequence){
+        LaunchedSequence savedLaunchedSequence = launchedSequenceRepository.save(launchedSequence);
         return LaunchedSequenceResponse.of(savedLaunchedSequence);
     }
 

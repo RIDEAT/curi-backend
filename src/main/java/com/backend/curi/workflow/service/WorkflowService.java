@@ -1,7 +1,13 @@
 package com.backend.curi.workflow.service;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
+import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
@@ -28,6 +34,10 @@ import java.util.Optional;
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final WorkspaceService workspaceService;
+
+
+
+
 
     @Transactional
     public WorkflowResponse createWorkflow (Long workspaceId, WorkflowRequest request){
@@ -72,6 +82,26 @@ public class WorkflowService {
         sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
         var responseList = sequenceList.stream().map(WorkflowSequence::getSequence).map(SequenceResponse::of).collect(Collectors.toList());
         return responseList;
+    }
+
+    public List<SimpleEntry<SequenceResponse, Integer>> getSequencesWithDayoffset(Long workflowId){
+        Workflow workflow = getWorkflowEntity(workflowId);
+        List<WorkflowSequence> sequenceList = workflow.getWorkflowSequences();
+        sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
+
+
+        List<SimpleEntry<SequenceResponse, Integer>> responseWithDayoffsetList = new ArrayList<>();
+        for (int i = 0; i < sequenceList.size(); i++) {
+            WorkflowSequence workflowSequence = sequenceList.get(i);
+            Integer dayOffset = workflowSequence.getDayOffset();
+
+            // Map the WorkflowSequence to SequenceResponse using SequenceResponse.of() method
+            SequenceResponse sequenceResponse = SequenceResponse.of(workflowSequence.getSequence());
+
+            // Create the Pair and add it to the responseWithDayoffList
+            responseWithDayoffsetList.add(new SimpleEntry<>(sequenceResponse, dayOffset));
+        }
+        return responseWithDayoffsetList;
     }
 
     public Workflow getWorkflowEntity(Long workflowId){

@@ -21,7 +21,6 @@ public class LaunchedSequenceResponse {
 
     private String applyDate;
 
-    private Long order;
 
     /*
     private Long employeeId;
@@ -38,9 +37,9 @@ public class LaunchedSequenceResponse {
                 launchedSequence.getId(),
                 launchedSequence.getName(),
                 launchedSequence.getStatus(),
-                launchedSequence.getApplyDate().toString(),
-                launchedSequence.getOrderInWorkflow()
-                /*
+                launchedSequence.getApplyDate().toString()
+               /* launchedSequence.getOrderInWorkflow()
+
                 launchedWorkflow.getEmployee().getId(),
                 launchedWorkflow.getWorkflow().getId(),
                 launchedWorkflow.getWorkspace().getId()*/
