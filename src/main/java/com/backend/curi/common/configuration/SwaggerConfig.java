@@ -1,4 +1,4 @@
-package com.backend.curi.security.configuration;
+package com.backend.curi.common.configuration;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

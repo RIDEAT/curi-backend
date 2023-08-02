@@ -28,6 +28,11 @@ jobs:
           touch ./src/main/resources/application.properties
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
 
+      - name: Set up application-data.properties
+        run: |
+          touch ./src/test/resources/application-data.properties
+          echo "${{ secrets.APPLICATION_DATA }}" > ./src/test/resources/application-data.properties
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:

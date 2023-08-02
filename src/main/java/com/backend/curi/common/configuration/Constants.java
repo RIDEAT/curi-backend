@@ -1,4 +1,4 @@
-package com.backend.curi.security.configuration;
+package com.backend.curi.common.configuration;
 
 public final class Constants {
     public static final String AUTH_HEADER = " ";
