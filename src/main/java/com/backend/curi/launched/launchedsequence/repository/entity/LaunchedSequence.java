@@ -4,6 +4,9 @@ import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
+import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.workflow.repository.entity.Sequence;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,17 +29,16 @@ public class LaunchedSequence extends BaseEntity {
 
     private LaunchedStatus status;
 
-    private LocalDate applyDate;
+    @Builder.Default
+    private LocalDate applyDate = LocalDate.of(2000,10,9);
 
-    private Long orderInWorkflow;
 
 
-/*
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member member;
 
-
+/*
     @OneToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "LaunchedSequenceId")
     private LaunchedSequence nextSequence;
@@ -46,15 +48,20 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "LaunchedWorkflowId")
     private LaunchedWorkflow lauchedWorkflow;
 
-/*
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
-*/
+
 
     public static LaunchedSequence of (LaunchedSequenceRequest launchedSequenceRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
          return LaunchedSequence.builder().name(launchedSequenceRequest.getName()).status(launchedSequenceRequest.getStatus())
-                .applyDate(LocalDate.parse(launchedSequenceRequest.getApplyDate())).orderInWorkflow(launchedSequenceRequest.getOrder())/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
+                .applyDate(LocalDate.parse(launchedSequenceRequest.getApplyDate()))/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
+     }
+
+     public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace, Integer dayOffset){
+        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.ACTIVE).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
+                applyDate(launchedWorkflow.getKeyDate().plusDays(dayOffset)).build();
      }
 
 }

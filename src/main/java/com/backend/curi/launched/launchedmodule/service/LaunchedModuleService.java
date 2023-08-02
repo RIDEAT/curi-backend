@@ -5,6 +5,7 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.launchedmodule.controller.dto.LaunchedModuleRequest;
 import com.backend.curi.launched.launchedmodule.controller.dto.LaunchedModuleResponse;
 import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule;
+import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceResponse;
 import com.backend.curi.launched.launchedsequence.repository.LaunchedSequenceRepository;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedmodule.repository.LaunchedModuleRepository;
@@ -31,6 +32,11 @@ public class LaunchedModuleService {
                 .orElseThrow(()-> new CuriException(HttpStatus.NOT_FOUND, ErrorType.SEQUENCE_NOT_EXISTS));
         LaunchedModule newLaunchedModule = LaunchedModule.of(launchedModuleRequest, launchedSequence);
         LaunchedModule savedLaunchedModule = launchedModuleRepository.save(newLaunchedModule);
+        return LaunchedModuleResponse.of(savedLaunchedModule);
+    }
+
+    public LaunchedModuleResponse saveLaunchedModule (LaunchedModule launchedModule){
+        LaunchedModule savedLaunchedModule = launchedModuleRepository.save(launchedModule);
         return LaunchedModuleResponse.of(savedLaunchedModule);
     }
 }

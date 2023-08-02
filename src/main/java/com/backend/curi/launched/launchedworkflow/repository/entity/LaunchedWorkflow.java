@@ -1,7 +1,13 @@
 package com.backend.curi.launched.launchedworkflow.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowRequest;
+import com.backend.curi.member.repository.entity.Employee;
+import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.workflow.controller.dto.LaunchRequest;
+import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +16,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,24 +35,33 @@ public class LaunchedWorkflow extends BaseEntity {
 
     private LocalDate keyDate;
 
-    /*
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employeeId")
-    private Employee employee;
+    @JoinColumn(name = "memberId")
+    private Member member;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflowId")
     private Workflow workflow;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workspace_id")
+    @JoinColumn(name = "workspaceId")
     private Workspace workspace;
-*/
+
+
+
+    @OneToMany(mappedBy = "lauchedWorkflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<LaunchedSequence> launchedSequences = new ArrayList<>();
 
     public static LaunchedWorkflow of (LaunchedWorkflowRequest launchedWorkflowRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
         return LaunchedWorkflow.builder().name(launchedWorkflowRequest.getName()).status(LaunchedStatus.valueOf(launchedWorkflowRequest.getStatus()))
                 .keyDate(LocalDate.parse(launchedWorkflowRequest.getKeyDate()))/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
     }
 
+    public static LaunchedWorkflow of (LaunchRequest launchRequest, Workflow workflow, Member member, Workspace workspace) {
+        return LaunchedWorkflow.builder().name(workflow.getName()).status(LaunchedStatus.ACTIVE).keyDate(launchRequest.getKeyDate()).member(member).workflow(workflow).workspace(workspace).build();
 
+    }
 }

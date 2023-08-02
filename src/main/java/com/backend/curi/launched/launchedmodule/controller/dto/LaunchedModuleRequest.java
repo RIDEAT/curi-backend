@@ -1,8 +1,10 @@
 package com.backend.curi.launched.launchedmodule.controller.dto;
 
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
+import com.backend.curi.workflow.repository.entity.ModuleType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bson.types.ObjectId;
 
 import javax.validation.constraints.*;
 
@@ -18,12 +20,16 @@ public class LaunchedModuleRequest {
     private LaunchedStatus status;
 
     @NotNull
+    @Pattern(regexp = "^(notification|contents|survey|finished)")
+    private ModuleType type;
+
+    @NotNull
     @Min(value = 1, message = "launchedSequence Id must be greater than or equal to 1")
     private Long launchedSequenceId;
 
     @NotNull
-    @Min(value = 1, message = "mongo Id must be greater than or equal to 1")
-    private Long mongoId;
+    @Min(value = 1, message = "enter content id")
+    private ObjectId contentId;
 
     @NotNull
     @Min(value = 1, message = "order must be greater than or equal to 1")

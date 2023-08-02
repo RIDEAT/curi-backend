@@ -7,6 +7,9 @@ import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflo
 import com.backend.curi.launched.launchedworkflow.repository.LaunchedWorkflowRepository;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 import com.backend.curi.member.service.MemberService;
+import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workflow.service.ModuleService;
+import com.backend.curi.workflow.service.SequenceService;
 import com.backend.curi.workflow.service.WorkflowService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +22,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LaunchedWorkflowService {
     private final LaunchedWorkflowRepository launchedWorkflowRepository;
-    private final WorkspaceService workspaceService;
-    private final WorkflowService workflowService;
-    private final MemberService memberService;
-
 
     public LaunchedWorkflow getLaunchedWorkflowEntity (Long launchedWorkflowId){
         Optional<LaunchedWorkflow> launchedWorkflow = launchedWorkflowRepository.findById(launchedWorkflowId);
@@ -46,6 +45,11 @@ public class LaunchedWorkflowService {
 
         LaunchedWorkflow newLaunchedWorkflow = LaunchedWorkflow.of(createdLaunchedWorkflow);
         LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(newLaunchedWorkflow);
+        return LaunchedWorkflowResponse.of(savedLaunchedWorkflow);
+    }
+
+    public LaunchedWorkflowResponse saveLaunchedWorkflow (LaunchedWorkflow launchedWorkflow){
+        LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(launchedWorkflow);
         return LaunchedWorkflowResponse.of(savedLaunchedWorkflow);
     }
 

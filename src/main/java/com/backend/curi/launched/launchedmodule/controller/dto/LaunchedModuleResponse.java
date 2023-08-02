@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,7 +22,7 @@ public class LaunchedModuleResponse {
 
     private LaunchedSequence launchedSequence;
 
-    private Long mongoId;
+    private ObjectId contentId;
 
     private Long order;
 
@@ -31,7 +32,7 @@ public class LaunchedModuleResponse {
                 launchedModule.getName(),
                 launchedModule.getStatus(),
                 launchedModule.getLaunchedSequence(),
-                launchedModule.getMongoId(),
+                launchedModule.getContentId(),
                 launchedModule.getOrderInSequence()
         );
     }
