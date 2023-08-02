@@ -26,7 +26,10 @@ public class LaunchedSequenceService {
         return LaunchedSequenceResponse.of(launchedSequence.get());
     }
 
-
+    public LaunchedSequence getLaunchedSequenceEntity(Long sequenceId) {
+        return launchedSequenceRepository.findById(sequenceId)
+                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.SEQUENCE_NOT_EXISTS));
+    }
 
 
     public LaunchedSequenceResponse createLaunchedSequence(LaunchedSequenceRequest createdLaunchedSequence) {

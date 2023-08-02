@@ -61,7 +61,11 @@ public class LaunchedWorkflow extends BaseEntity {
     }
 
     public static LaunchedWorkflow of (LaunchRequest launchRequest, Workflow workflow, Member member, Workspace workspace) {
-        return LaunchedWorkflow.builder().name(workflow.getName()).status(LaunchedStatus.ACTIVE).keyDate(launchRequest.getKeyDate()).member(member).workflow(workflow).workspace(workspace).build();
+        return LaunchedWorkflow.builder().name(workflow.getName()).status(LaunchedStatus.NEW).keyDate(launchRequest.getKeyDate()).member(member).workflow(workflow).workspace(workspace).build();
 
+    }
+
+    public void setStatus(LaunchedStatus status) {
+        this.status = status;
     }
 }

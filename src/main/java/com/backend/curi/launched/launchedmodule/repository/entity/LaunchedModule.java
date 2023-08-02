@@ -32,7 +32,7 @@ public class LaunchedModule extends BaseEntity {
     private ModuleType type;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LaunchedSequenceId")
     private LaunchedSequence launchedSequence;
 
@@ -53,7 +53,11 @@ public class LaunchedModule extends BaseEntity {
 
 
     public static LaunchedModule of (Module module, LaunchedSequence launchedSequence, Workspace workspace , Long orderInSequence){
-        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.ACTIVE).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(module.getContentId()).orderInSequence(orderInSequence).build();
+        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(module.getContentId()).orderInSequence(orderInSequence).build();
+    }
+
+    public void setStatus(LaunchedStatus status){
+        this.status = status;
     }
 
 }
