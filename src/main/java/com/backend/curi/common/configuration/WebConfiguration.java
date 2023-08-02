@@ -1,7 +1,7 @@
-package com.backend.curi.security.configuration;
+package com.backend.curi.common.configuration;
 
-import com.backend.curi.common.AuthenticationInterceptor;
-import com.backend.curi.common.WorkspaceAuthInterceptor;
+import com.backend.curi.common.interceptor.AuthenticationInterceptor;
+import com.backend.curi.common.interceptor.WorkspaceAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

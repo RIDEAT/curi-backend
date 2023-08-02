@@ -1,6 +1,7 @@
-package com.backend.curi.security.configuration;
+package com.backend.curi.security.filter;
 
 
+import com.backend.curi.common.configuration.Constants;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
@@ -11,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,9 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-
-import static com.backend.curi.security.configuration.Constants.AUTH_HEADER;
-import static com.backend.curi.security.configuration.Constants.AUTH_SERVER;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -144,7 +141,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(AUTH_SERVER.concat("/verify"));
+        URI requestUri = URI.create(Constants.AUTH_SERVER.concat("/verify"));
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {

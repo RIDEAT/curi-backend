@@ -21,47 +21,41 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'junit:junit:4.13.1'
-	testImplementation 'junit:junit:4.13.1'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'io.rest-assured:rest-assured:4.4.0'
-
-	testRuntimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.h2database:h2'
-	//implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
-	//testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23' // 추가
-
-	runtimeOnly 'org.postgresql:postgresql' // 추가	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
-	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.10'
-	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
-
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.1'
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.9.0'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.10'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
+	implementation 'com.amazonaws:aws-java-sdk-ses:1.12.408'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.1.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.1.RELEASE'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'junit:junit:4.13.1'
+	testImplementation 'io.rest-assured:rest-assured:4.4.0'
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testRuntimeOnly 'com.h2database:h2'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.postgresql:postgresql'
+
 
 
 	//testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.5'
-
 	//implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
-
-
-
-
 }
 
 test {

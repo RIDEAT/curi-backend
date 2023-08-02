@@ -1,4 +1,4 @@
-package com.backend.curi.common;
+package com.backend.curi.common.interceptor;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
