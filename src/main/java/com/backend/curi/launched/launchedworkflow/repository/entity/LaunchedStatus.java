@@ -1,5 +1,5 @@
 package com.backend.curi.launched.launchedworkflow.repository.entity;
 
 public enum LaunchedStatus {
-    ACTIVE, PENDING, COMPLETED
+    NEW, IN_PROGRESS, PENDING, COMPLETED
 }

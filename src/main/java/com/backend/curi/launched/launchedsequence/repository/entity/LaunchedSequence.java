@@ -1,6 +1,7 @@
 package com.backend.curi.launched.launchedsequence.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule;
 import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -53,6 +56,8 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
+    @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
+    private List<LaunchedModule> launchedModules;
 
     public static LaunchedSequence of (LaunchedSequenceRequest launchedSequenceRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
          return LaunchedSequence.builder().name(launchedSequenceRequest.getName()).status(launchedSequenceRequest.getStatus())
@@ -60,8 +65,11 @@ public class LaunchedSequence extends BaseEntity {
      }
 
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace, Integer dayOffset){
-        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.ACTIVE).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
+        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(dayOffset)).build();
      }
 
+     public void setStatus(LaunchedStatus status){
+        this.status = status;
+     }
 }
