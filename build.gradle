@@ -19,6 +19,10 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
+ext {
+	set('springCloudVersion', "2021.0.8")
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -35,6 +39,7 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-ses:1.12.408'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.1.RELEASE'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.1.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -57,6 +62,13 @@ dependencies {
 	//testImplementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.5'
 	//implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 }
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
 
 test {
 	useJUnitPlatform()
