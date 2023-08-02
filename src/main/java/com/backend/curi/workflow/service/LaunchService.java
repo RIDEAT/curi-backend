@@ -12,6 +12,7 @@ import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
+import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.backend.curi.workflow.repository.entity.Module;
 
@@ -35,8 +36,6 @@ public class LaunchService {
     private final LaunchedSequenceService launchedSequenceService;
     private final LaunchedModuleService launchedModuleService;
     private final WorkflowService workflowService;
-    private final SequenceService sequenceService;
-    private final ModuleService moduleService;
     private final MemberService memberService;
     private final WorkspaceService workspaceService;
 
@@ -48,24 +47,21 @@ public class LaunchService {
         var member = memberService.getMemberEntity(launchRequest.getMemberId(), currentUser);
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
 
-
-        var sequenceResposneList = workflowService.getSequencesWithDayoffset(workflowId);
-        for (SimpleEntry<SequenceResponse, Integer> sequenceResponseWithDayoffset : sequenceResposneList){
-            launchSequence(launchedWorkflow, sequenceResponseWithDayoffset.getKey().getId(), workspace, member, sequenceResponseWithDayoffset.getValue());
+        var sequences = workflowService.getSequencesWithDayoffset(workflowId);
+        for (var sequenceWithDayoffset : sequences){
+            launchSequence(launchedWorkflow, sequenceWithDayoffset.getKey(), workspace, member, sequenceWithDayoffset.getValue());
         }
 
         launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
     }
 
-    private void launchSequence(LaunchedWorkflow launchedWorkflow, Long sequenceId, Workspace workspace, Member member, Integer dayOffset){
-        var sequence = sequenceService.getSequenceEntity(sequenceId);
+    private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Integer dayOffset){
         var role = sequence.getRole();
         var assignedMember = memberService.getManagerByEmployeeAndRole(member, role);
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace, dayOffset);
 
-        List<SequenceModule> sequenceModuleList = sequence.getSequenceModules();
-
-        for (SequenceModule sequenceModule : sequenceModuleList) {
+        var sequenceModules = sequence.getSequenceModules();
+        for (var sequenceModule : sequenceModules) {
             var module = sequenceModule.getModule();
             var order = sequenceModule.getOrderNum();
             launchModule(launchedSequence, module, workspace, Long.valueOf(order));
@@ -75,7 +71,6 @@ public class LaunchService {
     }
 
     private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace, Long order){
-
         var launchedModule = LaunchedModule.of(module, launchedSequence, workspace, order);
         launchedModuleService.saveLaunchedModule(launchedModule);
     }

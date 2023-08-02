@@ -84,22 +84,16 @@ public class WorkflowService {
         return responseList;
     }
 
-    public List<SimpleEntry<SequenceResponse, Integer>> getSequencesWithDayoffset(Long workflowId){
+    public List<SimpleEntry<Sequence, Integer>> getSequencesWithDayoffset(Long workflowId){
         Workflow workflow = getWorkflowEntity(workflowId);
-        List<WorkflowSequence> sequenceList = workflow.getWorkflowSequences();
-        sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
+        List<WorkflowSequence> workflowSequences = workflow.getWorkflowSequences();
+        workflowSequences.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
 
-
-        List<SimpleEntry<SequenceResponse, Integer>> responseWithDayoffsetList = new ArrayList<>();
-        for (int i = 0; i < sequenceList.size(); i++) {
-            WorkflowSequence workflowSequence = sequenceList.get(i);
+        List<SimpleEntry<Sequence, Integer>> responseWithDayoffsetList = new ArrayList<>();
+        for (var workflowSequence : workflowSequences) {
+            var sequence = workflowSequence.getSequence();
             Integer dayOffset = workflowSequence.getDayOffset();
-
-            // Map the WorkflowSequence to SequenceResponse using SequenceResponse.of() method
-            SequenceResponse sequenceResponse = SequenceResponse.of(workflowSequence.getSequence());
-
-            // Create the Pair and add it to the responseWithDayoffList
-            responseWithDayoffsetList.add(new SimpleEntry<>(sequenceResponse, dayOffset));
+            responseWithDayoffsetList.add(new SimpleEntry<>(sequence, dayOffset));
         }
         return responseWithDayoffsetList;
     }

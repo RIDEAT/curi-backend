@@ -40,3 +40,6 @@ application-jwt.properties
 serviceAccountKey.json
 
 .DS_Store
+
+application.properties
+application-data.properties
