@@ -1,5 +1,7 @@
 package com.backend.curi.workflow.service;
 
+import com.backend.curi.common.feign.SchedulerOpenFeign;
+import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule;
@@ -31,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +52,9 @@ public class LaunchService {
     private final AwsSMTPService awsSMTPService;
 
     private final ContentRepository contentRepository;
+
+    private final SchedulerOpenFeign schedulerOpenFeign;
+
     @Transactional
     public void launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
@@ -78,6 +84,13 @@ public class LaunchService {
         }
 
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
+        var request = SequenceMessageRequest.builder()
+                .id(launchedSequence.getId())
+                .applyDate(launchedSequence.getUpdatedDate())
+                .build();
+        var response = schedulerOpenFeign.createMessage(request);
+        if(response.getStatusCode() != HttpStatus.CREATED)
+            throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
     }
 
     private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace, Long order){
@@ -106,6 +119,11 @@ public class LaunchService {
 //        var contents = contentRepository.findById(contentsId)
 //                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
         awsSMTPService.send("test", "this is test", memberTo);
+
+        var response = schedulerOpenFeign.deleteMessage(launchedSequenceId);
+        if(response.getStatusCode() != HttpStatus.NO_CONTENT)
+            throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
+
     }
 
 }
