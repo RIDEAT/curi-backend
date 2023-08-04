@@ -42,4 +42,3 @@ serviceAccountKey.json
 .DS_Store
 
 application.properties
-application-data.properties
