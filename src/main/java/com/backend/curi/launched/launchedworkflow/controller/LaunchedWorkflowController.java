@@ -2,10 +2,13 @@ package com.backend.curi.launched.launchedworkflow.controller;
 
 import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowRequest;
 import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/workspaces/{workspaceId}/launchedworkflows")
@@ -14,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class LaunchedWorkflowController {
 
     private final LaunchedWorkflowService launchedWorkflowService;
+
+    @GetMapping
+    public ResponseEntity<List<LaunchedWorkflowResponse>> getLaunchedWorkflowList(@PathVariable Long workspaceId){
+        List<LaunchedWorkflowResponse> launchedWorkflowResponse = launchedWorkflowService.getLaunchedWorkflowList(workspaceId);
+        return ResponseEntity.ok(launchedWorkflowResponse);
+    }
     @GetMapping("/{launchedworkflowId}")
     public ResponseEntity<LaunchedWorkflowResponse> getLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId) {
         // Here, you can implement the logic to retrieve a specific launched workflow by its ID within the specified workspaceId.
@@ -29,23 +38,17 @@ public class LaunchedWorkflowController {
         return ResponseEntity.ok(createdLaunchedWorkflow);
     }
 
-    /*
-    @PutMapping("/{launchedworkflowId}")
-    public ResponseEntity<LaunchedWorkflowResponse> updateLaunchedWorkflow(@PathVariable String workspaceId, @PathVariable Long launchedworkflowId, @RequestBody LaunchedWorkflow updatedLaunchedWorkflow) {
-        // Here, you can implement the logic to update a specific launched workflow by its ID within the specified workspaceId.
-        LaunchedWorkflowResponse updatedLaunchedWorkflow = launchedWorkflowService.updateLaunchedWorkflow(workspaceId, launchedworkflowId, updatedLaunchedWorkflow);
-        return ResponseEntity.ok(updatedLaunchedWorkflow);
 
+    @PutMapping("/{launchedworkflowId}")
+    public ResponseEntity<LaunchedWorkflowResponse> updateLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody LaunchedWorkflowRequest launchedWorkflowRequest) {
+        // Here, you can implement the logic to update a specific launched workflow by its ID within the specified workspaceId.
+        LaunchedWorkflowResponse updatedLaunchedWorkflow = launchedWorkflowService.updateLaunchedWorkflow(workspaceId, launchedworkflowId, launchedWorkflowRequest);
+        return ResponseEntity.ok(updatedLaunchedWorkflow);
     }
 
     @DeleteMapping("/{launchedworkflowId}")
-    public ResponseEntity<Void> deleteLaunchedWorkflow(@PathVariable String workspaceId, @PathVariable Long launchedworkflowId) {
-        // Here, you can implement the logic to delete a specific launched workflow by its ID within the specified workspaceId.
-        boolean deleted = launchedWorkflowService.deleteLaunchedWorkflow(workspaceId, launchedworkflowId);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }*/
+    public ResponseEntity<Void> deleteLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId) {
+        launchedWorkflowService.deleteLaunchedWorkflow(launchedworkflowId);
+        return ResponseEntity.noContent().build();
+    }
 }

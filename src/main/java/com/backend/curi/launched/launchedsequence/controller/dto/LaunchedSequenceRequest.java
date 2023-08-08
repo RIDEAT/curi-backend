@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @Getter
@@ -19,7 +20,7 @@ public class LaunchedSequenceRequest {
 
     @NotNull
     @Pattern(regexp = "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\\d|3[0-1])$", message = "applyDate must be in the format YYYY-MM-DD and represent a valid date.")
-    private String applyDate;
+    private LocalDate applyDate;
 
     @NotNull
     @Min(value = 1, message = "employeeId must be greater than or equal to 1")

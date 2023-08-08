@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -42,6 +43,18 @@ public class LaunchedSequenceService {
         return LaunchedSequenceResponse.of(savedLaunchedSequence);
     }
 
+
+    @Transactional
+    public LaunchedSequenceResponse updateLaunchedSeqeunce(LaunchedSequenceRequest launchedSequenceRequest, Long launchedSequenceId){
+        LaunchedSequence launchedSequence = getLaunchedSequenceEntity(launchedSequenceId);
+        launchedSequence.modify(launchedSequenceRequest);
+        return LaunchedSequenceResponse.of(launchedSequence);
+    }
+
+    public void deleteLaunchedSequence(Long launchedSequenceId){
+        LaunchedSequence launchedSequence = getLaunchedSequenceEntity(launchedSequenceId);
+        launchedSequenceRepository.delete(launchedSequence);
+    }
 
     public LaunchedSequenceResponse saveLaunchedSequence (LaunchedSequence launchedSequence){
         LaunchedSequence savedLaunchedSequence = launchedSequenceRepository.save(launchedSequence);

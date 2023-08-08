@@ -27,4 +27,16 @@ public class LaunchedModuleController {
         return ResponseEntity.ok(createdLaunchedModule);
     }
 
+    @PutMapping("/{moduleId}")
+    public ResponseEntity<LaunchedModuleResponse> updateLaunchedModule(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId, @PathVariable Long moduleId, @RequestBody LaunchedModuleRequest launchedModuleRequest){
+        LaunchedModuleResponse updatedLaunchedModule = launchedModuleService.updateLaunchedModule(launchedModuleRequest, moduleId);
+        return ResponseEntity.ok(updatedLaunchedModule);
+    }
+
+    @DeleteMapping("/{moduleId}")
+    public ResponseEntity<Void> deleteLaunchedModule (@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId, @PathVariable Long moduleId){
+        launchedModuleService.deleteLaunchedModule(moduleId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

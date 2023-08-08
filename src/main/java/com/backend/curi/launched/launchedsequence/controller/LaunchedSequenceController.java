@@ -4,17 +4,18 @@ import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenc
 import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceResponse;
 import com.backend.curi.launched.launchedsequence.service.LaunchedSequenceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}")
+@RequestMapping("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/sequences")
 @RequiredArgsConstructor
 public class LaunchedSequenceController {
 
     private final LaunchedSequenceService launchedSequenceService;
 
-    @GetMapping("/sequences/{sequenceId}")
+    @GetMapping("/{sequenceId}")
     public ResponseEntity<LaunchedSequenceResponse> getLaunchedSequence(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId) {
         LaunchedSequenceResponse launchedSequence = launchedSequenceService.getLaunchedSequence(sequenceId);
         return ResponseEntity.ok(launchedSequence);
@@ -22,9 +23,24 @@ public class LaunchedSequenceController {
 
 
 
-    @PostMapping("/sequences")
+    @PostMapping
     public ResponseEntity<LaunchedSequenceResponse> createLaunchedSequence(@PathVariable Long workspaceId,@PathVariable Long launchedworkflowId, @RequestBody LaunchedSequenceRequest launchedSequenceRequest) {
         LaunchedSequenceResponse createdLaunchedSequence = launchedSequenceService.createLaunchedSequence(launchedSequenceRequest);
-        return ResponseEntity.ok(createdLaunchedSequence);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdLaunchedSequence);
     }
+
+
+    @PutMapping("/{sequenceId}")
+    public ResponseEntity<LaunchedSequenceResponse> updateLaunchedSequence(@PathVariable Long workspaceId,@PathVariable Long launchedworkflowId, @RequestBody LaunchedSequenceRequest launchedSequenceRequest, @PathVariable Long sequenceId){
+        LaunchedSequenceResponse updatedLaunchedSequence = launchedSequenceService.updateLaunchedSeqeunce(launchedSequenceRequest, sequenceId);
+        return ResponseEntity.ok(updatedLaunchedSequence);
+    }
+
+    @DeleteMapping("/{sequenceId}")
+    public ResponseEntity<Void> deleteLaunchedSequence(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId){
+        launchedSequenceService.deleteLaunchedSequence(sequenceId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

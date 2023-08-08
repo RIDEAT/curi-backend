@@ -61,7 +61,7 @@ public class LaunchedSequence extends BaseEntity {
 
     public static LaunchedSequence of (LaunchedSequenceRequest launchedSequenceRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
          return LaunchedSequence.builder().name(launchedSequenceRequest.getName()).status(launchedSequenceRequest.getStatus())
-                .applyDate(LocalDate.parse(launchedSequenceRequest.getApplyDate()))/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
+                .applyDate(launchedSequenceRequest.getApplyDate())/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
      }
 
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace, Integer dayOffset){
@@ -69,6 +69,11 @@ public class LaunchedSequence extends BaseEntity {
                 applyDate(launchedWorkflow.getKeyDate().plusDays(dayOffset)).build();
      }
 
+     public void modify(LaunchedSequenceRequest launchedSequenceRequest){
+        this.name = launchedSequenceRequest.getName();
+        this.status = launchedSequenceRequest.getStatus();
+        this.applyDate = launchedSequenceRequest.getApplyDate();
+     }
      public void setStatus(LaunchedStatus status){
         this.status = status;
      }

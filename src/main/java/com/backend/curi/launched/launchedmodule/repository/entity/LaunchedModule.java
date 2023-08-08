@@ -2,6 +2,7 @@ package com.backend.curi.launched.launchedmodule.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.launchedmodule.controller.dto.LaunchedModuleRequest;
+import com.backend.curi.launched.launchedmodule.controller.dto.LaunchedModuleResponse;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -56,6 +57,10 @@ public class LaunchedModule extends BaseEntity {
         return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(module.getContentId()).orderInSequence(orderInSequence).build();
     }
 
+    public void modify (LaunchedModuleRequest request){
+        this.name = request.getName();
+        this.orderInSequence = request.getOrder();
+    }
     public void setStatus(LaunchedStatus status){
         this.status = status;
     }
