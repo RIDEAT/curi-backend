@@ -1,11 +1,17 @@
 package com.backend.curi.launched.launchedworkflow.controller.dto;
 
+import com.backend.curi.launched.launchedsequence.controller.dto.LaunchedSequenceResponse;
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,9 +23,12 @@ public class LaunchedWorkflowResponse {
 
     private String name;
 
-    private String status;
+    private LaunchedStatus status;
 
-    private String keyDate;
+    private LocalDate keyDate;
+
+    private List<LaunchedSequenceResponse> launchedSequenceList;
+
     /*
     private Long employeeId;
 
@@ -32,8 +41,11 @@ public class LaunchedWorkflowResponse {
         return new LaunchedWorkflowResponse(
                 launchedWorkflow.getId(),
                 launchedWorkflow.getName(),
-                launchedWorkflow.getStatus().toString(),
-                launchedWorkflow.getKeyDate().toString()
+                launchedWorkflow.getStatus(),
+                launchedWorkflow.getKeyDate(),
+                launchedWorkflow.getLaunchedSequences().stream().map(LaunchedSequenceResponse::of
+                ).collect(Collectors.toList())
+
                 /*
                 launchedWorkflow.getEmployee().getId(),
                 launchedWorkflow.getWorkflow().getId(),

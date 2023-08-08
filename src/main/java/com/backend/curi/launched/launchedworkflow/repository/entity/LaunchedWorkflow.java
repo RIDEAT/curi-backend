@@ -3,6 +3,7 @@ package com.backend.curi.launched.launchedworkflow.repository.entity;
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowRequest;
+import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
@@ -56,8 +57,8 @@ public class LaunchedWorkflow extends BaseEntity {
     private List<LaunchedSequence> launchedSequences = new ArrayList<>();
 
     public static LaunchedWorkflow of (LaunchedWorkflowRequest launchedWorkflowRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
-        return LaunchedWorkflow.builder().name(launchedWorkflowRequest.getName()).status(LaunchedStatus.valueOf(launchedWorkflowRequest.getStatus()))
-                .keyDate(LocalDate.parse(launchedWorkflowRequest.getKeyDate()))/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
+        return LaunchedWorkflow.builder().name(launchedWorkflowRequest.getName()).status(launchedWorkflowRequest.getStatus())
+                .keyDate(launchedWorkflowRequest.getKeyDate())/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
     }
 
     public static LaunchedWorkflow of (LaunchRequest launchRequest, Workflow workflow, Member member, Workspace workspace) {
@@ -67,5 +68,13 @@ public class LaunchedWorkflow extends BaseEntity {
 
     public void setStatus(LaunchedStatus status) {
         this.status = status;
+    }
+
+    public void modify(LaunchedWorkflowRequest launchedWorkflowRequest){
+        this.name = launchedWorkflowRequest.getName();
+        this.status = launchedWorkflowRequest.getStatus();
+        this.keyDate = launchedWorkflowRequest.getKeyDate();
+
+
     }
 }

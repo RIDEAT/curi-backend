@@ -1,5 +1,6 @@
 package com.backend.curi.launched.launchedworkflow.controller.dto;
 
+import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @Getter
@@ -22,11 +24,11 @@ public class LaunchedWorkflowRequest
 
     @NotNull
     @Pattern(regexp = "^(ACTIVE|PENDING|COMPLETED)$")
-    private String status;
+    private LaunchedStatus status;
 
     @NotNull
     @Pattern(regexp = "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\\d|3[0-1])$", message = "keyDate must be in the format YYYY-MM-DD and represent a valid date.")
-    private String keyDate;
+    private LocalDate keyDate;
 
     @NotNull
     @Min(value = 1, message = "employeeId must be greater than or equal to 1")

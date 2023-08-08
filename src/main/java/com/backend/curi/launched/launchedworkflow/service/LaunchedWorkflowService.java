@@ -16,13 +16,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LaunchedWorkflowService {
     private final LaunchedWorkflowRepository launchedWorkflowRepository;
 
+
+    public List<LaunchedWorkflowResponse> getLaunchedWorkflowList (Long workspaceId){
+        List<LaunchedWorkflow> launchedWorkflowList = launchedWorkflowRepository.findAllByWorkspaceId(workspaceId);
+        return launchedWorkflowList.stream().map(LaunchedWorkflowResponse::of).collect(Collectors.toList());
+    }
     public LaunchedWorkflow getLaunchedWorkflowEntity (Long launchedWorkflowId){
         Optional<LaunchedWorkflow> launchedWorkflow = launchedWorkflowRepository.findById(launchedWorkflowId);
         if (launchedWorkflow.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS);
@@ -48,6 +56,22 @@ public class LaunchedWorkflowService {
         return LaunchedWorkflowResponse.of(savedLaunchedWorkflow);
     }
 
+    @Transactional
+
+    public LaunchedWorkflowResponse updateLaunchedWorkflow(Long workspaceId, Long launchedWorkflowId, LaunchedWorkflowRequest launchedWorkflowRequestRequest ) {
+        //Employee employee = memberService.getEmployeeById(createdLaunchedWorkflow.getEmployeeId());
+        //Workspace workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        //Workflow workflow = workflowService.getWorkflowById(createdLaunchedWorkflow.getWorkflowId());
+
+
+        LaunchedWorkflow existedLaunchedWorkflow = getLaunchedWorkflowEntity(launchedWorkflowId);
+        existedLaunchedWorkflow.modify(launchedWorkflowRequestRequest);
+
+       //LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(newLaunchedWorkflow);
+        return LaunchedWorkflowResponse.of(existedLaunchedWorkflow);
+    }
+
+
     public LaunchedWorkflowResponse saveLaunchedWorkflow (LaunchedWorkflow launchedWorkflow){
         LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(launchedWorkflow);
         return LaunchedWorkflowResponse.of(savedLaunchedWorkflow);
@@ -69,15 +93,12 @@ public class LaunchedWorkflowService {
         // Convert the updated entity to the response DTO.
         return convertToLaunchedWorkflowResponse(updatedWorkflow);
     }
+*/
 
-    public boolean deleteLaunchedWorkflow(String workspaceId, Long launchedworkflowId) {
+    public void deleteLaunchedWorkflow(Long launchedworkflowId) {
         // Implement the logic to delete a specific launched workflow based on the IDs.
-        LaunchedWorkflow existingLaunchedWorkflow = launchedWorkflowRepository.findByIdAndWorkspaceId(launchedworkflowId, workspaceId);
-        if (existingLaunchedWorkflow == null) {
-            return false; // Workflow not found.
-        }
-
+        LaunchedWorkflow existingLaunchedWorkflow = launchedWorkflowRepository.findById(launchedworkflowId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
         launchedWorkflowRepository.delete(existingLaunchedWorkflow);
-        return true;
-    }*/
+
+    }
 }
