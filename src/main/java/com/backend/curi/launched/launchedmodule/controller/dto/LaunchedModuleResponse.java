@@ -3,6 +3,8 @@ package com.backend.curi.launched.launchedmodule.controller.dto;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +22,7 @@ public class LaunchedModuleResponse {
 
     private LaunchedStatus status;
 
-    private LaunchedSequence launchedSequence;
-
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId contentId;
 
     private Long order;
@@ -31,7 +32,6 @@ public class LaunchedModuleResponse {
                 launchedModule.getId(),
                 launchedModule.getName(),
                 launchedModule.getStatus(),
-                launchedModule.getLaunchedSequence(),
                 launchedModule.getContentId(),
                 launchedModule.getOrderInSequence()
         );

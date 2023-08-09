@@ -3,6 +3,8 @@ package com.backend.curi.launched.launchedworkflow.controller.dto;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -15,7 +17,9 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Setter
 public class LaunchedWorkflowRequest
 {
     @NotNull

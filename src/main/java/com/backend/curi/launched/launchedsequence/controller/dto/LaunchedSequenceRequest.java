@@ -3,12 +3,16 @@ package com.backend.curi.launched.launchedsequence.controller.dto;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Setter
 public class LaunchedSequenceRequest {
     @NotNull
     @Size(max = 50, min = 2)
@@ -30,9 +34,6 @@ public class LaunchedSequenceRequest {
     @Min(value = 1, message = "workflowId must be greater than or equal to 1")
     private Long workflowId;
 
-    @NotNull
-    @Min(value = 1, message = "order must be greater than or equal to 1")
-    @Max(value = 100, message = "order must be less than or equal to 100")
-    private Long order;
+
 
 }

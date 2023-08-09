@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,8 +45,12 @@ public class LaunchedWorkflowResponse {
                 launchedWorkflow.getName(),
                 launchedWorkflow.getStatus(),
                 launchedWorkflow.getKeyDate(),
-                launchedWorkflow.getLaunchedSequences().stream().map(LaunchedSequenceResponse::of
-                ).collect(Collectors.toList())
+                launchedWorkflow.getLaunchedSequences() != null
+                        ? launchedWorkflow.getLaunchedSequences().stream()
+                        .map(LaunchedSequenceResponse::of)
+                        .sorted(Comparator.comparing(LaunchedSequenceResponse::getApplyDate))
+                        .collect(Collectors.toList())
+                        : Collections.emptyList()
 
                 /*
                 launchedWorkflow.getEmployee().getId(),
