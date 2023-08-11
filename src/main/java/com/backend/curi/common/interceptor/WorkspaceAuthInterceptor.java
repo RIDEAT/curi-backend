@@ -21,13 +21,13 @@ public class WorkspaceAuthInterceptor implements HandlerInterceptor {
     private final UserworkspaceService userworkspaceService;
 @Override
 public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    Long workspaceId = extractWorkspaceId(request);
+    Long workspaceId = extractFromUrl(request);
     userworkspaceService.belongstoWorkspace(workspaceId);
 
     return true;
     }
 
-    public static Long extractWorkspaceId(HttpServletRequest request) {
+    public static Long extractFromUrl(HttpServletRequest request) {
         String requestUrl = request.getRequestURI();
         String[] parts = requestUrl.split("/workspaces/");
         if (parts.length >= 2) {

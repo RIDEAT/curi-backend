@@ -63,10 +63,13 @@ public class WorkflowAcceptanceTest {
     private final String workflowName = Constants.workflowName;
     private final String authToken = Constants.authToken;
     private Long workspaceId;
+    private Long workspaceId2;
+
     private Long employeeId;
     private Long managerId;
 
     private Long workflowId;
+
 
     @BeforeEach
     public void setup() {
@@ -75,6 +78,9 @@ public class WorkflowAcceptanceTest {
         userService.dbStore(userId, userEmail);
         WorkspaceResponse workspace = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspace.getId();
+
+        WorkspaceResponse workspace2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
+        workspaceId2 = workspace2.getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
@@ -96,6 +102,7 @@ public class WorkflowAcceptanceTest {
 
     }
 
+
     @DisplayName("워크스페이스에 속한 워크플로우를 조회할 수 있다.")
     @Test
     public void getWorkflow(){
@@ -103,6 +110,14 @@ public class WorkflowAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
+
+    @DisplayName("워크스페이스에 속하지 않은 워크플로우를 조회할 수 없다")
+    @Test
+    public void getWorflowInOthersWorkflow(){
+        ExtractableResponse<Response> response = 워크스페이스내_없는_워크플로우_조회();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
 
     @DisplayName("워크스페이스 내에 워크플로우를 추가할 수 있다.")
     @Test
@@ -153,6 +168,18 @@ public class WorkflowAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .when()
                 .get("/workspaces/{workspaceId}/workflows/{workflowId}",workspaceId, workflowId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 워크스페이스내_없는_워크플로우_조회(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/workspaces/{workspaceId}/workflows/{workflowId}",workspaceId2, workflowId)
                 .then()
                 .log()
                 .all()

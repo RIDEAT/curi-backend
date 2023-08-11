@@ -1,17 +1,20 @@
-package com.backend.curi.workflow;
+package com.backend.curi.launched;
 
 
 import com.backend.curi.common.Constants;
+import com.backend.curi.common.feign.SchedulerOpenFeign;
+import com.backend.curi.common.feign.dto.SequenceMessageRequest;
+import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
-import com.backend.curi.workflow.controller.dto.SequenceRequest;
-import com.backend.curi.workflow.controller.dto.SequenceResponse;
-import com.backend.curi.workflow.controller.dto.WorkflowRequest;
-import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.controller.dto.*;
+import com.backend.curi.workflow.repository.entity.ModuleType;
+import com.backend.curi.workflow.service.LaunchService;
+import com.backend.curi.workflow.service.ModuleService;
 import com.backend.curi.workflow.service.SequenceService;
 import com.backend.curi.workflow.service.WorkflowService;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
@@ -26,26 +29,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import io.restassured.RestAssured;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+@ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-data.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SequenceAcceptanceTest {
+public class NewLaunchedWorkflowAcceptanceTest {
 
-
+    @MockBean
+    private SchedulerOpenFeign schedulerOpenFeign;
     @Autowired
     private UserService userService;
     @Autowired
@@ -60,6 +70,12 @@ public class SequenceAcceptanceTest {
     private RoleService roleService;
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private ModuleService moduleService;
+
+    @Autowired
+    private LaunchService launchService;
 
     @LocalServerPort
     public int port;
@@ -82,22 +98,50 @@ public class SequenceAcceptanceTest {
 
     private Long defaultRoleId;
 
+    private Long templateModuleId;
+    private Long moduleInSequenceId;
+
+
+
     @BeforeEach
     public void setup() {
+        defaultSet();
+        userMakeWorkspace();
+        userMakeEmployeeAndManager();
+        userMakeWorkspaceSequenceModule();
+        userLaunchWorkflow();
+    }
+
+    private void defaultSet (){
+        when(schedulerOpenFeign.createMessage(any(SequenceMessageRequest.class)))
+                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).build());
+
+        when(schedulerOpenFeign.deleteMessage(any(Long.class)))
+                .thenReturn(ResponseEntity.noContent().build());
+
         RestAssured.port = port;
 
+    }
+
+
+    private void userMakeWorkspace(){
         userService.dbStore(userId, userEmail);
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
         defaultRoleId = workspaceResponse.getRoles().get(0).getId();
+    }
 
+    private void userMakeEmployeeAndManager(){
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
-
 
         managerId = managerResponse.getId();
-        employeeId = employeeResponse.getId();
 
+        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+
+        employeeId = employeeResponse.getId();
+    }
+
+    private void userMakeWorkspaceSequenceModule(){
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
         var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
 
@@ -107,7 +151,27 @@ public class SequenceAcceptanceTest {
         var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
         sequenceInWorkflowId = sequenceInWorkflow.getId();
 
+        var module = moduleService.createModule(workspaceId, getModuleRequest());
+        templateModuleId = module.getId();
+
+        var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
+        moduleInSequenceId = moduleInSequence.getId();
     }
+
+    private void userLaunchWorkflow(){
+        워크스페이스내_워크플로우_런치();
+    }
+
+
+    @DisplayName("워크스페이스에 속한 런치드 워크플로우 리스트를 조회할 수 있다.")
+    @Test
+    public void getLaunchedWorkflowList(){
+        ExtractableResponse<Response> response = 워크스페이스내_런치드_워크플로우_리스트_조회();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+
+
 
     @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
     @Test
@@ -144,12 +208,6 @@ public class SequenceAcceptanceTest {
         assertThat(workflowResponse.getSequences().contains(sequenceResponse.as(SequenceResponse.class)));
     }
 
-    @DisplayName("템플릿 시퀀스와 워크스페이스 관계를 봅니다.")
-    @Test
-    public void relateSequenceAndWorkspace(){
-        assertEquals(workspaceId, sequenceService.getSequenceEntity(sequenceId).getWorkspace().getId()
-        );
-    }
 
     @DisplayName("워크스페이스 내에 템플릿 시퀀스를 수정할 수 있다.")
     @Test
@@ -196,6 +254,32 @@ public class SequenceAcceptanceTest {
         WorkflowResponse workflowResponse = workflowGetResponse.as(WorkflowResponse.class);
 
         assertThat(workflowResponse.getSequences().isEmpty());
+    }
+
+    private ExtractableResponse<Response> 워크스페이스내_워크플로우_런치(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(getLaunchRequest())
+                .when()
+                .post("/workspaces/{workspaceId}/workflows/{workflowId}/launch",workspaceId, workflowId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_리스트_조회(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/workspaces/{workspaceId}/launchedworkflows",workspaceId)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     private ExtractableResponse<Response> 워크스페이스내_워크플로우_조회(){
@@ -329,8 +413,20 @@ public class SequenceAcceptanceTest {
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(new ArrayList<>());
+        employeeRequest.setManagers(getManagers());
+
         return employeeRequest;
+    }
+
+    private List<EmployeeManagerDetail> getManagers(){
+        List<EmployeeManagerDetail> employeeManagerDetails = new ArrayList<>();
+        EmployeeManagerDetail employeeManagerDetail = new EmployeeManagerDetail();
+        employeeManagerDetail.setId(managerId);
+        employeeManagerDetail.setName("juram");
+        employeeManagerDetail.setRoleId(defaultRoleId);
+        employeeManagerDetail.setRoleName("담당 사수");
+        employeeManagerDetails.add(employeeManagerDetail);
+        return employeeManagerDetails;
     }
 
 
@@ -373,7 +469,30 @@ public class SequenceAcceptanceTest {
     }
 
 
+    private LaunchRequest getLaunchRequest(){
+        LaunchRequest launchRequest = new LaunchRequest();
+        launchRequest.setMemberId(employeeId);
+        launchRequest.setKeyDate(LocalDate.of(2000,10,9));
+        return launchRequest;
+    }
 
+    private ModuleRequest getModuleRequest(){
+        ModuleRequest moduleRequest = new ModuleRequest();
+        moduleRequest.setName("hello new employee!");
+        moduleRequest.setType(ModuleType.contents);
+        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setOrder(1);
+        return moduleRequest;
+    }
+
+    private ModuleRequest getModifiedModuleRequest(){
+        ModuleRequest moduleRequest = new ModuleRequest();
+        moduleRequest.setName("bye old employee!");
+        moduleRequest.setType(ModuleType.contents);
+        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setOrder(1);
+        return moduleRequest;
+    }
     private CurrentUser getCurrentUser(){
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
