@@ -3,6 +3,7 @@ package com.backend.curi.user.controller;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.controller.dto.UserListResponse;
 import com.backend.curi.user.controller.dto.UserRequest;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.entity.User_;
@@ -41,20 +42,12 @@ public class UserController {
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
     public ResponseEntity getUserList(@PathVariable Long workspaceId) {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("transactionId", 11);
 
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //String userEmail = currentUser.getUserEmail();
 
 
         var userList = userService.getAllUsers(workspaceId, currentUser);
-        // 비웠을 때는 따로 예외처리 해주어야 하나.
-        // 헤더에 auth 토큰 넣어야 하는데.
-
-        responseBody.put("user list", userList);
-
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
 
@@ -78,8 +71,6 @@ public class UserController {
     public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserRequest userForm) {
         User_ existingUser = userService.getUserByUserId(userId);
 
-        checkIfuserHasAuth(userId);
-
         existingUser.setEmail(userForm.getEmail());
 
         UserResponse updatedUser = userService.updateUser(existingUser);
@@ -91,8 +82,6 @@ public class UserController {
     @Operation(summary = "delete user", description = "유저를 삭제합니다.")
     public ResponseEntity deleteUser(@PathVariable String userId) {
         User_ existingUser = userService.getUserByUserId(userId);
-
-        checkIfuserHasAuth(userId);
 
         UserResponse deletedUser = userService.deleteUser(existingUser);
 
@@ -109,14 +98,6 @@ public class UserController {
 
     }
 
-    private void checkIfuserHasAuth(String userId){
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String currentUserUserId = currentUser.getUserId();
-        //String userEmail = currentUser.getUserEmail();
-
-        if (!currentUserUserId.equals(userId))
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_USER);
-    }
 
 
 }

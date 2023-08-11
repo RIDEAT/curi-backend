@@ -27,7 +27,7 @@ public class LaunchedWorkflowController {
     public ResponseEntity<LaunchedWorkflowResponse> getLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId) {
         // Here, you can implement the logic to retrieve a specific launched workflow by its ID within the specified workspaceId.
         System.out.println("Launch Controller");
-        LaunchedWorkflowResponse launchedWorkflow = launchedWorkflowService.getLaunchedWorkflow(workspaceId, launchedworkflowId);
+        LaunchedWorkflowResponse launchedWorkflow = launchedWorkflowService.getLaunchedWorkflow(launchedworkflowId);
         return ResponseEntity.ok(launchedWorkflow);
     }
 

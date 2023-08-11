@@ -64,13 +64,6 @@ public class UserworkspaceService {
         return userworkspaceList.stream().map(Userworkspace::getUser).collect(Collectors.toList());
     }
 
-    public void checkAuthentication (CurrentUser currentUser, Workspace workspace){
-        var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        if (userworkspaceRepository.findAllByUserAndWorkspace(user, workspace).isEmpty()) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
-    }
-
     public void belongstoWorkspace(Long workspaceId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();

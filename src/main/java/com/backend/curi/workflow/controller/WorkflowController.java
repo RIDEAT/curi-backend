@@ -1,6 +1,7 @@
 package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
+import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
@@ -27,9 +28,9 @@ public class WorkflowController {
     private final LaunchService launchService;
 
     @PostMapping("/{workflowId}/launch")
-    public ResponseEntity<Void> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId){
-        launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId){
+        var launchedWorkflowResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(launchedWorkflowResponse);
     }
 
     @PostMapping

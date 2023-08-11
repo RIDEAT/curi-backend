@@ -15,13 +15,12 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class WorkspaceListResponse {
-    private String status;
     List<WorkspaceResponse> workspaceList;
 
     public static WorkspaceListResponse of(List<Workspace> workspaceList){
         var responseList = workspaceList.stream()
                 .map(WorkspaceResponse::of)
                 .collect(Collectors.toList());
-        return new WorkspaceListResponse("success", responseList);
+        return new WorkspaceListResponse(responseList);
     }
 }

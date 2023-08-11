@@ -20,9 +20,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 public class CuriApplication {
 
+	private static Logger log = LoggerFactory.getLogger(CuriApplication.class);
 
 	public static void main(String[] args) {
-
+		log.info("main");
 
 		SpringApplication.run(CuriApplication.class, args);
 	}

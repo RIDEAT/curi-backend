@@ -1,9 +1,7 @@
 package com.backend.curi.common.configuration;
 
-import com.backend.curi.common.interceptor.AuthenticationInterceptor;
-import com.backend.curi.common.interceptor.SequenceAuthInterceptor;
-import com.backend.curi.common.interceptor.WorkflowAuthInterceptor;
-import com.backend.curi.common.interceptor.WorkspaceAuthInterceptor;
+import com.backend.curi.common.interceptor.*;
+import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -17,6 +15,8 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final WorkspaceAuthInterceptor workspaceAuthInterceptor;
     private final WorkflowAuthInterceptor workflowAuthInterceptor;
     private final SequenceAuthInterceptor sequenceAuthInterceptor;
+    private final ModuleAuthInterceptor moduleAuthInterceptor;
+    private final LaunchedworkflowAuthInterceptor launchedworkflowAuthInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
@@ -29,12 +29,14 @@ public class WebConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(workflowAuthInterceptor)
                 .addPathPatterns("/workspaces/{workspaceId}/workflows/{workflowId}/**");
 
-
         registry.addInterceptor(sequenceAuthInterceptor)
-                .addPathPatterns("/workspaces/{workspaceId}/sequences/{sequenceId}/**");
-/*
+                .addPathPatterns("/workspaces/{workspaceId}/sequences/{sequenceId}/**", "/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}/**");
+
         registry.addInterceptor(moduleAuthInterceptor)
-                .addPathPatterns("/workspaces/{workspaceId}/workflows/{workflows}/sequences/{sequenceId}/modules/{moduleId}/**");
-*/
+                .addPathPatterns("/workspaces/{workspaceId}/modules/{modules}/**","/workspaces/{workspaceId}/workflows/{workflows}/sequences/{sequenceId}/modules/{moduleId}/**");
+
+
+        registry.addInterceptor(launchedworkflowAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/**");
     }
 }

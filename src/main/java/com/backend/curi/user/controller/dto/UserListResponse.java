@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class UserListResponse {
-    private String status;
     List<UserResponse> userList;
 
 
@@ -20,6 +19,6 @@ public class UserListResponse {
         var responseList = userList.stream()
                 .map(UserResponse::of)
                 .collect(Collectors.toList());
-        return new UserListResponse("success", responseList);
+        return new UserListResponse(responseList);
     }
 }
