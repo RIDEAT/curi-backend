@@ -1,5 +1,6 @@
 package com.backend.curi.workspace.service;
 
+import com.backend.curi.CuriApplication;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
@@ -12,6 +13,8 @@ import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
@@ -20,13 +23,15 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class WorkspaceService {
+    private static Logger log = LoggerFactory.getLogger(WorkspaceService.class);
+
     private final WorkspaceRepository workspaceRepository;
     private final UserworkspaceService userworkspaceService;
     private final RoleRepository roleRepository;
     public WorkspaceResponse getWorkspaceById(Long id){
+        log.info("getWorkspaceById");
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
         return WorkspaceResponse.of(workspace);
     }
@@ -55,10 +60,6 @@ public class WorkspaceService {
     @Transactional
     public WorkspaceResponse updateWorkspace (Long workspaceId, CurrentUser currentUser, WorkspaceRequest request){
         var workspace = getWorkspaceEntityById(workspaceId);
-
-        // 수정 권한이 있는 사람만 확인하는 로직
-        userworkspaceService.checkAuthentication(currentUser, workspace);
-
         workspace.setName(request.getName());
         workspace.setEmail(request.getEmail());
 
@@ -68,8 +69,6 @@ public class WorkspaceService {
     @Transactional
     public WorkspaceResponse deleteWorkspace(Long workspaceId, CurrentUser currentUser){
         var workspace = getWorkspaceEntityById(workspaceId);
-        // 수정 권한이 있는 사람만 확인하는 로직
-        userworkspaceService.checkAuthentication(currentUser, workspace);
 
         log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
 

@@ -36,7 +36,7 @@ public class LaunchedWorkflowService {
         if (launchedWorkflow.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS);
         return launchedWorkflow.get();
     }
-    public LaunchedWorkflowResponse getLaunchedWorkflow(Long workspaceId, Long launchedWorkflowId) {
+    public LaunchedWorkflowResponse getLaunchedWorkflow(Long launchedWorkflowId) {
         Optional<LaunchedWorkflow> launchedWorkflow = launchedWorkflowRepository.findById(launchedWorkflowId);
         if (launchedWorkflow.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS);
         return LaunchedWorkflowResponse.of(launchedWorkflow.get());

@@ -31,7 +31,6 @@ import java.net.URI;
 import java.util.*;
 
 @RequiredArgsConstructor
-@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
@@ -59,17 +58,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            log.info(request.getRequestURI());
 
             Cookie[] cookies = request.getCookies();
 
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    log.info("Name: {}" , cookie.getName());
-                    log.info("value: {}", cookie.getValue());
-
-                }
-            } else log.info("cookie is null");
+       //     pretendTobeAuthorized(request, response, filterChain);
 
 
 
@@ -81,7 +73,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
             response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
-            log.info(responseBody);
 
             // Parse the responseBody JSON string
             ObjectMapper objectMapper = new ObjectMapper();
@@ -113,7 +104,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         catch (HttpClientErrorException e){
-            log.info(e.getMessage());
 
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
@@ -127,8 +117,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         } catch(CuriException e){
 
-            log.info("curi exception is catched");
-            log.info(e.getMessage());
+
             Map<String, Object> errorBody= new HashMap<>();
             errorBody.put("error", e.getMessage());
             filterChain.doFilter(request, response);
@@ -159,6 +148,32 @@ public class JwtFilter extends OncePerRequestFilter {
     private String getUserEmail(String userId){
         return userService.getEmailByUserId(userId);
     }
+
+    private void pretendTobeAuthorized (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        response.setHeader("AuthToken",  "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
+
+        // Parse the responseBody JSON string
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Extract userId
+        String userId = "floN3PYjxbQ9E3MQJmiHhwDxBwb2";
+        //String userEmail = jsonNode.get("userEmail").asText();
+
+
+        CurrentUser currentUser = new CurrentUser();
+        currentUser.setUserId(userId);
+        currentUser.setUserEmail(getUserEmail(userId));
+        currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
+
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        filterChain.doFilter(request, response);
+
+    }
+
 
 
 

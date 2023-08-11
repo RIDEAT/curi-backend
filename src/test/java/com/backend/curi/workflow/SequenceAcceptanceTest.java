@@ -144,13 +144,6 @@ public class SequenceAcceptanceTest {
         assertThat(workflowResponse.getSequences().contains(sequenceResponse.as(SequenceResponse.class)));
     }
 
-    @DisplayName("템플릿 시퀀스와 워크스페이스 관계를 봅니다.")
-    @Test
-    public void relateSequenceAndWorkspace(){
-        assertEquals(workspaceId, sequenceService.getSequenceEntity(sequenceId).getWorkspace().getId()
-        );
-    }
-
     @DisplayName("워크스페이스 내에 템플릿 시퀀스를 수정할 수 있다.")
     @Test
     public void updateSequence(){

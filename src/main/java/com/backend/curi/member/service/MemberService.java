@@ -66,7 +66,6 @@ public class MemberService {
 
     public List<MemberResponse> getMemberList(CurrentUser currentUser, Long workspaceId, MemberType memberType) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        userworkspaceService.checkAuthentication(currentUser, workspace);
         var memberList = memberRepository.findAllByWorkspaceAndType(workspace, memberType);
         var responseList = memberList.stream()
                 .map(MemberResponse::of)
@@ -77,7 +76,6 @@ public class MemberService {
     @Transactional
     public MemberResponse createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
-        userworkspaceService.checkAuthentication(currentUser, workspace);
 
 
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
@@ -107,7 +105,6 @@ public class MemberService {
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
         var workspace = member.getWorkspace();
 
-        userworkspaceService.checkAuthentication(currentUser, workspace);
 
         return member;
     }

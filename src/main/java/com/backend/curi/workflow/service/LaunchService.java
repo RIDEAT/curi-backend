@@ -8,6 +8,7 @@ import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule
 import com.backend.curi.launched.launchedmodule.service.LaunchedModuleService;
 import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.launchedsequence.service.LaunchedSequenceService;
+import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
 import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
@@ -56,7 +57,7 @@ public class LaunchService {
     private final SchedulerOpenFeign schedulerOpenFeign;
 
     @Transactional
-    public void launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId){
+    public LaunchedWorkflowResponse launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var currentUser = (CurrentUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -68,7 +69,7 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequenceWithDayoffset.getKey(), workspace, member, sequenceWithDayoffset.getValue());
         }
 
-        launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
+        return launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
     }
 
     private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Integer dayOffset){

@@ -77,6 +77,7 @@ public class ModuleAcceptanceTest {
     private final String workflowName = Constants.workflowName;
     private final String authToken = Constants.authToken;
     private Long workspaceId;
+    private Long workspaceId2;
     private Long employeeId;
     private Long managerId;
 
@@ -97,7 +98,10 @@ public class ModuleAcceptanceTest {
 
         userService.dbStore(userId, userEmail);
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
+        WorkspaceResponse workspaceResponse2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
+
         workspaceId = workspaceResponse.getId();
+        workspaceId2 = workspaceResponse2.getId();
         defaultRoleId = workspaceResponse.getRoles().get(0).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
@@ -137,12 +141,19 @@ public class ModuleAcceptanceTest {
     }
 
 
-
     @DisplayName("워크스페이스에 속한 모듈을 조회할 수 있다.")
     @Test
     public void getModule(){
         ExtractableResponse<Response> response = 워크스페이스내_모듈_조회(workspaceId, templateModuleId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+
+    @DisplayName("워크스페이스에 속하지 않은 모듈을 조회할 수 없다.")
+    @Test
+    public void getModuleInOtherWorkspace(){
+        ExtractableResponse<Response> response = 워크스페이스내_모듈_조회(workspaceId2, templateModuleId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("워크스페이스 내에 템플릿 모듈을 생성할 수 있다.")
