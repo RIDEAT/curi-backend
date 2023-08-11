@@ -47,6 +47,7 @@ public class SequenceService {
 
         var role = workspaceService.getRoleEntityByIdAndWorkspace(request.getRoleId(), workspace);
         var sequence = Sequence.of(request, role, workspace);
+
         sequenceRepository.save(sequence);
 
         return sequence;

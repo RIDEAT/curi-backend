@@ -34,7 +34,7 @@ public class SequenceController {
     }
 
     @GetMapping("/sequences/{sequenceId}")
-    public ResponseEntity<SequenceResponse> getSequence(@PathVariable Long sequenceId) {
+    public ResponseEntity<SequenceResponse> getSequence(@PathVariable Long sequenceId, @PathVariable Long workspaceId) {
         var response = sequenceService.getSequence(sequenceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

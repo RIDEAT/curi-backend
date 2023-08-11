@@ -1,6 +1,8 @@
 package com.backend.curi.common.configuration;
 
 import com.backend.curi.common.interceptor.AuthenticationInterceptor;
+import com.backend.curi.common.interceptor.SequenceAuthInterceptor;
+import com.backend.curi.common.interceptor.WorkflowAuthInterceptor;
 import com.backend.curi.common.interceptor.WorkspaceAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,8 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private final AuthenticationInterceptor authenticationInterceptor;
     private final WorkspaceAuthInterceptor workspaceAuthInterceptor;
+    private final WorkflowAuthInterceptor workflowAuthInterceptor;
+    private final SequenceAuthInterceptor sequenceAuthInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
@@ -21,5 +25,16 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         registry.addInterceptor(workspaceAuthInterceptor)
                 .addPathPatterns("/workspaces/{workspaceId}/**");
+
+        registry.addInterceptor(workflowAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/workflows/{workflowId}/**");
+
+
+        registry.addInterceptor(sequenceAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/sequences/{sequenceId}/**");
+/*
+        registry.addInterceptor(moduleAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/workflows/{workflows}/sequences/{sequenceId}/modules/{moduleId}/**");
+*/
     }
 }
