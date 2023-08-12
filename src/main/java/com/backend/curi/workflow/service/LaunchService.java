@@ -4,40 +4,31 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.launched.launchedmodule.repository.entity.LaunchedModule;
-import com.backend.curi.launched.launchedmodule.service.LaunchedModuleService;
-import com.backend.curi.launched.launchedsequence.repository.entity.LaunchedSequence;
-import com.backend.curi.launched.launchedsequence.service.LaunchedSequenceService;
-import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
-import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedStatus;
-import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
-import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
-import com.backend.curi.member.repository.entity.EmployeeManager;
+import com.backend.curi.launched.repository.entity.LaunchedModule;
+import com.backend.curi.launched.service.LaunchedModuleService;
+import com.backend.curi.launched.repository.entity.LaunchedSequence;
+import com.backend.curi.launched.service.LaunchedSequenceService;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.repository.entity.LaunchedStatus;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
-import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
-import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.backend.curi.workflow.repository.entity.Module;
 
-import com.backend.curi.workflow.repository.entity.WorkflowSequence;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

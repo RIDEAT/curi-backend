@@ -6,11 +6,6 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.launched.launchedworkflow.repository.entity.LaunchedWorkflow;
-import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
-import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.user.service.UserService;
-import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
@@ -24,10 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -103,9 +94,6 @@ public class WorkflowService {
                 .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
-    public Workflow getWorkflowById(Long workflowId){
-        Optional<Workflow> workflowOptional = workflowRepository.findById(workflowId);
-        return workflowOptional.orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
-    }
+
 
 }
