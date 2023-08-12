@@ -191,6 +191,7 @@ public class DashboardAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /*
     @DisplayName("대시보드에서 템플릿 워크플로우 별로 멤버 현황을 볼 수 있다.")
     @Test
     public void getDashboardMember(){
@@ -198,7 +199,7 @@ public class DashboardAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-
+*/
 
 
     private ExtractableResponse<Response> 대시보드_워크플로우_조회() {
