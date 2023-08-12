@@ -2,6 +2,7 @@ package com.backend.curi.common.configuration;
 
 import com.backend.curi.CuriApplication;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
@@ -21,5 +22,13 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         log.info("Before executing: {}.{}.{}", packageName, className, methodName);
+    }
+
+    @After("execution(* com.backend.curi.*.service.*.*(..))")
+    public void logAfter(JoinPoint joinPoint) {
+        String packageName = joinPoint.getTarget().getClass().getPackage().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+        log.info("After executing: {}.{}.{}", packageName, className, methodName);
     }
 }

@@ -1,4 +1,4 @@
-package com.backend.curi.launched;
+package com.backend.curi.dashboard;
 
 
 import com.backend.curi.common.Constants;
@@ -60,7 +60,7 @@ import org.springframework.security.core.context.SecurityContext;
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-data.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LaunchedWorkflowAcceptanceTest {
+public class DashboardAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
@@ -184,115 +184,47 @@ public class LaunchedWorkflowAcceptanceTest {
     }
 
 
-    @DisplayName("워크스페이스에 속한 런치드 워크플로우 리스트를 조회할 수 있다.")
+    @DisplayName("대시보드에서 템플릿 워크플로우 별로 현황을 볼 수 있다.")
     @Test
-    public void getLaunchedWorkflowList(){
-        ExtractableResponse<Response> response = 워크스페이스내_런치드_워크플로우_리스트_조회();
+    public void getDashboardWorkflow(){
+        ExtractableResponse<Response> response = 대시보드_워크플로우_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("워크스페이스에 속한 런치드 워크플로우를 조회할 수 있다.")
+    @DisplayName("대시보드에서 템플릿 워크플로우 별로 멤버 현황을 볼 수 있다.")
     @Test
-    public void getLaunchedWorkflow(){
-        ExtractableResponse<Response> response = 워크스페이스내_런치드_워크플로우_조회();
+    public void getDashboardMember(){
+        ExtractableResponse<Response> response = 대시보드_멤버_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("다른 워크스페이스에 속한 런치드 워크플로우를 조회할 수 없다.")
-    @Test
-    public void getLaunchedWorkflowInOtherWorkspace(){
-        ExtractableResponse<Response> response = 다른_워크스페이스내_런치드_워크플로우_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    @DisplayName("런치드 워크플로우 정보를 수정할 수 있다.")
-    @Test
-    public void updateLaunchedWorkflow(){
-        ExtractableResponse<Response> getResponseBeforeUpdate = 워크스페이스내_런치드_워크플로우_조회();
-        LaunchedWorkflowResponse originalWorkflowResponse = getResponseBeforeUpdate.as(LaunchedWorkflowResponse.class);
-        ExtractableResponse<Response> updateResponse = 런치드_워크플로우_수정(getModifiedLaunchedWorkflowRequest(originalWorkflowResponse));
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 
-        ExtractableResponse<Response> getResponseAfterUpdate = 워크스페이스내_런치드_워크플로우_조회();
-        LaunchedWorkflowResponse updatedWorkflowResponse = getResponseAfterUpdate.as(LaunchedWorkflowResponse.class);
-        assertThat(updatedWorkflowResponse.getStatus()).isEqualTo(getModifiedLaunchedWorkflowRequest(originalWorkflowResponse).getStatus());
-    }
 
-    @DisplayName("워크 스페이스 내에 런치드 워크 플로우를 삭제할 수 있다.")
-    @Test
-    public void deleteLaunchedWorkflow(){
-        ExtractableResponse<Response> response = 런치드_워크플로우_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        ExtractableResponse<Response> getResponse = 워크스페이스내_런치드_워크플로우_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_리스트_조회(){
+    private ExtractableResponse<Response> 대시보드_워크플로우_조회() {
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows",workspaceId)
+                .get("/workspaces/{workspaceId}/dashboard/workflows",workspaceId)
+                .then()
+                .log()
+                .all()
+                .extract();
+
+    }
+
+    private ExtractableResponse<Response> 대시보드_멤버_조회() {
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/workspaces/{workspaceId}/dashboard/workflows/{workflowId}/members",workspaceId, 695)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
-
-    private ExtractableResponse<Response> 다른_워크스페이스내_런치드_워크플로우_조회(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}",workspaceId2, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_조회(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}",workspaceId, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-
-    private ExtractableResponse<Response> 런치드_워크플로우_수정(LaunchedWorkflowRequest launchedWorkflowRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(launchedWorkflowRequest)
-                .when()
-                .put("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}", workspaceId, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 런치드_워크플로우_삭제(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .when()
-                .delete("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}", workspaceId, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
 
     private WorkspaceRequest getWorkspaceRequest(){
         return new WorkspaceRequest(workspaceName, workspaceEmail);

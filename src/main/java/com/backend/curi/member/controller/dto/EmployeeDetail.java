@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,13 +15,13 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeDetail {
-    private String startDate;
+    private LocalDate startDate;
     List<EmployeeManagerDetail> managers;
 
     public static EmployeeDetail of(Employee employee) {
         var managerList = employee.getEmployeeManagers().stream()
                 .map(EmployeeManagerDetail::of)
                 .collect(Collectors.toList());
-        return new EmployeeDetail(employee.getStartDate().toString(), managerList);
+        return new EmployeeDetail(employee.getStartDate(), managerList);
     }
 }

@@ -1,8 +1,7 @@
 package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
-import com.backend.curi.launched.launchedworkflow.controller.dto.LaunchedWorkflowResponse;
-import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 

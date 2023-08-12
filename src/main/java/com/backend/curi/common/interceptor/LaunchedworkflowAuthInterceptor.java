@@ -3,9 +3,7 @@ package com.backend.curi.common.interceptor;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
-import com.backend.curi.workflow.controller.dto.WorkflowResponse;
-import com.backend.curi.workflow.service.WorkflowService;
+import com.backend.curi.launched.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -13,7 +11,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

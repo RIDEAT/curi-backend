@@ -1,7 +1,6 @@
 package com.backend.curi.common.configuration;
 
 import com.backend.curi.common.interceptor.*;
-import com.backend.curi.launched.launchedworkflow.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
