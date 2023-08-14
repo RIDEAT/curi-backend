@@ -89,7 +89,7 @@ public class SequenceAcceptanceTest {
         userService.dbStore(userId, userEmail);
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
-        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
+        defaultRoleId = workspaceResponse.getRoles().get(1).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());

@@ -50,8 +50,8 @@ public class LaunchedModule extends BaseEntity {
     }
 
 
-    public static LaunchedModule of (Module module, LaunchedSequence launchedSequence, Workspace workspace , Long orderInSequence){
-        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(module.getContentId()).orderInSequence(orderInSequence).build();
+    public static LaunchedModule of (ObjectId launchedContentId, Module module, LaunchedSequence launchedSequence, Workspace workspace , Long orderInSequence){
+        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(orderInSequence).build();
     }
 
     public void modify (LaunchedModuleRequest request){

@@ -3,10 +3,7 @@ package com.backend.curi.workflow.controller.dto;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,7 +19,7 @@ public class ModuleRequest {
     private ModuleType type;
 
     @NotNull
-    private Object contents;
+    private Object message;
 
     private Integer order;
 }

@@ -37,7 +37,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
@@ -85,7 +84,9 @@ public class LaunchAcceptanceTest {
     private final String authToken = Constants.authToken;
     private Long workspaceId;
     private Long employeeId;
-    private Long managerId;
+    private Long directManagerId;
+
+    private Long hrManagerId;
 
     private Long workflowId;
 
@@ -93,7 +94,9 @@ public class LaunchAcceptanceTest {
 
     private Long sequenceInWorkflowId;
 
-    private Long defaultRoleId;
+    private Long employeeRoleId;
+    private Long directManagerRoleId;
+    private Long hrManagerRoleId;
 
     private Long templateModuleId;
     private Long moduleInSequenceId;
@@ -111,11 +114,17 @@ public class LaunchAcceptanceTest {
         userService.dbStore(userId, userEmail);
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
-        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
+        employeeRoleId = workspaceResponse.getRoles().get(0).getId();
+        directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
+        hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
 
-        managerId = managerResponse.getId();
+        directManagerId= managerResponse.getId();
+
+        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+
+        hrManagerId = hrManagerResponse.getId();
 
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
 
@@ -381,11 +390,19 @@ public class LaunchAcceptanceTest {
     private List<EmployeeManagerDetail> getManagers(){
         List<EmployeeManagerDetail> employeeManagerDetails = new ArrayList<>();
         EmployeeManagerDetail employeeManagerDetail = new EmployeeManagerDetail();
-        employeeManagerDetail.setId(managerId);
+        employeeManagerDetail.setId(directManagerId);
         employeeManagerDetail.setName("juram");
-        employeeManagerDetail.setRoleId(defaultRoleId);
-        employeeManagerDetail.setRoleName("담당 사수");
+        employeeManagerDetail.setRoleId(directManagerRoleId);
+        employeeManagerDetail.setRoleName("담당사수");
         employeeManagerDetails.add(employeeManagerDetail);
+
+        EmployeeManagerDetail employeeManagerDetail2 = new EmployeeManagerDetail();
+        employeeManagerDetail2.setId(hrManagerId);
+        employeeManagerDetail2.setName("hanna");
+        employeeManagerDetail2.setRoleId(hrManagerRoleId);
+        employeeManagerDetail2.setRoleName("hr매니저");
+        employeeManagerDetails.add(employeeManagerDetail2);
+
         return employeeManagerDetails;
     }
 
@@ -397,6 +414,16 @@ public class LaunchAcceptanceTest {
         managerRequest.setName("juram");
         managerRequest.setEmail("juram@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        return managerRequest;
+    }
+
+    private ManagerRequest getHrManagerRequest(){
+        ManagerRequest managerRequest = new ManagerRequest();
+        managerRequest.setWid(workspaceId);
+        managerRequest.setDepartment("HR");
+        managerRequest.setName("hanna");
+        managerRequest.setEmail("hanna@gmail.com");
+        managerRequest.setPhoneNum("010-1111-2222");
         return managerRequest;
     }
 
@@ -413,7 +440,7 @@ public class LaunchAcceptanceTest {
         sequenceRequest.setName("신입 환영 시퀀스");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(hrManagerRoleId);
 
         return sequenceRequest;
     }
@@ -423,7 +450,7 @@ public class LaunchAcceptanceTest {
         sequenceRequest.setName("담당 사수와의 미팅");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(directManagerRoleId);
 
         return sequenceRequest;
     }
@@ -440,7 +467,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -449,7 +476,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

@@ -33,11 +33,11 @@ public class ModuleController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("modules")
-    public ResponseEntity<Void> createModule(
+    public ResponseEntity<ModuleResponse> createModule(
             @RequestBody @Validated(ValidationSequence.class) ModuleRequest request,
             @PathVariable Long workspaceId) {
-        moduleService.createModule(workspaceId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        var response = moduleService.createModule(workspaceId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ModuleResponse.of(response));
     }
 
     @PostMapping("sequences/{sequenceId}/modules")
@@ -46,7 +46,7 @@ public class ModuleController {
             @PathVariable Long workspaceId,
             @PathVariable Long sequenceId) {
         var response = moduleService.createModule(workspaceId, sequenceId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ModuleResponse.of(response));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("modules/{moduleId}")

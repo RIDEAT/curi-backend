@@ -15,6 +15,8 @@ import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workflow.repository.entity.WorkflowSequence;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import javax.transaction.Transactional;
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final WorkspaceService workspaceService;
+    private static Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
 
 
@@ -78,6 +81,9 @@ public class WorkflowService {
     public List<SimpleEntry<Sequence, Integer>> getSequencesWithDayoffset(Long workflowId){
         Workflow workflow = getWorkflowEntity(workflowId);
         List<WorkflowSequence> workflowSequences = workflow.getWorkflowSequences();
+
+        log.info("workflowSequence size: {}", workflowSequences.size());
+
         workflowSequences.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
 
         List<SimpleEntry<Sequence, Integer>> responseWithDayoffsetList = new ArrayList<>();

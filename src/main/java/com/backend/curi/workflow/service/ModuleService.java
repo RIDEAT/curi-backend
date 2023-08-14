@@ -47,7 +47,7 @@ public class ModuleService {
     public Module createModule(Long workspaceId, ModuleRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
-        var content = Content.builder().content(request.getContents()).build();
+        var content = Content.builder().message(request.getMessage()).build();
         contentRepository.save(content);
 
         var module = Module.of(request, workspace, content.getId());
@@ -57,7 +57,7 @@ public class ModuleService {
     }
 
     @Transactional
-    public Module createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
+    public ModuleResponse createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
         var module = createModule(workspaceId, request);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
 
@@ -72,7 +72,7 @@ public class ModuleService {
                 .orderNum(request.getOrder())
                 .build();
         sequenceModuleRepository.save(sequenceModule);
-        return module;
+        return ModuleResponse.of(module);
     }
 
     @Transactional
