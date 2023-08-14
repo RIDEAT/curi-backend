@@ -15,8 +15,8 @@ public class DashboardAlertResponse {
 
     Long employeeAlertCnt;
     Long managerAlertCnt;
-    List<DashboardEmployeeAlertResponse> employeeAlertList;
-    List<DashboardManagerAlertResponse> managerAlertList;
+    List<DashboardEmployeeAlertResponse> employeeAlerts;
+    List<DashboardManagerAlertResponse> managerAlerts;
 
     public static DashboardAlertResponse of( List<DashboardEmployeeAlertResponse> employeeAlertList, List<DashboardManagerAlertResponse> managerAlertList){
         return new DashboardAlertResponse(Long.valueOf(employeeAlertList.size()), Long.valueOf(managerAlertList.size()), employeeAlertList, managerAlertList);

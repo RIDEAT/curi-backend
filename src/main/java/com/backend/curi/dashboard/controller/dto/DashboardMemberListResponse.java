@@ -14,7 +14,7 @@ import java.util.List;
 public class DashboardMemberListResponse {
 
     private String name;
-    private List<DashboardMemberResponse> dashboardMemberResponseList;
+    private List<DashboardMemberResponse> dashboardMembers;
 
     public static DashboardMemberListResponse of (String name, List<DashboardMemberResponse> dashboardMemberResponseList){
         return new DashboardMemberListResponse(name,dashboardMemberResponseList);

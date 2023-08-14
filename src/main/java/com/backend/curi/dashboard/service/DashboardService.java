@@ -93,7 +93,7 @@ public class DashboardService {
         dashboardMemberResponse.setStartDate(((EmployeeDetail)launchedWorkflowResponse.getEmployee().getDetail()).getStartDate());
       //  dashboardMemberResponse.setENPS(launchedWorkflow.getMember().getEnps);
         dashboardMemberResponse.setLaunchedStatus(launchedWorkflowResponse.getStatus());
-        dashboardMemberResponse.setLaunchedSequenceResponseList(launchedWorkflowResponse.getLaunchedSequenceList());
+        dashboardMemberResponse.setLaunchedSequences(launchedWorkflowResponse.getLaunchedSequences());
         dashboardMemberResponse.setProgress(getProgress(launchedWorkflowResponse));
         return dashboardMemberResponse;
     }
@@ -101,12 +101,12 @@ public class DashboardService {
     private Long getProgress(LaunchedWorkflowResponse launchedWorkflowResponse){
         Long completedCnt = 0L;
 
-        for (LaunchedSequenceResponse launchedSequenceResponse :launchedWorkflowResponse.getLaunchedSequenceList()){
+        for (LaunchedSequenceResponse launchedSequenceResponse :launchedWorkflowResponse.getLaunchedSequences()){
             if (launchedSequenceResponse.getStatus().equals(LaunchedStatus.COMPLETED)){
                 completedCnt ++;
             }
         }
-        return 100* completedCnt / launchedWorkflowResponse.getLaunchedSequenceList().size();
+        return 100* completedCnt / launchedWorkflowResponse.getLaunchedSequences().size();
     }
 
     public DashboardAlertResponse getDashboardAlertResponse(Long workspaceId) {

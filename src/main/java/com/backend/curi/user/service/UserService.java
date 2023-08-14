@@ -3,7 +3,6 @@ package com.backend.curi.user.service;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.user.controller.dto.UserListResponse;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
@@ -14,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import javax.transaction.Transactional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class UserService {
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }
 
-    public UserListResponse getAllUsers(Long workspaceId, CurrentUser currentUser){
+    public List<UserResponse> getAllUsers(Long workspaceId, CurrentUser currentUser){
         var user = getUserByUserId(currentUser.getUserId());
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
@@ -37,7 +36,7 @@ public class UserService {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
         }
 
-        return UserListResponse.of(userList);
+        return userList.stream().map(UserResponse::of).collect(Collectors.toList());
     }
 
     public UserResponse getUserResponseByUserId (String userId){
