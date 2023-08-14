@@ -48,6 +48,7 @@ jobs:
           AWS_REGION: ap-northeast-2
           DDL_AUTO: update
           ENVIRONMENT: build
+          TEST_ENVIRONMENT: data-build
         run: |
           echo $ENVIRONMENT
           ./gradlew --info test

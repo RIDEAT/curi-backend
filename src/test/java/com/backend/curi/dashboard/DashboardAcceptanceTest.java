@@ -54,9 +54,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource("classpath:application-data.properties")
 public class DashboardAcceptanceTest {
 
     @MockBean
