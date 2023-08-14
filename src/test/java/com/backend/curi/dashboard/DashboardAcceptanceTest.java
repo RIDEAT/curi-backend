@@ -96,6 +96,10 @@ public class DashboardAcceptanceTest {
     private Long workspaceId;
     private Long workspaceId2;
     private Long employeeId;
+
+    private Long directManagerId;
+
+    private Long hrManagerId;
     private Long managerId;
 
     private Long workflowId;
@@ -105,6 +109,11 @@ public class DashboardAcceptanceTest {
     private Long sequenceInWorkflowId;
 
     private Long defaultRoleId;
+
+    private Long employeeRoleId;
+
+    private Long directManagerRoleId;
+    private Long hrManagerRoleId;
 
     private Long launchedworkflowId;
 
@@ -140,13 +149,18 @@ public class DashboardAcceptanceTest {
         WorkspaceResponse workspaceResponse2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
         workspaceId2= workspaceResponse2.getId();
-        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
-    }
+        employeeRoleId = workspaceResponse.getRoles().get(0).getId();
+        directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
+        hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();    }
 
     private void userMakeEmployeeAndManager(){
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
 
-        managerId = managerResponse.getId();
+        directManagerId= managerResponse.getId();
+
+        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+
+        hrManagerId = hrManagerResponse.getId();
 
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
 
@@ -254,11 +268,19 @@ public class DashboardAcceptanceTest {
     private List<EmployeeManagerDetail> getManagers(){
         List<EmployeeManagerDetail> employeeManagerDetails = new ArrayList<>();
         EmployeeManagerDetail employeeManagerDetail = new EmployeeManagerDetail();
-        employeeManagerDetail.setId(managerId);
+        employeeManagerDetail.setId(directManagerId);
         employeeManagerDetail.setName("juram");
-        employeeManagerDetail.setRoleId(defaultRoleId);
-        employeeManagerDetail.setRoleName("담당 사수");
+        employeeManagerDetail.setRoleId(directManagerRoleId);
+        employeeManagerDetail.setRoleName("담당사수");
         employeeManagerDetails.add(employeeManagerDetail);
+
+        EmployeeManagerDetail employeeManagerDetail2 = new EmployeeManagerDetail();
+        employeeManagerDetail2.setId(hrManagerId);
+        employeeManagerDetail2.setName("hanna");
+        employeeManagerDetail2.setRoleId(hrManagerRoleId);
+        employeeManagerDetail2.setRoleName("hr매니저");
+        employeeManagerDetails.add(employeeManagerDetail2);
+
         return employeeManagerDetails;
     }
 
@@ -270,6 +292,16 @@ public class DashboardAcceptanceTest {
         managerRequest.setName("juram");
         managerRequest.setEmail("juram@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        return managerRequest;
+    }
+
+    private ManagerRequest getHrManagerRequest(){
+        ManagerRequest managerRequest = new ManagerRequest();
+        managerRequest.setWid(workspaceId);
+        managerRequest.setDepartment("HR");
+        managerRequest.setName("hanna");
+        managerRequest.setEmail("hanna@gmail.com");
+        managerRequest.setPhoneNum("010-1111-2222");
         return managerRequest;
     }
 
@@ -286,7 +318,7 @@ public class DashboardAcceptanceTest {
         sequenceRequest.setName("신입 환영 시퀀스");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(hrManagerRoleId);
 
         return sequenceRequest;
     }
@@ -296,7 +328,7 @@ public class DashboardAcceptanceTest {
         sequenceRequest.setName("담당 사수와의 미팅");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(directManagerRoleId);
 
         return sequenceRequest;
     }

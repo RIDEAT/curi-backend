@@ -95,7 +95,7 @@ public class LaunchAcceptanceTest {
     private Long sequenceInWorkflowId;
 
     private Long employeeRoleId;
-    private Long directMangerRoleId;
+    private Long directManagerRoleId;
     private Long hrManagerRoleId;
 
     private Long templateModuleId;
@@ -115,7 +115,7 @@ public class LaunchAcceptanceTest {
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
         employeeRoleId = workspaceResponse.getRoles().get(0).getId();
-        directMangerRoleId = workspaceResponse.getRoles().get(1).getId();
+        directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
@@ -392,7 +392,7 @@ public class LaunchAcceptanceTest {
         EmployeeManagerDetail employeeManagerDetail = new EmployeeManagerDetail();
         employeeManagerDetail.setId(directManagerId);
         employeeManagerDetail.setName("juram");
-        employeeManagerDetail.setRoleId(directMangerRoleId);
+        employeeManagerDetail.setRoleId(directManagerRoleId);
         employeeManagerDetail.setRoleName("담당사수");
         employeeManagerDetails.add(employeeManagerDetail);
 
@@ -450,7 +450,7 @@ public class LaunchAcceptanceTest {
         sequenceRequest.setName("담당 사수와의 미팅");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(directMangerRoleId);
+        sequenceRequest.setRoleId(directManagerRoleId);
 
         return sequenceRequest;
     }
