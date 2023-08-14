@@ -46,13 +46,17 @@ public class WorkspaceService {
         Workspace savedWorkspace = workspaceRepository.save(workspace);
         userworkspaceService.create(currentUser, savedWorkspace);
 
-        var directManagerRole = Role.builder().workspace(workspace).name("담당 사수").build();
-        var managerRole = Role.builder().workspace(workspace).name("HR 매니저").build();
-        roleRepository.save(directManagerRole);
-        roleRepository.save(managerRole);
+        var employeeRole = Role.builder().workspace(workspace).name("신규입사자").build();
+        var directManagerRole = Role.builder().workspace(workspace).name("담당사수").build();
+        var hrManagerRole = Role.builder().workspace(workspace).name("HR매니저").build();
 
+        roleRepository.save(employeeRole);
+        roleRepository.save(directManagerRole);
+        roleRepository.save(hrManagerRole);
+
+        savedWorkspace.getRoles().add(employeeRole);
         savedWorkspace.getRoles().add(directManagerRole);
-        savedWorkspace.getRoles().add(managerRole);
+        savedWorkspace.getRoles().add(hrManagerRole);
 
         return WorkspaceResponse.of(savedWorkspace);
     }

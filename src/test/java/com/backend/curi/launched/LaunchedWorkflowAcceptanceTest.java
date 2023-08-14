@@ -97,15 +97,19 @@ public class LaunchedWorkflowAcceptanceTest {
     private Long workspaceId;
     private Long workspaceId2;
     private Long employeeId;
-    private Long managerId;
+    private Long directManagerId;
 
+    private Long hrManagerId;
     private Long workflowId;
 
     private Long sequenceId;
 
     private Long sequenceInWorkflowId;
+    private Long employeeRoleId;
 
-    private Long defaultRoleId;
+
+    private Long directMangerRoleId;
+    private Long hrManagerRoleId;
 
     private Long launchedworkflowId;
 
@@ -141,13 +145,18 @@ public class LaunchedWorkflowAcceptanceTest {
         WorkspaceResponse workspaceResponse2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspaceResponse.getId();
         workspaceId2= workspaceResponse2.getId();
-        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
-    }
+        employeeRoleId = workspaceResponse.getRoles().get(0).getId();
+        directMangerRoleId = workspaceResponse.getRoles().get(1).getId();
+        hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();    }
 
     private void userMakeEmployeeAndManager(){
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getDirectManagerRequest());
 
-        managerId = managerResponse.getId();
+        directManagerId = managerResponse.getId();
+
+        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+
+        hrManagerId = hrManagerResponse.getId();
 
         var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
 
@@ -322,16 +331,23 @@ public class LaunchedWorkflowAcceptanceTest {
     private List<EmployeeManagerDetail> getManagers(){
         List<EmployeeManagerDetail> employeeManagerDetails = new ArrayList<>();
         EmployeeManagerDetail employeeManagerDetail = new EmployeeManagerDetail();
-        employeeManagerDetail.setId(managerId);
+        employeeManagerDetail.setId(directManagerId);
         employeeManagerDetail.setName("juram");
-        employeeManagerDetail.setRoleId(defaultRoleId);
-        employeeManagerDetail.setRoleName("담당 사수");
+        employeeManagerDetail.setRoleId(directMangerRoleId);
+        employeeManagerDetail.setRoleName("담당사수");
         employeeManagerDetails.add(employeeManagerDetail);
+
+        EmployeeManagerDetail employeeManagerDetail2 = new EmployeeManagerDetail();
+        employeeManagerDetail2.setId(hrManagerId);
+        employeeManagerDetail2.setName("hanna");
+        employeeManagerDetail2.setRoleId(hrManagerRoleId);
+        employeeManagerDetail2.setRoleName("hr매니저");
+        employeeManagerDetails.add(employeeManagerDetail2);
         return employeeManagerDetails;
     }
 
 
-    private ManagerRequest getManagerRequest(){
+    private ManagerRequest getDirectManagerRequest(){
         ManagerRequest managerRequest = new ManagerRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
@@ -340,6 +356,18 @@ public class LaunchedWorkflowAcceptanceTest {
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
+
+    private ManagerRequest getHrManagerRequest(){
+        ManagerRequest managerRequest = new ManagerRequest();
+        managerRequest.setWid(workspaceId);
+        managerRequest.setDepartment("HR");
+        managerRequest.setName("hanna");
+        managerRequest.setEmail("hanna@gmail.com");
+        managerRequest.setPhoneNum("010-1111-2222");
+        return managerRequest;
+    }
+
+
 
 
     private WorkflowRequest getWorkflowRequest(){
@@ -354,7 +382,7 @@ public class LaunchedWorkflowAcceptanceTest {
         sequenceRequest.setName("신입 환영 시퀀스");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(hrManagerRoleId);
 
         return sequenceRequest;
     }
@@ -364,7 +392,7 @@ public class LaunchedWorkflowAcceptanceTest {
         sequenceRequest.setName("담당 사수와의 미팅");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(defaultRoleId);
+        sequenceRequest.setRoleId(directMangerRoleId);
 
         return sequenceRequest;
     }
@@ -381,7 +409,7 @@ public class LaunchedWorkflowAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} 님 진심으로 반갑습니다.\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -390,7 +418,7 @@ public class LaunchedWorkflowAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

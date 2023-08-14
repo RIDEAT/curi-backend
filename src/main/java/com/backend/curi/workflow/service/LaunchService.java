@@ -1,5 +1,6 @@
 package com.backend.curi.workflow.service;
 
+import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
@@ -17,22 +18,31 @@ import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
-import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Module;
 
+import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class LaunchService {
+
+    private static Logger log = LoggerFactory.getLogger(LaunchService.class);
+
 
     private final LaunchedWorkflowService launchedWorkflowService;
     private final LaunchedSequenceService launchedSequenceService;
@@ -43,10 +53,11 @@ public class LaunchService {
 
     private final AwsSMTPService awsSMTPService;
 
-    private final ContentRepository contentRepository;
+    private final ContentService contentService;
 
     private final SchedulerOpenFeign schedulerOpenFeign;
 
+    private Map<Role, Member> memberMap= new HashMap<>();
     @Transactional
     public LaunchedWorkflowResponse launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
@@ -54,6 +65,14 @@ public class LaunchService {
         var currentUser = (CurrentUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var member = memberService.getMemberEntity(launchRequest.getMemberId(), currentUser);
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
+
+        for (Role role : launchedWorkflow.getWorkspace().getRoles()){
+            if (role.getName().equals("신규입사자")) memberMap.put(role, member);
+            else {
+                Member manager = memberService.getManagerByEmployeeAndRole(member, role);
+                memberMap.put(role, manager);
+            }
+        }
 
         var sequences = workflowService.getSequencesWithDayoffset(workflowId);
         for (var sequenceWithDayoffset : sequences){
@@ -65,7 +84,8 @@ public class LaunchService {
 
     private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Integer dayOffset){
         var role = sequence.getRole();
-        var assignedMember = memberService.getManagerByEmployeeAndRole(member, role);
+        Member assignedMember = memberMap.get(role);
+
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace, dayOffset);
 
         var sequenceModules = sequence.getSequenceModules();
@@ -86,7 +106,19 @@ public class LaunchService {
     }
 
     private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace, Long order){
-        var launchedModule = LaunchedModule.of(module, launchedSequence, workspace, order);
+
+        String message = contentService.getMessage(module.getContentId()).toString();
+
+        log.info(message);
+
+        Object substitutedMessage = substitutePlaceholders(message);
+
+        log.info(substitutedMessage.toString());
+
+        var content = contentService.createContent(substitutedMessage);
+
+        var launchedModule = LaunchedModule.of(content.getId(), module, launchedSequence, workspace, order);
+
         launchedModuleService.saveLaunchedModule(launchedModule);
     }
 
@@ -118,4 +150,27 @@ public class LaunchService {
 
     }
 
+    public String substitutePlaceholders(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+            if (jsonNode.isObject()) {
+                JsonNode contentNode = jsonNode.get("content");
+                if (contentNode != null && contentNode.isTextual()) {
+                    String content = contentNode.textValue();
+                    for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
+                        String placeholder = "{" + entry.getKey().getName() + "}";
+                        content = content.replace(placeholder, entry.getValue().getName());
+                    }
+                    ((com.fasterxml.jackson.databind.node.ObjectNode) jsonNode).put("content", content);
+                }
+            }
+
+            return jsonNode.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

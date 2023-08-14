@@ -24,7 +24,6 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
-import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -314,7 +313,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -323,7 +322,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

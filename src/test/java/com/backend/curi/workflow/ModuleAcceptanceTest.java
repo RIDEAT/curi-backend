@@ -2,6 +2,8 @@ package com.backend.curi.workflow;
 
 
 import com.backend.curi.common.Constants;
+import com.backend.curi.exception.CuriException;
+import com.backend.curi.exception.ErrorType;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
@@ -10,6 +12,8 @@ import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
+import com.backend.curi.workflow.repository.ContentRepository;
+import com.backend.curi.workflow.repository.entity.Content;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.service.ModuleService;
 import com.backend.curi.workflow.service.SequenceService;
@@ -18,6 +22,8 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -31,13 +37,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +54,8 @@ public class ModuleAcceptanceTest {
 
 
 
+    @Autowired
+    private ContentRepository contentRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -102,7 +109,7 @@ public class ModuleAcceptanceTest {
 
         workspaceId = workspaceResponse.getId();
         workspaceId2 = workspaceResponse2.getId();
-        defaultRoleId = workspaceResponse.getRoles().get(0).getId();
+        defaultRoleId = workspaceResponse.getRoles().get(1).getId();
 
         var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
 
@@ -161,6 +168,21 @@ public class ModuleAcceptanceTest {
     public void createModule(){
         ExtractableResponse<Response> response = 모듈_생성(getModuleRequest());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ModuleResponse moduleResponse = response.as(ModuleResponse.class);
+        System.out.println(moduleResponse.getContentId());
+
+
+        String str = contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getMessage().toString();
+
+        System.out.println(contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getMessage().toString());
+
+        Map<String, String> substitutions = Map.of("employee", "jiseung");
+
+        String substitedString =  substitutePlaceholders(str, substitutions);
+
+        System.out.println(substitedString);
+
     }
 
     @DisplayName("시퀀스 내 모듈을 추가할 수 있다.")
@@ -168,7 +190,6 @@ public class ModuleAcceptanceTest {
     public void createSequenceInWorkflow(){
         ExtractableResponse<Response> moduleResponse = 시퀀스내_모듈_생성(getModuleRequest());
         assertThat(moduleResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
 
     }
 
@@ -404,7 +425,7 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -413,7 +434,7 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContents(new ArrayList());
+        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"niece {employee} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -429,6 +450,29 @@ public class ModuleAcceptanceTest {
         return currentUser;
     }
 
+    public static String substitutePlaceholders(String jsonString, Map<String, String> substitutions) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+            if (jsonNode.isObject()) {
+                JsonNode contentNode = jsonNode.get("content");
+                if (contentNode != null && contentNode.isTextual()) {
+                    String content = contentNode.textValue();
+                    for (Map.Entry<String, String> entry : substitutions.entrySet()) {
+                        String placeholder = "{" + entry.getKey() + "}";
+                        content = content.replace(placeholder, entry.getValue());
+                    }
+                    ((com.fasterxml.jackson.databind.node.ObjectNode) jsonNode).put("content", content);
+                }
+            }
+
+            return jsonNode.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
 
 
