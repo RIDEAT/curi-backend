@@ -30,7 +30,7 @@ public class LaunchedSequenceResponse {
 
     private MemberResponse assignedMember;
 
-    private List<LaunchedModuleResponse> launchedModuleResponseList;
+    private List<LaunchedModuleResponse> launchedModules;
 /*
     private Long workflowId;
 

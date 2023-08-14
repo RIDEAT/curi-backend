@@ -20,5 +20,5 @@ public class DashboardMemberResponse {
     private LaunchedStatus launchedStatus;
     private Long progress;
     private Long eNPS;
-    private List<LaunchedSequenceResponse> launchedSequenceResponseList;
+    private List<LaunchedSequenceResponse> launchedSequences;
 }

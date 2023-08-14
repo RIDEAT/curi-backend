@@ -29,7 +29,7 @@ public class LaunchedWorkflowResponse {
 
     private LocalDate keyDate;
 
-    private List<LaunchedSequenceResponse> launchedSequenceList;
+    private List<LaunchedSequenceResponse> launchedSequences;
 
     private MemberResponse employee;
 

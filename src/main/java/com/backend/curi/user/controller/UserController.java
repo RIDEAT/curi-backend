@@ -1,33 +1,19 @@
 package com.backend.curi.user.controller;
 
-import com.backend.curi.exception.CuriException;
-import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.user.controller.dto.UserListResponse;
 import com.backend.curi.user.controller.dto.UserRequest;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
-import com.backend.curi.workspace.repository.entity.Workspace;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;;
+;
 
 
 import java.util.*;
@@ -41,7 +27,7 @@ public class UserController {
 
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
-    public ResponseEntity<UserListResponse> getUserList(@PathVariable Long workspaceId) {
+    public ResponseEntity<List<UserResponse>> getUserList(@PathVariable Long workspaceId) {
 
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
