@@ -23,10 +23,10 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - name: Set up application.properties
+      - name: Set up Environment build
         run: |
-          touch ./src/main/resources/application.properties
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+          touch ./src/main/resources/application-build.properties
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-build.properties
 
       - name: Set up application-data.properties
         run: |
@@ -71,6 +71,8 @@ jobs:
         run: |
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
+          echo "ENVIRONMENT=build" >> $GITHUB_ENV
+          echo $ENVIRONMENT
           ./gradlew -Djib.to.image=$ECR_REGISTRY/$ECR_REPOSITORY -PinputTag=$IMAGE_TAG clean jib test --no-daemon
 
       - name: Publish Unit Test Results
