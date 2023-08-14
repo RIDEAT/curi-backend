@@ -24,16 +24,6 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - name: Set up application.properties
-        run: |
-          touch ./src/main/resources/application.properties
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-
-      - name: Set up application-data.properties
-        run: |
-          touch ./src/test/resources/application-data.properties
-          echo "${{ secrets.APPLICATION_DATA }}" > ./src/test/resources/application-data.properties
-
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
@@ -46,8 +36,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Test with Gradle
+        env:
+          RDS_URL: ${{ secrets.RDS_URL }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SQS_QUEUE_NAME: ${{ secrets.AWS_SQS_QUEUE_NAME }}
+          AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
+          AWS_REGION: ap-northeast-2
+          DDL_AUTO: update
+          AWS_SQS_QUEUE_URL: http://localhost:8081
+          ENVIRONMENT: build
         run: |
-          echo "ENVIRONMENT=build" >> $GITHUB_ENV
           echo $ENVIRONMENT
           ./gradlew --info test
 

@@ -42,4 +42,4 @@ serviceAccountKey.json
 .DS_Store
 
 application-local.properties
-application-data.properties
+application-data-local.properties
