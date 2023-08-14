@@ -45,7 +45,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ import static org.mockito.Mockito.*;
 import org.springframework.security.core.context.SecurityContext;
 
 @ExtendWith(MockitoExtension.class)
-@TestPropertySource(locations = "classpath:application-data.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LaunchedWorkflowAcceptanceTest {
 
