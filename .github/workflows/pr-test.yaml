@@ -47,7 +47,6 @@ jobs:
           AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
           AWS_REGION: ap-northeast-2
           DDL_AUTO: update
-          AWS_SQS_QUEUE_URL: http://localhost:8081
           ENVIRONMENT: build
         run: |
           echo $ENVIRONMENT
