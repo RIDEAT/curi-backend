@@ -26,8 +26,8 @@ jobs:
 
       - name: Set up application.properties
         run: |
-          touch ./src/main/resources/application-build.properties
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-build.properties
+          touch ./src/main/resources/application.properties
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
 
       - name: Set up application-data.properties
         run: |
