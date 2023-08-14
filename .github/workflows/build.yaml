@@ -23,16 +23,6 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - name: Set up application.properties
-        run: |
-          touch ./src/main/resources/application.properties
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-
-      - name: Set up application-data.properties
-        run: |
-          touch ./src/test/resources/application-data.properties
-          echo "${{ secrets.APPLICATION_DATA }}" > ./src/test/resources/application-data.properties
-
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
@@ -68,9 +58,23 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: spring/curi-app
           IMAGE_TAG: ${{ steps.image.outputs.version }}
+          RDS_URL: ${{ secrets.RDS_URL }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SQS_QUEUE_NAME: ${{ secrets.AWS_SQS_QUEUE_NAME }}
+          AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
+          AWS_REGION: ap-northeast-2
+          DDL_AUTO: update
+          ENVIRONMENT: build
+          TEST_ENVIRONMENT: data-build
         run: |
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
+          echo "ENVIRONMENT=build" >> $GITHUB_ENV
+          echo $ENVIRONMENT
           ./gradlew -Djib.to.image=$ECR_REGISTRY/$ECR_REPOSITORY -PinputTag=$IMAGE_TAG clean jib test --no-daemon
 
       - name: Publish Unit Test Results

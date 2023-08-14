@@ -1,0 +1,82 @@
+name: Deploy Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - product
+      tag:
+        description: 'Deployment Tag(git sha)'
+        required: true
+        type: string
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Validate Git SHA or Tag
+        run: git rev-parse ${{ github.event.inputs.tag || github.sha }} || exit 1
+
+      - name: Configure AWS credentials # AWS 로그인
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR # ECR에도 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get image tag(verion)
+        id: image
+        run: |
+          REVISION=$(git rev-parse ${{ github.event.inputs.tag || github.sha }})
+          VERSION=$(echo $REVISION | cut -c1-8)
+          echo VERSION=$VERSION
+          echo "::set-output name=version::$VERSION"
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout kustomize repository
+        uses: actions/checkout@v2
+        with:
+          repository: RIDEAT/curi-manifests
+          ref: main
+          token: ${{ secrets.ACTION_TOKEN }}
+          path: curi-manifests
+
+      - name: Update Kubernetes resources
+        env:
+          ECR_REPOSITORY: spring/curi-app
+          IMAGE_TAG: ${{ steps.image.outputs.version }}
+
+        run: |
+          echo ${{ steps.login-ecr.outputs.registry }}
+          echo $ECR_REPOSITORY
+          echo $IMAGE_TAG
+          cd curi-manifests/k8s_manifests/spring/overlays/${{ github.event.inputs.environment }}
+          kustomize edit set image ${{ steps.login-ecr.outputs.registry}}/$ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry}}/$ECR_REPOSITORY:$IMAGE_TAG
+          cat kustomization.yaml
+
+      - name: Commit files
+        run: |
+          cd curi-manifests
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git commit -am "Update ${{ github.event.inputs.environment }} image tag"
+          git push -u origin main
