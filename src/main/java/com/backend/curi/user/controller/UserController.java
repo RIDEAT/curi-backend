@@ -41,7 +41,7 @@ public class UserController {
 
     @GetMapping(value = "/{workspaceId}")
     @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
-    public ResponseEntity getUserList(@PathVariable Long workspaceId) {
+    public ResponseEntity<UserListResponse> getUserList(@PathVariable Long workspaceId) {
 
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -56,7 +56,7 @@ public class UserController {
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
     @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 자동로그인하고 일어나는 게 좋을듯!")
-    public ResponseEntity register(@RequestBody UserRequest userForm) {
+    public ResponseEntity<UserResponse> register(@RequestBody UserRequest userForm) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getUserId();
         String userEmail = userForm.getEmail();
@@ -68,7 +68,7 @@ public class UserController {
 
     @PutMapping(value = "/{userId}")
     @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
-    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserRequest userForm) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserRequest userForm) {
         User_ existingUser = userService.getUserByUserId(userId);
 
         existingUser.setEmail(userForm.getEmail());
@@ -80,7 +80,7 @@ public class UserController {
 
     @DeleteMapping(value = "/{userId}")
     @Operation(summary = "delete user", description = "유저를 삭제합니다.")
-    public ResponseEntity deleteUser(@PathVariable String userId) {
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable String userId) {
         User_ existingUser = userService.getUserByUserId(userId);
 
         UserResponse deletedUser = userService.deleteUser(existingUser);
@@ -88,15 +88,7 @@ public class UserController {
         return new ResponseEntity<>(deletedUser, HttpStatus.OK);
     }
 
-    private List<UserResponse> convertToUserResponse(List<String> userIdList) {
-        List<UserResponse> userResponseList = new ArrayList<>();
-        for (String userId : userIdList) {
-            userResponseList.add(userService.getUserResponseByUserId(userId));
-        }
 
-        return userResponseList;
-
-    }
 
 
 
