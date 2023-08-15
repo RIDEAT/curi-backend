@@ -71,7 +71,6 @@ public class WorkspaceAcceptanceTest {
         ExtractableResponse<Response> response = 워크스페이스_리스트_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-
     }
 
     @DisplayName("워크스페이스 아이디를 가지고 워크스페이스를 조회할 수 있다.")

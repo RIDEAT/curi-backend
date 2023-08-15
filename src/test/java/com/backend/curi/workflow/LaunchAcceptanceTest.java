@@ -147,6 +147,13 @@ public class LaunchAcceptanceTest {
         moduleInSequenceId = moduleInSequence.getId();
     }
 
+    @DisplayName("워크플로우 launch 전 필요한 role 정보를 받을 수 있다.")
+    @Test
+    public void getRequiredRoles(){
+        ExtractableResponse<Response> response = 워크플로우_런처전_필요한_롤();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
     @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
@@ -237,6 +244,19 @@ public class LaunchAcceptanceTest {
         assertThat(workflowResponse.getSequences().isEmpty());
     }
 
+    private ExtractableResponse<Response>워크플로우_런처전_필요한_롤(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(getLaunchRequest())
+                .when()
+                .get("/workspaces/{workspaceId}/workflows/{workflowId}/requiredforlaunch",workspaceId, workflowId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
     private ExtractableResponse<Response> 워크스페이스내_워크플로우_런치(){
         return RestAssured.
                 given()

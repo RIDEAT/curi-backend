@@ -2,10 +2,7 @@ package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
-import com.backend.curi.workflow.controller.dto.LaunchRequest;
-import com.backend.curi.workflow.controller.dto.SequenceResponse;
-import com.backend.curi.workflow.controller.dto.WorkflowRequest;
-import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,13 @@ import java.util.List;
 public class WorkflowController {
     private final WorkflowService workflowService;
     private final LaunchService launchService;
+
+    @GetMapping("/{workflowId}/requiredforlaunch")
+    public ResponseEntity<RequiredForLaunchResponse> getRequiredForLaunch(@PathVariable Long workspaceId, @PathVariable Long workflowId){
+        var requiredForLaunchResponse = launchService.getRequiredForLaunch(workflowId);
+        return ResponseEntity.ok(requiredForLaunchResponse);
+    }
+
 
     @PostMapping("/{workflowId}/launch")
     public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId){
