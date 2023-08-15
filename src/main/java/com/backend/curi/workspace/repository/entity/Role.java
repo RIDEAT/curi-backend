@@ -2,6 +2,7 @@ package com.backend.curi.workspace.repository.entity;
 
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.workspace.controller.dto.RoleRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +26,8 @@ public class Role extends BaseEntity {
 
     private String name;
 
+    public Role modify(RoleRequest roleRequest){
+        this.name = roleRequest.getName();
+        return this;
+    }
 }

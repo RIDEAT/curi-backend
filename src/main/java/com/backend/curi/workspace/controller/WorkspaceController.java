@@ -81,7 +81,6 @@ public class WorkspaceController {
 
         // 업데이트된 작업 공간 정보 반환
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("transactionId", 1134);
         responseBody.put("workspace", response);
         // responseBody.put("createDate", existingWorkspace.getCreateDate());
         responseBody.put("creator", currentUser);

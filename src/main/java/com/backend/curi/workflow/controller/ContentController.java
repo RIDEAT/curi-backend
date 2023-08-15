@@ -23,4 +23,7 @@ public class ContentController {
     public ResponseEntity<ContentResponse> getContent(@PathVariable Long workspaceId, @PathVariable ObjectId contentId){
         var response = contentService.getContent(contentId);
         return ResponseEntity.ok(response);
-    }}
+    }
+
+
+}
