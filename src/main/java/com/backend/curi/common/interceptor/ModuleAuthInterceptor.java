@@ -20,8 +20,8 @@ public class ModuleAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long workspaceId = extractFromUrl(request, "workspaces");
-        Long moduleId = extractFromUrl(request, "modules");
+        Long workspaceId = Extractor.extractFromUrl(request, "workspaces");
+        Long moduleId = Extractor.extractFromUrl(request, "modules");
 
         Module module = moduleService.getModuleEntity(moduleId);
 
@@ -32,18 +32,5 @@ public class ModuleAuthInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    public static Long extractFromUrl(HttpServletRequest request, String point) {
-        String requestUrl = request.getRequestURI();
-        String[] parts = requestUrl.split("/" +point+ "/");
-        if (parts.length >= 2) {
-            String workspaceIdStr = parts[1].split("/")[0];
-            try {
-                return Long.parseLong(workspaceIdStr);
-            } catch (NumberFormatException e) {
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_URL_ERROR);
-            }
-        }
 
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_URL_ERROR);
-    }
 }

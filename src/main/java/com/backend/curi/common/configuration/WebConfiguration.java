@@ -16,6 +16,9 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final SequenceAuthInterceptor sequenceAuthInterceptor;
     private final ModuleAuthInterceptor moduleAuthInterceptor;
     private final LaunchedworkflowAuthInterceptor launchedworkflowAuthInterceptor;
+    private final LaunchedsequenceAuthInterceptor launchedsequenceAuthInterceptor;
+    private final LaunchedmoduleAuthInterceptor launchedmoduleAuthInterceptor;
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
@@ -37,5 +40,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         registry.addInterceptor(launchedworkflowAuthInterceptor)
                 .addPathPatterns("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/**");
+
+        registry.addInterceptor(launchedsequenceAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/sequences/{sequenceId}/**");
+
+        registry.addInterceptor(launchedmoduleAuthInterceptor)
+                .addPathPatterns("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/sequences/{sequenceId}/modules/{moduleId}/**");
     }
 }
