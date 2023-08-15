@@ -2,6 +2,7 @@ package com.backend.curi.workflow.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.workflow.controller.dto.ContentResponse;
 import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.entity.Content;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,15 @@ import org.springframework.stereotype.Service;
 public class ContentService {
     private final ContentRepository contentRepository;
 
-    Object getMessage(ObjectId contentId){
-        return contentRepository.findById(contentId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS)).getMessage();
+
+
+    public ContentResponse getContent (ObjectId contentId){
+        Content content = contentRepository.findById(contentId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
+        return ContentResponse.of(content);
     }
 
-    Content getContent (ObjectId contentId){
-        return contentRepository.findById(contentId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
-
+    public Object getMessage(ObjectId contentId){
+        return getContent(contentId).getMessage();
     }
 
     public Content createContent(Object substitutedMessage) {
