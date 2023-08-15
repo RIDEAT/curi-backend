@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final UserworkspaceService userworkspaceService;
-    private final WorkspaceService workspaceService;
 
     public User_ getUserByUserId(String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
@@ -29,8 +28,7 @@ public class UserService {
 
     public List<UserResponse> getAllUsers(Long workspaceId, CurrentUser currentUser){
         var user = getUserByUserId(currentUser.getUserId());
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
-        List<User_> userList = userworkspaceService.getUserListByWorkspace(workspace);
+        List<User_> userList = userworkspaceService.getUserListByWorkspaceId(workspaceId);
 
         if (!userList.contains(user)) {
             throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);

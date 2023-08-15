@@ -6,6 +6,7 @@ import com.backend.curi.workspace.controller.dto.RoleRequest;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.RoleRepository;
 import com.backend.curi.workspace.repository.entity.Role;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -48,4 +49,6 @@ public class RoleService {
         role.modify(roleRequest);
         return RoleResponse.of(role);
     }
+
+
 }

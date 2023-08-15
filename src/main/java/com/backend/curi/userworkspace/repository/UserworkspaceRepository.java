@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserworkspaceRepository extends JpaRepository<Userworkspace, Integer> {
     List<Userworkspace> findAllByUser(User_ user);
     List<Userworkspace> findAllByUserEmail(String userEmail);
-    List<Userworkspace> findAllByWorkspace(Workspace workspace);
+    List<Userworkspace> findAllByWorkspaceId(Long workspaceId);
 
     List<Userworkspace> findAllByUserAndWorkspace(User_ user, Workspace workspace);
 
