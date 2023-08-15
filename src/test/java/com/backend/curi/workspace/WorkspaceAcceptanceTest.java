@@ -99,7 +99,7 @@ public class WorkspaceAcceptanceTest {
     @Test
     public void deleteWorkspace(){
         ExtractableResponse<Response> response = 워크스페이스_삭제(workspaceId);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 

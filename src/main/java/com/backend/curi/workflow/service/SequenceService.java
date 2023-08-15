@@ -12,6 +12,7 @@ import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workflow.repository.entity.WorkflowSequence;
+import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class SequenceService {
     private final SequenceRepository sequenceRepository;
     private final WorkflowSequenceRepository workflowSequenceRepository;
     private final WorkspaceService workspaceService;
+    private final RoleService roleService;
     private final WorkflowService workflowService;
 
     public SequenceResponse getSequence(Long sequenceId){
@@ -45,7 +47,7 @@ public class SequenceService {
     public Sequence createSequence(Long workspaceId, SequenceRequest request){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
-        var role = workspaceService.getRoleEntityByIdAndWorkspace(request.getRoleId(), workspace);
+        var role = roleService.getRoleEntity(request.getRoleId());
         var sequence = Sequence.of(request, role, workspace);
 
         sequenceRepository.save(sequence);
@@ -78,7 +80,7 @@ public class SequenceService {
     public Sequence modifySequence(Long sequenceId, SequenceRequest request){
         var sequence = getSequenceEntity(sequenceId);
         var workspace = sequence.getWorkspace();
-        var role = workspaceService.getRoleEntityByIdAndWorkspace(request.getRoleId(), workspace);
+        var role = roleService.getRoleEntity(request.getRoleId());
         sequence.modify(request, role);
         return sequence;
     }
@@ -88,7 +90,7 @@ public class SequenceService {
         var sequence = modifySequence(sequenceId, request);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var workspace = sequence.getWorkspace();
-        var role = workspaceService.getRoleEntityByIdAndWorkspace(request.getRoleId(), workspace);
+        var role = roleService.getRoleEntity(request.getRoleId());
         sequence.modify(request, role);
 
         // 둘의 연관관계가 없으면?

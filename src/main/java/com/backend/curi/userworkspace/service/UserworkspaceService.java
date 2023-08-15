@@ -58,8 +58,8 @@ public class UserworkspaceService {
         return userworkspaceList.stream().map(Userworkspace::getWorkspace).collect(Collectors.toList());
     }
 
-    public List<User_> getUserListByWorkspace(Workspace workspace){
-        var userworkspaceList = userworkspaceRepository.findAllByWorkspace(workspace);
+    public List<User_> getUserListByWorkspaceId(Long workspaceId){
+        var userworkspaceList = userworkspaceRepository.findAllByWorkspaceId(workspaceId);
 
         return userworkspaceList.stream().map(Userworkspace::getUser).collect(Collectors.toList());
     }

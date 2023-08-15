@@ -3,6 +3,8 @@ package com.backend.curi.workspace.service;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.repository.entity.User_;
+import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
@@ -33,27 +35,21 @@ public class WorkspaceService {
         return WorkspaceResponse.of(workspace);
     }
 
+    public List<Workspace> getWorkspaceList(CurrentUser currentUser){
+        return userworkspaceService.getWorkspaceListByUser(currentUser);
+    }
+
+    public Workspace getWorkspaceEntityById(Long id){
+        return workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+    }
     @Transactional
     public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
 
-
         Workspace workspace = Workspace.builder().name(request.getName()).email(request.getEmail()).build();
-
-
         Workspace savedWorkspace = workspaceRepository.save(workspace);
         userworkspaceService.create(currentUser, savedWorkspace);
 
-        var employeeRole = Role.builder().workspace(workspace).name("신규입사자").build();
-        var directManagerRole = Role.builder().workspace(workspace).name("담당사수").build();
-        var hrManagerRole = Role.builder().workspace(workspace).name("HR매니저").build();
-
-        roleRepository.save(employeeRole);
-        roleRepository.save(directManagerRole);
-        roleRepository.save(hrManagerRole);
-
-        savedWorkspace.getRoles().add(employeeRole);
-        savedWorkspace.getRoles().add(directManagerRole);
-        savedWorkspace.getRoles().add(hrManagerRole);
+        createDefaultRole(savedWorkspace);
 
         return WorkspaceResponse.of(savedWorkspace);
     }
@@ -68,7 +64,7 @@ public class WorkspaceService {
     }
 
     @Transactional
-    public WorkspaceResponse deleteWorkspace(Long workspaceId, CurrentUser currentUser){
+    public void deleteWorkspace(Long workspaceId, CurrentUser currentUser){
         var workspace = getWorkspaceEntityById(workspaceId);
 
         log.info("User {} is deleting workspace {}", currentUser.getUserId(), workspaceId);
@@ -79,21 +75,26 @@ public class WorkspaceService {
         }*/
         // 작업 공간 삭제
         workspaceRepository.delete(workspace);
-
-        return WorkspaceResponse.of(workspace);
-
     }
 
-    public List<Workspace> getWorkspaceList(CurrentUser currentUser){
-        return userworkspaceService.getWorkspaceListByUser(currentUser);
+    private void createDefaultRole(Workspace workspace) {
+        var employeeRole = Role.builder().workspace(workspace).name("신규입사자").build();
+        var directManagerRole = Role.builder().workspace(workspace).name("담당사수").build();
+        var hrManagerRole = Role.builder().workspace(workspace).name("HR매니저").build();
+
+        roleRepository.save(employeeRole);
+        roleRepository.save(directManagerRole);
+        roleRepository.save(hrManagerRole);
+
+        workspace.getRoles().add(employeeRole);
+        workspace.getRoles().add(directManagerRole);
+        workspace.getRoles().add(hrManagerRole);
     }
 
-    public Workspace getWorkspaceEntityById(Long id){
-        return workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
-    }
 
-    public Role getRoleEntityByIdAndWorkspace(Long id, Workspace workspace){
-        return roleRepository.findByIdAndWorkspace(id, workspace).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.NOT_ALLOWED_PERMISSION_ERROR));
-    }
+
+
+
+
 
 }

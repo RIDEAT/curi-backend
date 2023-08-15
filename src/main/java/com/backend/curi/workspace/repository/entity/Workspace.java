@@ -44,6 +44,7 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Role> roles = new ArrayList<>();
+
     public Workspace(){}
     @Builder
     public Workspace(Long id, String name, String email){
