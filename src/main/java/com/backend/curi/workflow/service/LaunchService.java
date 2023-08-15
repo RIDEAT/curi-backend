@@ -18,11 +18,15 @@ import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
+import com.backend.curi.workflow.controller.dto.RequiredForLaunchResponse;
+import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Module;
 
+import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
+import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,8 +38,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +62,8 @@ public class LaunchService {
 
     private final ContentService contentService;
 
+    private final RoleService roleService;
+
     private final SchedulerOpenFeign schedulerOpenFeign;
 
     private Map<Role, Member> memberMap= new HashMap<>();
@@ -65,8 +74,10 @@ public class LaunchService {
         var currentUser = (CurrentUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var member = memberService.getMemberEntity(launchRequest.getMemberId(), currentUser);
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
+        List<Role> requiredRoleEntities = getRequiredRoles(workflowId).stream().map(RoleResponse -> roleService.getRoleEntity(RoleResponse.getId())).collect(Collectors.toList());
 
-        for (Role role : launchedWorkflow.getWorkspace().getRoles()){
+        for (Role role : requiredRoleEntities){
+
             if (role.getName().equals("신규입사자")) memberMap.put(role, member);
             else {
                 Member manager = memberService.getManagerByEmployeeAndRole(member, role);
@@ -172,5 +183,21 @@ public class LaunchService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public RequiredForLaunchResponse getRequiredForLaunch(Long workflowId) {
+        RequiredForLaunchResponse response = new RequiredForLaunchResponse();
+        List<RoleResponse> requiredRoles = getRequiredRoles(workflowId);
+        response.setRequiredRoles(requiredRoles);
+        return response;
+    }
+
+    private List<RoleResponse> getRequiredRoles (Long workflowId){
+        List<SequenceResponse> sequenceResponses = workflowService.getSequences(workflowId);
+
+        return sequenceResponses.stream()
+                .map(SequenceResponse::getRole)
+                .distinct()  // 중복 요소 제거
+                .collect(Collectors.toList());
     }
 }
