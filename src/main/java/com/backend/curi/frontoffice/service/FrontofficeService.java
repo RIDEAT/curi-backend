@@ -5,6 +5,7 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.frontoffice.controller.dto.FrontofficeResponse;
 import com.backend.curi.frontoffice.repository.FrontofficeRepository;
 import com.backend.curi.frontoffice.repository.entity.Frontoffice;
+import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,14 @@ public class FrontofficeService {
     public void checkAuth(UUID frontofficeId, UUID accessToken) {
         Frontoffice frontoffice = frontofficeRepository.findById(frontofficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
         if (!frontoffice.getAccessToken().equals(accessToken)) throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.FRONTOFFICE_UNAUTHORIZED);
+
+    }
+
+    public void createFrontoffice(LaunchedSequence launchedSequence) {
+        Frontoffice frontoffice = new Frontoffice();
+        frontoffice.setLaunchedSequence(launchedSequence);
+        frontoffice.setAccessToken(UUID.randomUUID());
+        frontofficeRepository.save(frontoffice);
 
     }
 }
