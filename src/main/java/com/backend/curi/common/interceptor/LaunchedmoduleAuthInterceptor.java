@@ -19,8 +19,8 @@ public class LaunchedmoduleAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long workspaceId = Extractor.extractFromUrl(request, "workspaces");
-        Long launchedmoduleId = Extractor.extractFromUrl(request, "modules");
+        Long workspaceId = Extractor.extractLongFromUrl(request, "workspaces");
+        Long launchedmoduleId = Extractor.extractLongFromUrl(request, "modules");
 
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedmoduleId);
         if(!launchedModule.getWorkspace().getId().equals(workspaceId)){

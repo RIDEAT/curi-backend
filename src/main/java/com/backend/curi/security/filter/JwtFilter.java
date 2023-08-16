@@ -39,25 +39,26 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-
-
-            // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/h2-console")){
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/swagger-ui") ){
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            // h2-console 할 때는 패스!
             if (request.getRequestURI().startsWith("/backend-api-docs") ){
                 filterChain.doFilter(request, response);
                 return;
             }
+
+            if (request.getRequestURI().startsWith("/frontoffices") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
+
 
             Cookie[] cookies = request.getCookies();
 

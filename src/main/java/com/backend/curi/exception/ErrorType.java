@@ -36,7 +36,10 @@ public enum ErrorType {
     SEQUENCE_MODULE_ALREADY_EXISTS("MODULE-004", "시퀀스에 해당 모듈이 이미 존재합니다. 모듈은 중복될 수 없습니다."),
     WORKFLOW_SEQUENCE_NOT_EXISTS("SEQUENCE-001", "워크플로우에 해당 시퀀스가 존재하지 않습니다."),
     SEQUENCE_NOT_EXISTS("SEQUENCE-002", "존재하지 않는 시퀀스 입니다."),
-    WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다.");
+    WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다."),
+
+    FRONTOFFICE_NOT_EXISTS("FRONTOFFICE-001", "존재하지 않는 프론트오피스입니다."),
+    FRONTOFFICE_UNAUTHORIZED ("FRONTOFFICE-002", "프론트오피스 접근권한이 없습니다.");
 
     private final String errorCode;
     private final String message;
