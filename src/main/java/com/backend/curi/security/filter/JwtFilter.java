@@ -59,6 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
+
             Cookie[] cookies = request.getCookies();
 
        //     pretendTobeAuthorized(request, response, filterChain);
@@ -85,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             CurrentUser currentUser = new CurrentUser();
             currentUser.setUserId(userId);
-            currentUser.setUserEmail(getUserEmail(userId));
+//          currentUser.setUserEmail(getUserEmail(userId));
             currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
