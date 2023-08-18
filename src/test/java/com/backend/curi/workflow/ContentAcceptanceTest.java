@@ -1,4 +1,5 @@
-package com.backend.curi.launched;
+package com.backend.curi.workflow;
+
 
 
 import com.backend.curi.common.Constants;
@@ -61,7 +62,7 @@ import org.springframework.test.context.TestPropertySource;
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-data.properties")
-public class LaunchedWorkflowAcceptanceTest {
+public class ContentAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
@@ -106,7 +107,6 @@ public class LaunchedWorkflowAcceptanceTest {
     private Long sequenceId;
 
     private Long sequenceInWorkflowId;
-    private Long sequenceInWorkflowId2;
     private Long employeeRoleId;
 
 
@@ -175,9 +175,6 @@ public class LaunchedWorkflowAcceptanceTest {
         var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
         sequenceInWorkflowId = sequenceInWorkflow.getId();
 
-        var sequenceInWorkflow2 = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest2());
-        sequenceInWorkflowId2 = sequenceInWorkflow2.getId();
-
         var module = moduleService.createModule(workspaceId, getModuleRequest());
         templateModuleId = module.getId();
 
@@ -198,81 +195,20 @@ public class LaunchedWorkflowAcceptanceTest {
     }
 
 
-    @DisplayName("워크스페이스에 속한 런치드 워크플로우 리스트를 조회할 수 있다.")
+    @DisplayName("콘텐츠 아이디를 가지고 콘텐츠를 가져올 수 있다.")
     @Test
-    public void getLaunchedWorkflowList(){
-        ExtractableResponse<Response> response = 워크스페이스내_런치드_워크플로우_리스트_조회();
+    public void getContent(){
+        ExtractableResponse<Response> response = 콘텐츠_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("워크스페이스에 속한 런치드 워크플로우를 조회할 수 있다.")
-    @Test
-    public void getLaunchedWorkflow(){
-        ExtractableResponse<Response> response = 워크스페이스내_런치드_워크플로우_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
 
-    @DisplayName("다른 워크스페이스에 속한 런치드 워크플로우를 조회할 수 없다.")
-    @Test
-    public void getLaunchedWorkflowInOtherWorkspace(){
-        ExtractableResponse<Response> response = 다른_워크스페이스내_런치드_워크플로우_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    @DisplayName("런치드 워크플로우 정보를 수정할 수 있다.")
-    @Test
-    public void updateLaunchedWorkflow(){
-        ExtractableResponse<Response> getResponseBeforeUpdate = 워크스페이스내_런치드_워크플로우_조회();
-        LaunchedWorkflowResponse originalWorkflowResponse = getResponseBeforeUpdate.as(LaunchedWorkflowResponse.class);
-        ExtractableResponse<Response> updateResponse = 런치드_워크플로우_수정(getModifiedLaunchedWorkflowRequest(originalWorkflowResponse));
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-
-        ExtractableResponse<Response> getResponseAfterUpdate = 워크스페이스내_런치드_워크플로우_조회();
-        LaunchedWorkflowResponse updatedWorkflowResponse = getResponseAfterUpdate.as(LaunchedWorkflowResponse.class);
-        assertThat(updatedWorkflowResponse.getStatus()).isEqualTo(getModifiedLaunchedWorkflowRequest(originalWorkflowResponse).getStatus());
-    }
-
-    @DisplayName("워크 스페이스 내에 런치드 워크 플로우를 삭제할 수 있다.")
-    @Test
-    public void deleteLaunchedWorkflow(){
-        ExtractableResponse<Response> response = 런치드_워크플로우_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        ExtractableResponse<Response> getResponse = 워크스페이스내_런치드_워크플로우_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_리스트_조회(){
+    private ExtractableResponse<Response> 콘텐츠_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows",workspaceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 다른_워크스페이스내_런치드_워크플로우_조회(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}",workspaceId2, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_조회(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .when()
-                .get("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}",workspaceId, launchedworkflowId)
+                .get("/workspaces/{workspaceId}/contents/{contentId}",workspaceId,"64df9a81a9f41a5201c089ef")
                 .then()
                 .log()
                 .all()
@@ -280,32 +216,6 @@ public class LaunchedWorkflowAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> 런치드_워크플로우_수정(LaunchedWorkflowRequest launchedWorkflowRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(launchedWorkflowRequest)
-                .when()
-                .put("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}", workspaceId, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 런치드_워크플로우_삭제(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .when()
-                .delete("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}", workspaceId, launchedworkflowId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 
 
     private WorkspaceRequest getWorkspaceRequest(){
@@ -392,17 +302,6 @@ public class LaunchedWorkflowAcceptanceTest {
         return sequenceRequest;
     }
 
-    private SequenceRequest getSequenceRequest2() {
-        SequenceRequest sequenceRequest = new SequenceRequest();
-        sequenceRequest.setName("적응 시퀀스");
-        sequenceRequest.setDayOffset(-2);
-        sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(employeeRoleId);
-
-        return sequenceRequest;
-    }
-
-
     private SequenceRequest getModifiedSequenceRequest() {
         SequenceRequest sequenceRequest = new SequenceRequest();
         sequenceRequest.setName("담당 사수와의 미팅");
@@ -425,7 +324,7 @@ public class LaunchedWorkflowAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"marks\":[{\"type\":\"bold\"}],\"text\":\"새로운 입사자가 있어요!\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"안녕하세요 {HR매니저} 님,\\n\\n신규 팀원 {신규입사자} 님의 입사 소식을 알려드립니다. {신규입사자} 님은 [날짜]부터 우리 팀에 합류하게 되었습니다. 이를 통해 우리 팀은 한층 더 다양하고 강력한 팀이 될 수 있을 것입니다.\"}]}]}]}\n");
+        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} 님 진심으로 반갑습니다.\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

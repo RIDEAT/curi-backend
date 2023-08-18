@@ -17,9 +17,9 @@ public class Content extends BaseEntity {
     @Id
     private ObjectId id;
 
-    private Object message;
+    private Object content;
 
     public void modify(ModuleRequest request){
-        this.message = request.getMessage();
+        this.content = request.getContent();
     }
 }
