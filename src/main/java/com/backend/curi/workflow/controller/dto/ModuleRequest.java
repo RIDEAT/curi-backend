@@ -19,7 +19,7 @@ public class ModuleRequest {
     private ModuleType type;
 
     @NotNull
-    private Object message;
+    private Object content;
 
     private Integer order;
 }

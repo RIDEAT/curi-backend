@@ -172,9 +172,9 @@ public class ModuleAcceptanceTest {
         System.out.println(moduleResponse.getContentId());
 
 
-        String str = contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getMessage().toString();
+        String str = contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getContent().toString();
 
-        System.out.println(contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getMessage().toString());
+        System.out.println(contentRepository.findById(moduleResponse.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS)).getContent().toString());
 
         Map<String, String> substitutions = Map.of("employee", "jiseung");
 
@@ -424,7 +424,7 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} nice to meet you!\" }");
+        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -433,7 +433,7 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"niece {employee} nice to meet you!\" }");
+        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"niece {employee} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

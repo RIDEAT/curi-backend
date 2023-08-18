@@ -487,7 +487,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -496,7 +496,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

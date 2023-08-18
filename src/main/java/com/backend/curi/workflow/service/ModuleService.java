@@ -47,7 +47,7 @@ public class ModuleService {
     public Module createModule(Long workspaceId, ModuleRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
 
-        var content = Content.builder().message(request.getMessage()).build();
+        var content = Content.builder().content(request.getContent()).build();
         contentRepository.save(content);
 
         var module = Module.of(request, workspace, content.getId());

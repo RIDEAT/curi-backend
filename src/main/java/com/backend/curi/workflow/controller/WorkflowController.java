@@ -5,6 +5,7 @@ import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.WorkflowService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class WorkflowController {
 
 
     @PostMapping("/{workflowId}/launch")
-    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId){
+    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId) throws JsonProcessingException {
         var launchedWorkflowResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(launchedWorkflowResponse);
     }

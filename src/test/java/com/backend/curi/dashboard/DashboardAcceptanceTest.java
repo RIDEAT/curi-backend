@@ -24,6 +24,7 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -123,7 +124,7 @@ public class DashboardAcceptanceTest {
 
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws JsonProcessingException {
         defaultSet();
         userMakeWorkspace();
         userMakeEmployeeAndManager();
@@ -184,7 +185,7 @@ public class DashboardAcceptanceTest {
         moduleInSequenceId = moduleInSequence.getId();
     }
 
-    private void userLaunchWorkflow(){
+    private void userLaunchWorkflow() throws JsonProcessingException {
         //securityContext 설정
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication authentication = Mockito.mock(Authentication.class);
@@ -345,7 +346,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -354,7 +355,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
