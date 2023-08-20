@@ -14,6 +14,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import java.io.IOException;
+
 @EnableJpaRepositories(excludeFilters =
 	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ContentRepository.class))
 @OpenAPIDefinition(servers = {@Server(url="/", description = "Default Server Url")})
@@ -22,7 +24,7 @@ public class CuriApplication {
 
 	private static Logger log = LoggerFactory.getLogger(CuriApplication.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		log.info("main");
 
 		SpringApplication.run(CuriApplication.class, args);
