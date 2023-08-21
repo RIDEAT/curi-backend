@@ -124,7 +124,7 @@ public class WorkspaceService {
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_IMAGE_NAME);
 
         var workspace = getWorkspaceEntityById(workspaceId);
-        if(!workspace.getLogoUrl().isEmpty())
+        if(!workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_ALREADY_EXISTS);
 
         var prefix = "workspace/" + workspaceId + "/logo";
@@ -136,7 +136,7 @@ public class WorkspaceService {
     @Transactional
     public String modifyWorkspaceLogo(Long workspaceId){
         var workspace = getWorkspaceEntityById(workspaceId);
-        if(workspace.getLogoUrl().isEmpty())
+        if(workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_NOT_EXISTS);
         var prefix = "workspace/" + workspaceId + "/logo";
         var preSignedUrl = amazonS3Service.getExistObjectPreSignedUrl(prefix, workspace.getLogoUrl());
