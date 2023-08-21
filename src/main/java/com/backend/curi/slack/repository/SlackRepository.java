@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface SlackRepository extends JpaRepository<SlackToken, Long> {
-    Optional<SlackToken> findByUserId(String userId);
+    Optional<SlackToken> findByUserFirebaseId(String userFirebaseId);
 
 }

@@ -17,7 +17,10 @@ public class SlackToken {
     Long id;
 
     @Column
-    String userId;
+    String userFirebaseId;
+
+    @Column
+    String userSlackId;
 
     @Column
     String accessToken;

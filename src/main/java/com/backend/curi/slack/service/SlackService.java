@@ -4,6 +4,7 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.ChannelRequest;
+import com.backend.curi.slack.controller.dto.InviteRequest;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.repository.SlackRepository;
@@ -13,9 +14,11 @@ import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.request.conversations.ConversationsCreateRequest;
+import com.slack.api.methods.request.conversations.ConversationsInviteRequest;
 import com.slack.api.methods.request.oauth.OAuthV2AccessRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.methods.response.conversations.ConversationsCreateResponse;
+import com.slack.api.methods.response.conversations.ConversationsInviteResponse;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +27,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +50,7 @@ public class SlackService {
     private final SlackRepository slackRepository;
 
 
-    public OAuthV2AccessResponse getAccessToken (OAuthRequest oAuthRequest) throws SlackApiException, IOException {
+    public OAuthV2AccessResponse oauth (OAuthRequest oAuthRequest) throws SlackApiException, IOException {
 
         OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                 .clientId(clientId)
@@ -59,7 +64,7 @@ public class SlackService {
 
         if (response.isOk()) {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            SlackToken slackToken = SlackToken.builder().userId(currentUser.getUserId()).accessToken(response.getAccessToken()).build();
+            SlackToken slackToken = SlackToken.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
             slackRepository.save(slackToken);
         }
 
@@ -67,13 +72,24 @@ public class SlackService {
     }
 
     public ConversationsCreateResponse createChannel(ChannelRequest channelRequest) throws SlackApiException, IOException {
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String accessToken = slackRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
+        String accessToken = getAccessToken();
 
         MethodsClient methods = slack.methods(accessToken);
         ConversationsCreateRequest conversationsCreateRequest = ConversationsCreateRequest.builder().name(channelRequest.getChannelName()).isPrivate(false).token(accessToken).build();
 
         var response = methods.conversationsCreate(conversationsCreateRequest);
+        return response;
+    }
+
+    public ConversationsInviteResponse invite(InviteRequest inviteRequest) throws SlackApiException, IOException {
+        String accessToken = getAccessToken();
+
+        MethodsClient methods = slack.methods(accessToken);
+        List<String> users = new ArrayList<>();
+        users.add(inviteRequest.getSlackUserId());
+
+        ConversationsInviteRequest conversationsInviteRequest = ConversationsInviteRequest.builder().channel(inviteRequest.getChannel()).token(accessToken).users(users).build();
+        var response = methods.conversationsInvite(conversationsInviteRequest);
         return response;
     }
 
@@ -84,12 +100,17 @@ public class SlackService {
                 .text(slackMessageRequest.getText())
                 .build();
 
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String accessToken = slackRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
-
+        String accessToken = getAccessToken();
         MethodsClient methods = slack.methods(accessToken);
         ChatPostMessageResponse response = methods.chatPostMessage(request);
         return response;
+    }
+
+
+    private String getAccessToken (){
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String accessToken = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
+        return accessToken;
     }
 
 
