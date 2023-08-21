@@ -62,8 +62,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Cookie[] cookies = request.getCookies();
 
-       //     pretendTobeAuthorized(request, response, filterChain);
-
+            pretendTobeAuthorized(request, response, filterChain);
+/*
 
 
             ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
@@ -96,7 +96,7 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);
-            return;
+            return;*/
         }
         catch (JsonMappingException e) {
             throw new RuntimeException(e);
