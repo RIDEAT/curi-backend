@@ -15,12 +15,14 @@ import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
 import com.backend.curi.workflow.controller.dto.RequiredForLaunchResponse;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Module;
+import com.backend.curi.slack.service.SlackService;
 
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
@@ -32,14 +34,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.slack.api.methods.SlackApiException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+
+
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +77,8 @@ public class LaunchService {
 
     private final SchedulerOpenFeign schedulerOpenFeign;
 
+    private final SlackService slackService;
+
     private Map<Role, Member> memberMap = new HashMap<>();
 
     @Transactional
@@ -94,7 +103,18 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequenceWithDayoffset.getKey(), workspace, member, sequenceWithDayoffset.getValue());
         }
 
-        return launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
+        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
+
+
+        try {
+            slackService.sendMessage(new SlackMessageRequest("workflow가 launch 되었습니다."));
+        } catch (SlackApiException e) {
+            log.error("slack message 전송에 실패하였습니다.");
+        } catch (IOException e){
+            log.error("slack message 전송에 실패하였습니다.");
+        }
+
+        return response;
     }
 
     private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Integer dayOffset) throws JsonProcessingException {

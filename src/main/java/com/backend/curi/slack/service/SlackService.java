@@ -8,7 +8,7 @@ import com.backend.curi.slack.controller.dto.InviteRequest;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.repository.SlackRepository;
-import com.backend.curi.slack.repository.entity.SlackToken;
+import com.backend.curi.slack.repository.entity.SlackInfo;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -64,8 +64,25 @@ public class SlackService {
 
         if (response.isOk()) {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            SlackToken slackToken = SlackToken.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
-            slackRepository.save(slackToken);
+            SlackInfo slackInfo = SlackInfo.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
+
+            slackRepository.save(slackInfo);
+
+            ChannelRequest channelRequest = new ChannelRequest("curi-alarm");
+            var res = createChannel(channelRequest);
+
+            InviteRequest inviteRequest = new InviteRequest(res.getChannel().getId(),response.getAuthedUser().getId());
+            invite(inviteRequest);
+
+            slackInfo.setChannelId(res.getChannel().getId());
+
+            slackRepository.save(slackInfo);
+
+            SlackMessageRequest slackMessageRequest = new SlackMessageRequest("안녕하세요. 큐리 알람이 추가되었습니다.");
+            sendMessage(slackMessageRequest);
+
+
+
         }
 
         return response;
@@ -75,7 +92,7 @@ public class SlackService {
         String accessToken = getAccessToken();
 
         MethodsClient methods = slack.methods(accessToken);
-        ConversationsCreateRequest conversationsCreateRequest = ConversationsCreateRequest.builder().name(channelRequest.getChannelName()).isPrivate(false).token(accessToken).build();
+        ConversationsCreateRequest conversationsCreateRequest = ConversationsCreateRequest.builder().name(channelRequest.getChannelName()).isPrivate(true).token(accessToken).build();
 
         var response = methods.conversationsCreate(conversationsCreateRequest);
         return response;
@@ -96,7 +113,7 @@ public class SlackService {
     public ChatPostMessageResponse sendMessage (SlackMessageRequest slackMessageRequest) throws SlackApiException, IOException {
 
         ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                .channel(slackMessageRequest.getChannelId()) // Use a channel ID `C1234567` is preferable
+                .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
                 .text(slackMessageRequest.getText())
                 .build();
 
@@ -111,6 +128,12 @@ public class SlackService {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String accessToken = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
         return accessToken;
+    }
+
+    private String getAlarmChannelId(){
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String channelId = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getChannelId();
+        return channelId;
     }
 
 

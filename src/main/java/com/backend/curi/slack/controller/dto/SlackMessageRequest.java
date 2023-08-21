@@ -16,7 +16,5 @@ import javax.validation.constraints.NotNull;
 
 public class SlackMessageRequest {
     @NotNull
-    String channelId;
-    @NotNull
     String text;
 }
