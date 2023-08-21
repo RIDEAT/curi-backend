@@ -8,7 +8,9 @@ import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 
 public class UserService {
+
     private final UserRepository userRepository;
     private final UserworkspaceService userworkspaceService;
+
+    @Getter
+    @Value("${spring.profiles.active}")
+    private String ENV;
 
     public User_ getUserByUserId(String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));

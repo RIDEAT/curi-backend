@@ -93,7 +93,7 @@ public class AwsS3Service {
         return generatePresignedUrlRequest;
     }
 
-    public PreSignedUrl getNewObjectPreSignedUrl(String prefix, String fileName) {
+    public PreSignedUrl getUniqueObjectPreSignedUrl(String prefix, String fileName) {
 
         String onlyOneFileName = createFileName(fileName);
 
@@ -108,19 +108,15 @@ public class AwsS3Service {
                 .build();
     }
 
-    public String getExistObjectPreSignedUrl(String prefix, String fileName) {
-        if (!prefix.isEmpty()) {
-            fileName = prefix + "/" + fileName;
-        }
-        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucket, fileName);
-
+    public String getPreSignedUrl(String path) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(bucket, path);
         return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
 
-    public String getSignedUrl(String fileName) {
+    public String getSignedUrl(String path) {
         String signedURL;
         try {
-            String resourcePath = cloudFrontPath + fileName;
+            String resourcePath = cloudFrontPath + path;
             Date dateLessThan = getSignedUrlExpiration();
 
             String customPolicyForSignedUrl = CloudFrontUrlSigner.buildCustomPolicyForSignedUrl(

@@ -3,10 +3,13 @@ package com.backend.curi.workspace.controller;
 
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsS3Service;
+import com.backend.curi.workspace.controller.dto.LogoPreSignedUrlResponse;
+import com.backend.curi.workspace.controller.dto.LogoSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -70,24 +73,17 @@ public class WorkspaceController {
     }
 
 
-
-
     @GetMapping("workspaces/{workspaceId}/logo")
-    public ResponseEntity<String> getWorkspaceLogo(@PathVariable Long workspaceId){
+    public ResponseEntity<LogoSignedUrlResponse> getWorkspaceLogo(@PathVariable Long workspaceId){
         return new ResponseEntity<>(workspaceService.getWorkspaceLogo(workspaceId), HttpStatus.OK);
     }
 
-    @PostMapping("workspaces/{workspaceId}/logo")
-    public ResponseEntity<String> setWorkspaceLogo(@PathVariable Long workspaceId, @RequestParam("fileName") String fileName) {
-        return new ResponseEntity<>(workspaceService.setWorkspaceLogo(workspaceId, fileName), HttpStatus.CREATED);
-    }
-
     @PutMapping("workspaces/{workspaceId}/logo")
-    public ResponseEntity<String> modifyWorkspaceLogo(@PathVariable Long workspaceId) {
-        return new ResponseEntity<>(workspaceService.modifyWorkspaceLogo(workspaceId), HttpStatus.OK);
+    public ResponseEntity<LogoPreSignedUrlResponse> modifyWorkspaceLogo(@PathVariable Long workspaceId) {
+        return new ResponseEntity<>(workspaceService.setWorkspaceLogo(workspaceId), HttpStatus.OK);
     }
     @DeleteMapping("workspaces/{workspaceId}/logo")
-    public ResponseEntity<String> deleteWorkspaceLogo(@PathVariable Long workspaceId){
+    public ResponseEntity<Void> deleteWorkspaceLogo(@PathVariable Long workspaceId){
         workspaceService.deleteWorkspaceLogo(workspaceId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

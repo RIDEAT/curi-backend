@@ -11,6 +11,8 @@ import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.WorkflowRepository;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workspace.controller.dto.LogoPreSignedUrlResponse;
+import com.backend.curi.workspace.controller.dto.LogoSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.repository.RoleRepository;
@@ -119,45 +121,28 @@ public class WorkspaceService {
     }
   
     @Transactional
-    public String setWorkspaceLogo(Long workspaceId, String fileName){
-        if(!amazonS3Service.isValidimageName(fileName))
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_IMAGE_NAME);
-
+    public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId){
         var workspace = getWorkspaceEntityById(workspaceId);
-        if(!workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_ALREADY_EXISTS);
-
-        var prefix = "workspace/" + workspaceId + "/logo";
-        var preSignedUrl = amazonS3Service.getNewObjectPreSignedUrl(prefix, fileName);
-        workspace.setLogoUrl(preSignedUrl.getFileName());
-        return preSignedUrl.getPreSignedUrl();
+        var path = "workspace/" + workspaceId + "/logo.png";
+        var preSignedUrl = amazonS3Service.getPreSignedUrl(path);
+        workspace.setLogoUrl(path);
+        return new LogoPreSignedUrlResponse(preSignedUrl);
     }
 
     @Transactional
-    public String modifyWorkspaceLogo(Long workspaceId){
-        var workspace = getWorkspaceEntityById(workspaceId);
-        if(workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_NOT_EXISTS);
-        var prefix = "workspace/" + workspaceId + "/logo";
-        var preSignedUrl = amazonS3Service.getExistObjectPreSignedUrl(prefix, workspace.getLogoUrl());
-        return preSignedUrl;
-    }
-
     public void deleteWorkspaceLogo(Long workspaceId){
         var workspace = getWorkspaceEntityById(workspaceId);
         // 추후 constant로 변경
         if(workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
             return;
-        var prefix = "workspace/" + workspaceId + "/logo";
-        amazonS3Service.deleteFile(workspace.getLogoUrl());
+        var path = "workspace/" + workspaceId + "/logo.png";
+        amazonS3Service.deleteFile(path);
         workspace.setLogoUrl("default/logo/example_logo.jpeg");
     }
 
-    public String getWorkspaceLogo(Long workspaceId){
+    public LogoSignedUrlResponse getWorkspaceLogo(Long workspaceId){
         var workspace = getWorkspaceEntityById(workspaceId);
-        if(workspace.getLogoUrl().isEmpty())
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_NOT_EXISTS);
-        return amazonS3Service.getSignedUrl(workspace.getLogoUrl());
+        return new LogoSignedUrlResponse(amazonS3Service.getSignedUrl(workspace.getLogoUrl()));
     }
 
 }
