@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SlackToken {
+public class SlackInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +18,9 @@ public class SlackToken {
 
     @Column
     String userFirebaseId;
+
+    @Column
+    String channelId;
 
     @Column
     String userSlackId;
