@@ -3,6 +3,13 @@ package com.backend.curi.common.configuration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.cloudfront.AmazonCloudFront;
+import com.amazonaws.services.cloudfront.AmazonCloudFrontClient;
+import com.amazonaws.services.cloudfront.AmazonCloudFrontClientBuilder;
+import com.amazonaws.services.cloudfront.CloudFrontUrlSigner;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQS;
@@ -32,8 +39,24 @@ public class AwsConfiguration {
     }
 
     @Bean
+    public AmazonS3 amazonS3Client() {
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(awsStaticCredentialsProvider())
+                .withRegion(region)
+                .build();
+    }
+
+    @Bean
     public AmazonSQS amazonSQSClient() {
         return AmazonSQSClientBuilder.standard()
+                .withCredentials(awsStaticCredentialsProvider())
+                .withRegion(region)
+                .build();
+    }
+
+    @Bean
+    public AmazonCloudFront amazonCloudFrontClient() {
+        return AmazonCloudFrontClientBuilder.standard()
                 .withCredentials(awsStaticCredentialsProvider())
                 .withRegion(region)
                 .build();

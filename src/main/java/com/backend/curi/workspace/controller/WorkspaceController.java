@@ -2,6 +2,7 @@ package com.backend.curi.workspace.controller;
 
 
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.repository.entity.Workspace;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -26,11 +28,10 @@ import java.util.stream.Collectors;
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
+    private final AwsS3Service awsS3Service;
     @GetMapping("/workspaces/{workspaceId}")
-    public ResponseEntity<WorkspaceResponse> getWorkspace(@PathVariable Long workspaceId, Authentication authentication) {
-        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+    public ResponseEntity<WorkspaceResponse> getWorkspace(@PathVariable Long workspaceId) {
         var response = workspaceService.getWorkspaceById(workspaceId);
-
         return ResponseEntity.ok(response);
     }
     @GetMapping("/workspaces")
@@ -45,7 +46,7 @@ public class WorkspaceController {
 
     @PostMapping(path = "/workspaces",consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
     public ResponseEntity<WorkspaceResponse> createWorkspace(@RequestBody @Valid WorkspaceRequest request, Authentication authentication) {
-        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = workspaceService.createWorkspace(request, currentUser);
 
         return new ResponseEntity(response, HttpStatus.CREATED);
@@ -54,11 +55,8 @@ public class WorkspaceController {
     @PutMapping(
             path ="/workspaces/{workspaceId}",
             consumes = {"application/json", "application/xml", "application/x-www-form-urlencoded"})
-    public ResponseEntity updateWorkspace(@PathVariable Long workspaceId, @RequestBody @Valid WorkspaceRequest reqeust, Authentication authentication) {
-
-        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
-
-        var response = workspaceService.updateWorkspace(workspaceId, currentUser, reqeust);
+    public ResponseEntity<WorkspaceResponse> updateWorkspace(@PathVariable Long workspaceId, @RequestBody @Valid WorkspaceRequest reqeust) {
+        var response = workspaceService.updateWorkspace(workspaceId, reqeust);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -68,6 +66,29 @@ public class WorkspaceController {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         workspaceService.deleteWorkspace(workspaceId, currentUser);
 
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
+
+
+    @GetMapping("workspaces/{workspaceId}/logo")
+    public ResponseEntity<String> getWorkspaceLogo(@PathVariable Long workspaceId){
+        return new ResponseEntity<>(workspaceService.getWorkspaceLogo(workspaceId), HttpStatus.OK);
+    }
+
+    @PostMapping("workspaces/{workspaceId}/logo")
+    public ResponseEntity<String> setWorkspaceLogo(@PathVariable Long workspaceId, @RequestParam("fileName") String fileName) {
+        return new ResponseEntity<>(workspaceService.setWorkspaceLogo(workspaceId, fileName), HttpStatus.CREATED);
+    }
+
+    @PutMapping("workspaces/{workspaceId}/logo")
+    public ResponseEntity<String> modifyWorkspaceLogo(@PathVariable Long workspaceId) {
+        return new ResponseEntity<>(workspaceService.modifyWorkspaceLogo(workspaceId), HttpStatus.OK);
+    }
+    @DeleteMapping("workspaces/{workspaceId}/logo")
+    public ResponseEntity<String> deleteWorkspaceLogo(@PathVariable Long workspaceId){
+        workspaceService.deleteWorkspaceLogo(workspaceId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
