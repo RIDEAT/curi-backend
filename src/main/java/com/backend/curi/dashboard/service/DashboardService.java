@@ -61,7 +61,7 @@ public class DashboardService {
             }
         }
 
-        dashboardWorkflowResponse.setProgress(100 * dashboardWorkflowResponse.getCompletedCnt() / launchedWorkflowList.size());
+        //dashboardWorkflowResponse.setProgress(100 * dashboardWorkflowResponse.getCompletedCnt() / launchedWorkflowList.size());
         return dashboardWorkflowResponse;
     }
 

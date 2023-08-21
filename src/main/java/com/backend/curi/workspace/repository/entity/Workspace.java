@@ -40,7 +40,8 @@ public class Workspace {
     private List<Member> members;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Workflow> workflows;
+    @Builder.Default
+    private List<Workflow> workflows = new ArrayList<>();
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;

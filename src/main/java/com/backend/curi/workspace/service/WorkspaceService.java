@@ -8,6 +8,9 @@ import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.repository.WorkflowRepository;
+import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.repository.RoleRepository;
@@ -32,7 +35,8 @@ public class WorkspaceService {
     private final UserworkspaceService userworkspaceService;
     private final RoleRepository roleRepository;
     private final AwsS3Service amazonS3Service;
-
+    private final WorkflowRepository workflowRepository;
+  
     public WorkspaceResponse getWorkspaceById(Long id){
         log.info("getWorkspaceById");
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
@@ -55,6 +59,7 @@ public class WorkspaceService {
         userworkspaceService.create(currentUser, savedWorkspace);
 
         createDefaultRole(savedWorkspace);
+        createDefaultWorkflow(savedWorkspace);
 
         return WorkspaceResponse.of(savedWorkspace);
     }
@@ -96,6 +101,23 @@ public class WorkspaceService {
         workspace.getRoles().add(hrManagerRole);
     }
 
+
+
+    private void createDefaultWorkflow(Workspace workspace){
+        var employeeWorkflow = Workflow.builder().workspace(workspace).name("신입 공통 워크플로우").build();
+        var itWorkflow = Workflow.builder().workspace(workspace).name("it 직무 워크플로우").build();
+        var ethicWorkflow = Workflow.builder().workspace(workspace).name("윤리 워크플로우").build();
+
+        workflowRepository.save(employeeWorkflow);
+        workflowRepository.save(itWorkflow);
+        workflowRepository.save(ethicWorkflow);
+
+        workspace.getWorkflows().add(employeeWorkflow);
+        workspace.getWorkflows().add(itWorkflow);
+        workspace.getWorkflows().add(ethicWorkflow);
+
+    }
+  
     @Transactional
     public String setWorkspaceLogo(Long workspaceId, String fileName){
         if(!amazonS3Service.isValidimageName(fileName))
