@@ -79,8 +79,8 @@ public class WorkspaceController {
     }
 
     @PutMapping("workspaces/{workspaceId}/logo")
-    public ResponseEntity<LogoPreSignedUrlResponse> modifyWorkspaceLogo(@PathVariable Long workspaceId) {
-        return new ResponseEntity<>(workspaceService.setWorkspaceLogo(workspaceId), HttpStatus.OK);
+    public ResponseEntity<LogoPreSignedUrlResponse> modifyWorkspaceLogo(@PathVariable Long workspaceId, @RequestParam("fileName") String fileName) {
+        return new ResponseEntity<>(workspaceService.setWorkspaceLogo(workspaceId, fileName), HttpStatus.OK);
     }
     @DeleteMapping("workspaces/{workspaceId}/logo")
     public ResponseEntity<Void> deleteWorkspaceLogo(@PathVariable Long workspaceId){

@@ -121,9 +121,12 @@ public class WorkspaceService {
     }
   
     @Transactional
-    public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId){
+    public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId, String fileName){
+        amazonS3Service.isValidimageName(fileName);
         var workspace = getWorkspaceEntityById(workspaceId);
-        var path = "workspace/" + workspaceId + "/logo.png";
+        if(!workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
+            amazonS3Service.deleteFile(workspace.getLogoUrl());
+        var path = "workspace/" + workspaceId + "/" + fileName;
         var preSignedUrl = amazonS3Service.getPreSignedUrl(path);
         workspace.setLogoUrl(path);
         return new LogoPreSignedUrlResponse(preSignedUrl);
