@@ -46,14 +46,6 @@ public class AwsConfiguration {
                 .build();
     }
 
-    @Bean AmazonCloudFront amazonCloudFront() {
-        return AmazonCloudFrontClientBuilder.standard()
-                .withCredentials(awsStaticCredentialsProvider())
-                .withRegion(region)
-                .build();
-    }
-
-
     @Bean
     public AmazonSQS amazonSQSClient() {
         return AmazonSQSClientBuilder.standard()
