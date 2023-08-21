@@ -57,6 +57,9 @@ jobs:
           AWS_REGION: ap-northeast-2
           DDL_AUTO: update
           ENVIRONMENT: build
+          AWS_S3_BUCKET: temp
+          AWS_CLOUDFRONT_URL: temp
+          AWS_CLOUDFRONT_KEYPAIR: temp
           TEST_ENVIRONMENT: data-build
         run: |
           echo $ENVIRONMENT

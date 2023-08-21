@@ -41,7 +41,7 @@ public class AwsS3Service {
     @Value("${cloud.aws.cloudfront.url}")
     private String cloudFrontPath;
 
-    @Value("${clout.aws.cloudfront.keypair-id}")
+    @Value("${cloud.aws.cloudfront.keypair-id}")
     private String keyPairId;
 
     private final AmazonS3 amazonS3Client;

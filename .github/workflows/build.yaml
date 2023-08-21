@@ -77,6 +77,9 @@ jobs:
           AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
           AWS_REGION: ap-northeast-2
           DDL_AUTO: update
+          AWS_S3_BUCKET: temp
+          AWS_CLOUDFRONT_URL: temp
+          AWS_CLOUDFRONT_KEYPAIR: temp
           ENVIRONMENT: build
           TEST_ENVIRONMENT: data-build
         run: |
