@@ -36,7 +36,9 @@ public enum ErrorType {
     SEQUENCE_MODULE_ALREADY_EXISTS("MODULE-004", "시퀀스에 해당 모듈이 이미 존재합니다. 모듈은 중복될 수 없습니다."),
     WORKFLOW_SEQUENCE_NOT_EXISTS("SEQUENCE-001", "워크플로우에 해당 시퀀스가 존재하지 않습니다."),
     SEQUENCE_NOT_EXISTS("SEQUENCE-002", "존재하지 않는 시퀀스 입니다."),
-    WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다.");
+    WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다."),
+
+    SLACK_ACCESS_TOKEN_NOT_EXISTS("SLACK-001", "슬랙의 어세스 토큰이 없습니다.");
 
     private final String errorCode;
     private final String message;
