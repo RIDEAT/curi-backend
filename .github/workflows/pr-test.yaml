@@ -24,6 +24,15 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
+      - name: Setup key
+        id: setup-key
+        env:
+          PRIVATE_KEY: ${{ secrets.CLOUD_FRONT_PRIVATE_KEY }}
+        run: |
+          touch ./src/main/resources/key.pem
+          echo "$PRIVATE_KEY" >> "./src/main/resources/key.pem"
+          chmod 400 "./src/main/resources/key.pem"
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:

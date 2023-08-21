@@ -1,8 +1,10 @@
 package com.backend.curi.workspace.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
@@ -29,9 +31,12 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserworkspaceService userworkspaceService;
     private final RoleRepository roleRepository;
+    private final AwsS3Service amazonS3Service;
+
     public WorkspaceResponse getWorkspaceById(Long id){
         log.info("getWorkspaceById");
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+        workspace.setLogoUrl(amazonS3Service.getSignedUrl(workspace.getLogoUrl()));
         return WorkspaceResponse.of(workspace);
     }
 
@@ -55,7 +60,7 @@ public class WorkspaceService {
     }
 
     @Transactional
-    public WorkspaceResponse updateWorkspace (Long workspaceId, CurrentUser currentUser, WorkspaceRequest request){
+    public WorkspaceResponse updateWorkspace (Long workspaceId, WorkspaceRequest request){
         var workspace = getWorkspaceEntityById(workspaceId);
         workspace.setName(request.getName());
         workspace.setEmail(request.getEmail());
@@ -91,10 +96,46 @@ public class WorkspaceService {
         workspace.getRoles().add(hrManagerRole);
     }
 
+    @Transactional
+    public String setWorkspaceLogo(Long workspaceId, String fileName){
+        if(!amazonS3Service.isValidimageName(fileName))
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_IMAGE_NAME);
 
+        var workspace = getWorkspaceEntityById(workspaceId);
+        if(!workspace.getLogoUrl().isEmpty())
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_ALREADY_EXISTS);
 
+        var prefix = "workspace/" + workspaceId + "/logo";
+        var preSignedUrl = amazonS3Service.getNewObjectPreSignedUrl(prefix, fileName);
+        workspace.setLogoUrl(preSignedUrl.getFileName());
+        return preSignedUrl.getPreSignedUrl();
+    }
 
+    @Transactional
+    public String modifyWorkspaceLogo(Long workspaceId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        if(workspace.getLogoUrl().isEmpty())
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_NOT_EXISTS);
+        var prefix = "workspace/" + workspaceId + "/logo";
+        var preSignedUrl = amazonS3Service.getExistObjectPreSignedUrl(prefix, workspace.getLogoUrl());
+        return preSignedUrl;
+    }
 
+    public void deleteWorkspaceLogo(Long workspaceId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        // 추후 constant로 변경
+        if(workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
+            return;
+        var prefix = "workspace/" + workspaceId + "/logo";
+        amazonS3Service.deleteFile(workspace.getLogoUrl());
+        workspace.setLogoUrl("default/logo/example_logo.jpeg");
+    }
 
+    public String getWorkspaceLogo(Long workspaceId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        if(workspace.getLogoUrl().isEmpty())
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKSPACE_LOGO_NOT_EXISTS);
+        return amazonS3Service.getSignedUrl(workspace.getLogoUrl());
+    }
 
 }

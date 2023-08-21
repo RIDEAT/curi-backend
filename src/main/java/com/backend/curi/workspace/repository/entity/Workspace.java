@@ -32,6 +32,10 @@ public class Workspace {
     @Column
     private String email;
 
+    @Column
+    @Builder.Default
+    private String logoUrl = "default/logo/example_logo.jpeg";
+
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;
 

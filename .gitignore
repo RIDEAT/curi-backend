@@ -43,3 +43,4 @@ serviceAccountKey.json
 
 application-local.properties
 application-data-local.properties
+key.pem
