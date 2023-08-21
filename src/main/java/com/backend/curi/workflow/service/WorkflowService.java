@@ -60,9 +60,10 @@ public class WorkflowService {
     }
 
     @Transactional
-    public void updateWorkflow(Long workflowId, WorkflowRequest request){
+    public WorkflowResponse updateWorkflow(Long workflowId, WorkflowRequest request){
         var workflow = getWorkflowEntity(workflowId);
         workflow.modify(request);
+        return WorkflowResponse.of(workflow);
     }
 
     public void deleteWorkflow (Long workflowId){
