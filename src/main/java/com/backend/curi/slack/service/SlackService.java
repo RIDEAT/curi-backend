@@ -78,7 +78,8 @@ public class SlackService {
 
             slackRepository.save(slackInfo);
 
-            SlackMessageRequest slackMessageRequest = new SlackMessageRequest("안녕하세요. 큐리 알람이 추가되었습니다.");
+            SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
+            slackMessageRequest.setTexts("큐리알람이 추가되었습니다.");
             sendMessage(slackMessageRequest);
 
 
@@ -114,13 +115,17 @@ public class SlackService {
 
         ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                 .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
-                .text(slackMessageRequest.getText())
+                .blocksAsString(slackMessageRequest.getBlocksAsString())
+                .text("default")
                 .build();
+
 
         String accessToken = getAccessToken();
         MethodsClient methods = slack.methods(accessToken);
+
         try {
             ChatPostMessageResponse response = methods.chatPostMessage(request);
+            System.out.println(response.getError());
             return response;
         } catch (SlackApiException e){
 
@@ -133,14 +138,15 @@ public class SlackService {
     }
 
 
-    private String getAccessToken (){
+    protected String getAccessToken (){
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String accessToken = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
         return accessToken;
     }
 
-    private String getAlarmChannelId(){
+    protected String getAlarmChannelId(){
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         String channelId = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getChannelId();
         return channelId;
     }

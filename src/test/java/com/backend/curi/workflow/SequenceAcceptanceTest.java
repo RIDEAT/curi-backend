@@ -349,7 +349,7 @@ public class SequenceAcceptanceTest {
         SequenceRequest sequenceRequest = new SequenceRequest();
         sequenceRequest.setName("신입 환영 시퀀스");
         sequenceRequest.setDayOffset(-2);
-        sequenceRequest.setPrevSequenceId(0L);
+       // sequenceRequest.setPrevSequenceId(0L);
         sequenceRequest.setRoleId(defaultRoleId);
 
         return sequenceRequest;
@@ -359,7 +359,7 @@ public class SequenceAcceptanceTest {
         SequenceRequest sequenceRequest = new SequenceRequest();
         sequenceRequest.setName("담당 사수와의 미팅");
         sequenceRequest.setDayOffset(-2);
-        sequenceRequest.setPrevSequenceId(0L);
+        //sequenceRequest.setPrevSequenceId(0L);
         sequenceRequest.setRoleId(defaultRoleId);
 
         return sequenceRequest;

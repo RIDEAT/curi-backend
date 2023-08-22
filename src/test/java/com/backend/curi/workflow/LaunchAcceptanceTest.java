@@ -60,8 +60,7 @@ public class LaunchAcceptanceTest {
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
 
-    @MockBean
-    private SlackService slackService;
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -115,8 +114,6 @@ public class LaunchAcceptanceTest {
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
 
-        when(slackService.sendMessage(any(SlackMessageRequest.class)))
-                .thenReturn(new ChatPostMessageResponse());
 
 
         RestAssured.port = port;
