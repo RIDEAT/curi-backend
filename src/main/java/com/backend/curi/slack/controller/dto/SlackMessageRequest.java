@@ -1,12 +1,12 @@
 package com.backend.curi.slack.controller.dto;
 
-import com.slack.api.methods.SlackApiRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -16,5 +16,10 @@ import javax.validation.constraints.NotNull;
 
 public class SlackMessageRequest {
     @NotNull
-    String text;
+    String texts;
+
+    String blocksAsString;
+
+
 }
+

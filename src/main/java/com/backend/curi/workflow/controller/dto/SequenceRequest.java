@@ -21,5 +21,5 @@ public class SequenceRequest {
 
     private Integer dayOffset;
 
-    private Long prevSequenceId;
+    private Long prevSequenceId = 0L;
 }

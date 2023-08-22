@@ -34,23 +34,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.slack.api.methods.SlackApiException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -105,7 +99,11 @@ public class LaunchService {
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
-        slackService.sendMessage(new SlackMessageRequest("workflow가 launch 되었습니다."));
+        SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
+        slackMessageRequest.setBlocksAsString("\"{\\\"type\\\": \\\"plain_text\\\", \\\"text\\\": \\\"Budget Performance\\\"}\";");
+
+        slackService.sendMessage(slackMessageRequest);
+
 
         return response;
     }
