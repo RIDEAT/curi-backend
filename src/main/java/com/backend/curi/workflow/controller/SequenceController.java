@@ -7,6 +7,7 @@ import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.SequenceModuleRepository;
 import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.backend.curi.workflow.service.SequenceService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 public class SequenceController {
     private final SequenceService sequenceService;
 
+    @Hidden
     @PostMapping("/sequences")
     public ResponseEntity<SequenceResponse> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId) {
         var createdSequence = sequenceService.createSequence(workspaceId, request);
@@ -33,18 +35,20 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SequenceResponse.of(createdSequence));
     }
 
-    @GetMapping("/sequences/{sequenceId}")
+    @GetMapping("workflows/{workflowId}/sequences/{sequenceId}")
     public ResponseEntity<SequenceResponse> getSequence(@PathVariable Long sequenceId, @PathVariable Long workspaceId) {
         var response = sequenceService.getSequence(sequenceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Hidden
     @GetMapping("/sequences")
     public ResponseEntity<List<SequenceResponse>> getSequences(@PathVariable Long workspaceId) {
         var response = sequenceService.getSequences(workspaceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Hidden
     @PutMapping("/sequences/{sequenceId}")
     public ResponseEntity<SequenceResponse> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
                                                @PathVariable Long sequenceId) {
@@ -60,6 +64,7 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.OK).body(SequenceResponse.of(updatedSequence));
     }
 
+    @Hidden
     @DeleteMapping("/sequences/{sequenceId}")
     public ResponseEntity<Void> deleteSequence(@PathVariable Long sequenceId) {
         sequenceService.deleteSequence(sequenceId);

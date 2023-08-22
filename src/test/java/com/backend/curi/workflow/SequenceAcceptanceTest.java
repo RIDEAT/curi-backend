@@ -219,7 +219,7 @@ public class SequenceAcceptanceTest {
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/sequences/{sequenceId}",workspaceId, sequenceId)
+                .get("/workspaces/{workspaceId}/workflows/{workflows}/sequences/{sequenceId}",workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()

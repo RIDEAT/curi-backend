@@ -114,9 +114,12 @@ public class WorkspaceService {
         workflowRepository.save(itWorkflow);
         workflowRepository.save(ethicWorkflow);
 
+
         workspace.getWorkflows().add(employeeWorkflow);
         workspace.getWorkflows().add(itWorkflow);
         workspace.getWorkflows().add(ethicWorkflow);
+
+
 
     }
   
