@@ -105,14 +105,7 @@ public class LaunchService {
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
-
-        try {
-            slackService.sendMessage(new SlackMessageRequest("workflow가 launch 되었습니다."));
-        } catch (SlackApiException e) {
-            log.error("slack message 전송에 실패하였습니다.");
-        } catch (IOException e){
-            log.error("slack message 전송에 실패하였습니다.");
-        }
+        slackService.sendMessage(new SlackMessageRequest("workflow가 launch 되었습니다."));
 
         return response;
     }

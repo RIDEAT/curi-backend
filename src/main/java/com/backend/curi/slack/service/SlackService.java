@@ -110,7 +110,7 @@ public class SlackService {
         return response;
     }
 
-    public ChatPostMessageResponse sendMessage (SlackMessageRequest slackMessageRequest) throws SlackApiException, IOException {
+    public ChatPostMessageResponse sendMessage (SlackMessageRequest slackMessageRequest){
 
         ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                 .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
@@ -119,8 +119,17 @@ public class SlackService {
 
         String accessToken = getAccessToken();
         MethodsClient methods = slack.methods(accessToken);
-        ChatPostMessageResponse response = methods.chatPostMessage(request);
-        return response;
+        try {
+            ChatPostMessageResponse response = methods.chatPostMessage(request);
+            return response;
+        } catch (SlackApiException e){
+
+        } catch (Exception e){
+
+        }
+
+        throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
+
     }
 
 
