@@ -17,6 +17,7 @@ public class WorkspaceResponse {
     private Long id;
     private String name;
     private String email;
+    private String logoUrl;
     private List<RoleResponse> roles;
     public static WorkspaceResponse of(Workspace workspace){
         var responseList = workspace.getRoles().stream().map(RoleResponse::of).collect(Collectors.toList());
@@ -24,6 +25,7 @@ public class WorkspaceResponse {
                 workspace.getId(),
                 workspace.getName(),
                 workspace.getEmail(),
+                workspace.getLogoUrl(),
                 responseList);
     }
 }

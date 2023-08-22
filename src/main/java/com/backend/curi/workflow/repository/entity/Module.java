@@ -16,6 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//@Table(name = "module_")
 public class Module extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

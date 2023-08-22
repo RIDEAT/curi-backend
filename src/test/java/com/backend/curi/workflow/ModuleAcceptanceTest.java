@@ -229,7 +229,7 @@ public class ModuleAcceptanceTest {
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/sequences/{sequenceId}",workspaceId, sequenceId)
+                .get("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}",workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()
@@ -292,7 +292,7 @@ public class ModuleAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(moduleRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/sequences/{sequenceId}/modules", workspaceId, sequenceInWorkflowId)
+                .post("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}/modules", workspaceId, workflowId, sequenceInWorkflowId)
                 .then()
                 .log()
                 .all()
@@ -322,7 +322,7 @@ public class ModuleAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(moduleRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/sequences/{sequenceId}/modules/{moduleId}", workspaceId, sequenceInWorkflowId, moduleInSequenceId)
+                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}/modules/{moduleId}", workspaceId,workflowId,  sequenceInWorkflowId, moduleInSequenceId)
                 .then()
                 .log()
                 .all()
@@ -349,7 +349,7 @@ public class ModuleAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/sequences/{sequenceId}/modules/{moduleId}", workspaceId, sequenceInWorkflowId, moduleInSequenceId)
+                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}/modules/{moduleId}", workspaceId, workflowId, sequenceInWorkflowId, moduleInSequenceId)
                 .then()
                 .log()
                 .all()

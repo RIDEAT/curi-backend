@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,7 +38,6 @@ public class JwtFilter extends OncePerRequestFilter {
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         try {
 
 
@@ -62,41 +62,44 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Cookie[] cookies = request.getCookies();
 
-       //     pretendTobeAuthorized(request, response, filterChain);
+            if(userService.getENV().equals("local")) {
+                pretendTobeAuthorized(request, response, filterChain);
+                return;
+            }
+            else {
+                ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
+
+                // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
+
+                String responseBody = responseEntity.getBody();
+
+                // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
+                response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
+
+                // Parse the responseBody JSON string
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+                // Extract userId
+                String userId = jsonNode.get("userId").asText();
+                //String userEmail = jsonNode.get("userEmail").asText();
 
 
-
-            ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
-
-            // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
-
-            String responseBody = responseEntity.getBody();
-
-            // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
-            response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
-
-            // Parse the responseBody JSON string
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
-
-            // Extract userId
-            String userId = jsonNode.get("userId").asText();
-            //String userEmail = jsonNode.get("userEmail").asText();
-
-
-            CurrentUser currentUser = new CurrentUser();
-            currentUser.setUserId(userId);
+                CurrentUser currentUser = new CurrentUser();
+                currentUser.setUserId(userId);
 //          currentUser.setUserEmail(getUserEmail(userId));
-            currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
+                currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
-            // 여기에 security context 인증 정보 넣어야 할지도 .
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                // 여기에 security context 인증 정보 넣어야 할지도 .
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            filterChain.doFilter(request, response);
-            return;
+                filterChain.doFilter(request, response);
+
+                return;
+            }
         }
         catch (JsonMappingException e) {
             throw new RuntimeException(e);
@@ -163,7 +166,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
-        currentUser.setUserEmail(getUserEmail(userId));
+        //currentUser.setUserEmail(getUserEmail(userId));
         currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
 

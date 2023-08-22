@@ -1,11 +1,18 @@
 package com.backend.curi.workspace.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
+import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.repository.WorkflowRepository;
+import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workspace.controller.dto.LogoPreSignedUrlResponse;
+import com.backend.curi.workspace.controller.dto.LogoSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.repository.RoleRepository;
@@ -29,9 +36,13 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserworkspaceService userworkspaceService;
     private final RoleRepository roleRepository;
+    private final AwsS3Service amazonS3Service;
+    private final WorkflowRepository workflowRepository;
+  
     public WorkspaceResponse getWorkspaceById(Long id){
         log.info("getWorkspaceById");
         var workspace = workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+        workspace.setLogoUrl(amazonS3Service.getSignedUrl(workspace.getLogoUrl()));
         return WorkspaceResponse.of(workspace);
     }
 
@@ -50,12 +61,13 @@ public class WorkspaceService {
         userworkspaceService.create(currentUser, savedWorkspace);
 
         createDefaultRole(savedWorkspace);
+        createDefaultWorkflow(savedWorkspace);
 
         return WorkspaceResponse.of(savedWorkspace);
     }
 
     @Transactional
-    public WorkspaceResponse updateWorkspace (Long workspaceId, CurrentUser currentUser, WorkspaceRequest request){
+    public WorkspaceResponse updateWorkspace (Long workspaceId, WorkspaceRequest request){
         var workspace = getWorkspaceEntityById(workspaceId);
         workspace.setName(request.getName());
         workspace.setEmail(request.getEmail());
@@ -93,8 +105,50 @@ public class WorkspaceService {
 
 
 
+    private void createDefaultWorkflow(Workspace workspace){
+        var employeeWorkflow = Workflow.builder().workspace(workspace).name("신입 공통 워크플로우").build();
+        var itWorkflow = Workflow.builder().workspace(workspace).name("it 직무 워크플로우").build();
+        var ethicWorkflow = Workflow.builder().workspace(workspace).name("윤리 워크플로우").build();
+
+        workflowRepository.save(employeeWorkflow);
+        workflowRepository.save(itWorkflow);
+        workflowRepository.save(ethicWorkflow);
+
+
+        workspace.getWorkflows().add(employeeWorkflow);
+        workspace.getWorkflows().add(itWorkflow);
+        workspace.getWorkflows().add(ethicWorkflow);
 
 
 
+    }
+  
+    @Transactional
+    public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId, String fileName){
+        amazonS3Service.isValidimageName(fileName);
+        var workspace = getWorkspaceEntityById(workspaceId);
+        if(!workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
+            amazonS3Service.deleteFile(workspace.getLogoUrl());
+        var path = "workspace/" + workspaceId + "/" + fileName;
+        var preSignedUrl = amazonS3Service.getPreSignedUrl(path);
+        workspace.setLogoUrl(path);
+        return new LogoPreSignedUrlResponse(preSignedUrl);
+    }
+
+    @Transactional
+    public void deleteWorkspaceLogo(Long workspaceId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        // 추후 constant로 변경
+        if(workspace.getLogoUrl().equals(("default/logo/example_logo.jpeg")))
+            return;
+        var path = "workspace/" + workspaceId + "/logo.png";
+        amazonS3Service.deleteFile(path);
+        workspace.setLogoUrl("default/logo/example_logo.jpeg");
+    }
+
+    public LogoSignedUrlResponse getWorkspaceLogo(Long workspaceId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        return new LogoSignedUrlResponse(amazonS3Service.getSignedUrl(workspace.getLogoUrl()));
+    }
 
 }

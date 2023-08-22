@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -64,17 +65,21 @@ public class WorkflowController {
     }
 
     @PutMapping("/{workflowId}")
-    public ResponseEntity<Void> updateWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
+    public ResponseEntity<WorkflowResponse> updateWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
                                                @PathVariable Long workflowId,
                                                Authentication authentication) {
-        workflowService.updateWorkflow(workflowId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var response = workflowService.updateWorkflow(workflowId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{workflowId}")
-    public ResponseEntity<Void> deleteWorkflow(@PathVariable Long workflowId,
+    public ResponseEntity<WorkflowResponse> deleteWorkflow(@PathVariable Long workflowId,
                                                Authentication authentication) {
         workflowService.deleteWorkflow(workflowId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        var response = new WorkflowResponse();
+        response.setCreatedDate(LocalDateTime.now());
+        response.setUpdatedDate(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 }

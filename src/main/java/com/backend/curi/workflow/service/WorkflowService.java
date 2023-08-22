@@ -60,9 +60,10 @@ public class WorkflowService {
     }
 
     @Transactional
-    public void updateWorkflow(Long workflowId, WorkflowRequest request){
+    public WorkflowResponse updateWorkflow(Long workflowId, WorkflowRequest request){
         var workflow = getWorkflowEntity(workflowId);
         workflow.modify(request);
+        return WorkflowResponse.of(workflow);
     }
 
     public void deleteWorkflow (Long workflowId){
@@ -99,6 +100,8 @@ public class WorkflowService {
         return workflowRepository.findById(workflowId)
                 .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
+
+
 
 
 

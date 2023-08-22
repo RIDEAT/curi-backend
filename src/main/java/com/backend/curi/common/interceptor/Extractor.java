@@ -15,6 +15,7 @@ public class Extractor {
             try {
                 return Long.parseLong(workspaceIdStr);
             } catch (NumberFormatException e) {
+
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_URL_ERROR);
             }
         }
