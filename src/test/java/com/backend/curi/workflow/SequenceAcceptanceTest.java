@@ -78,8 +78,6 @@ public class SequenceAcceptanceTest {
 
     private Long sequenceId;
 
-    private Long sequenceInWorkflowId;
-
     private Long defaultRoleId;
 
     @BeforeEach
@@ -99,23 +97,13 @@ public class SequenceAcceptanceTest {
         employeeId = employeeResponse.getId();
 
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
-        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
-
         workflowId = workflowResponse.getId();
-        sequenceId = sequence.getId();
 
         var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
-        sequenceInWorkflowId = sequenceInWorkflow.getId();
+        sequenceId = sequenceInWorkflow.getId();
 
     }
 
-    @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
-    @Test
-    public void getSequences(){
-        ExtractableResponse<Response> response = 워크스페이스내_시퀀스_리스트_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-    }
 
     @DisplayName("워크스페이스에 속한 시퀀스를 조회할 수 있다.")
     @Test
@@ -125,12 +113,7 @@ public class SequenceAcceptanceTest {
 
     }
 
-    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 생성할 수 있다.")
-    @Test
-    public void createSequence(){
-        ExtractableResponse<Response> response = 시퀀스_생성(getSequenceRequest());
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
+
 
     @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 추가할 수 있다.")
     @Test
@@ -144,12 +127,6 @@ public class SequenceAcceptanceTest {
         assertThat(workflowResponse.getSequences().contains(sequenceResponse.as(SequenceResponse.class)));
     }
 
-    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 수정할 수 있다.")
-    @Test
-    public void updateSequence(){
-        ExtractableResponse<Response> updateResponse = 시퀀스_수정(getModifiedSequenceRequest());
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
 
 
     @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 수정할 수 있다.")
@@ -164,15 +141,6 @@ public class SequenceAcceptanceTest {
         assertThat(workflowResponse.getSequences().contains(updatedResponse.as(SequenceResponse.class)));
     }
 
-    @DisplayName("워크 스페이스 내에 템플릿 시퀀스를 삭제할 수 있다.")
-    @Test
-    public void deleteSequence(){
-        ExtractableResponse<Response> response = 시퀀스_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        ExtractableResponse<Response> getResponse = 워크스페이스내_시퀀스_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
 
     @DisplayName("워크 스페이스 내에 워크플로우 아래에 템플릿 시퀀스를 삭제할 수 있다.")
     @Test
@@ -202,17 +170,6 @@ public class SequenceAcceptanceTest {
                 .all()
                 .extract();
     }
-    private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .when()
-                .get("/workspaces/{workspaceId}/sequences",workspaceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_조회(){
         return RestAssured.
@@ -226,19 +183,7 @@ public class SequenceAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 시퀀스_생성(SequenceRequest sequenceRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(sequenceRequest)
-                .when()
-                .post("/workspaces/{workspaceId}/sequences", workspaceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
+
 
     private ExtractableResponse<Response> 워크플로우내_시퀀스_생성(SequenceRequest sequenceRequest){
         return RestAssured.
@@ -255,21 +200,6 @@ public class SequenceAcceptanceTest {
     }
 
 
-
-    private ExtractableResponse<Response> 시퀀스_수정(SequenceRequest sequenceRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(sequenceRequest)
-                .when()
-                .put("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
     private ExtractableResponse<Response> 워크플로우내_시퀀스_수정(SequenceRequest sequenceRequest){
         return RestAssured.
                 given()
@@ -277,26 +207,13 @@ public class SequenceAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(sequenceRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
+                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-
-    private ExtractableResponse<Response> 시퀀스_삭제(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .when()
-                .delete("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 
     private ExtractableResponse<Response> 워크플로우내_시퀀스_삭제(){
         return RestAssured.
@@ -304,7 +221,7 @@ public class SequenceAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
+                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()

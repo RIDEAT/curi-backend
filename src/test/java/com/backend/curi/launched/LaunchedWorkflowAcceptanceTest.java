@@ -176,19 +176,14 @@ public class LaunchedWorkflowAcceptanceTest {
 
     private void userMakeWorkspaceSequenceModule(){
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
-        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
 
         workflowId = workflowResponse.getId();
-        sequenceId = sequence.getId();
 
         var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
         sequenceInWorkflowId = sequenceInWorkflow.getId();
 
         var sequenceInWorkflow2 = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest2());
         sequenceInWorkflowId2 = sequenceInWorkflow2.getId();
-
-        var module = moduleService.createModule(workspaceId, getModuleRequest());
-        templateModuleId = module.getId();
 
         var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();

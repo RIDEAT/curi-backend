@@ -31,7 +31,7 @@ public class Workflow extends BaseEntity {
 
     @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<WorkflowSequence> workflowSequences = new ArrayList<>();
+    private List<Sequence> sequences = new ArrayList<>();
 
 
     public void modify(WorkflowRequest request){

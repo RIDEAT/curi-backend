@@ -2,6 +2,7 @@ package com.backend.curi.launched.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.controller.dto.LaunchedModuleRequest;
+import com.backend.curi.workflow.controller.dto.ModuleResponse;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.Module;
 import com.backend.curi.workspace.repository.entity.Workspace;
@@ -36,7 +37,7 @@ public class LaunchedModule extends BaseEntity {
 
     private ObjectId contentId;
 
-    private Long orderInSequence;
+    private Integer orderInSequence;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,8 +51,8 @@ public class LaunchedModule extends BaseEntity {
     }
 
 
-    public static LaunchedModule of (ObjectId launchedContentId, Module module, LaunchedSequence launchedSequence, Workspace workspace , Long orderInSequence){
-        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(orderInSequence).build();
+    public static LaunchedModule of (ObjectId launchedContentId, ModuleResponse module, LaunchedSequence launchedSequence, Workspace workspace){
+        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(module.getOrder()).build();
     }
 
     public void modify (LaunchedModuleRequest request){

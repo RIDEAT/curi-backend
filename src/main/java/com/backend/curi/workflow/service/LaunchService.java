@@ -18,6 +18,7 @@ import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
+import com.backend.curi.workflow.controller.dto.ModuleResponse;
 import com.backend.curi.workflow.controller.dto.RequiredForLaunchResponse;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
@@ -92,9 +93,9 @@ public class LaunchService {
             }
         }
 
-        var sequences = workflowService.getSequencesWithDayoffset(workflowId);
-        for (var sequenceWithDayoffset : sequences) {
-            launchSequence(launchedWorkflow, sequenceWithDayoffset.getKey(), workspace, member, sequenceWithDayoffset.getValue());
+        var sequences = workflowService.getSequences(workflowId);
+        for (var sequence : sequences) {
+            launchSequence(launchedWorkflow, sequence, workspace, member);
         }
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
@@ -109,17 +110,15 @@ public class LaunchService {
         return response;
     }
 
-    private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Integer dayOffset) throws JsonProcessingException {
+    private void launchSequence(LaunchedWorkflow launchedWorkflow, SequenceResponse sequence, Workspace workspace, Member member) throws JsonProcessingException {
         var role = sequence.getRole();
         Member assignedMember = memberMap.get(role);
 
-        var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace, dayOffset);
+        var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace);
 
-        var sequenceModules = sequence.getSequenceModules();
-        for (var sequenceModule : sequenceModules) {
-            var module = sequenceModule.getModule();
-            var order = sequenceModule.getOrderNum();
-            launchModule(launchedSequence, module, workspace, Long.valueOf(order));
+        var modules = sequence.getModules();
+        for (var module : modules) {
+            launchModule(launchedSequence, module, workspace);
         }
 
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
@@ -132,7 +131,7 @@ public class LaunchService {
             throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
     }
 
-    private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace, Long order) throws JsonProcessingException {
+    private void launchModule(LaunchedSequence launchedSequence, ModuleResponse module, Workspace workspace) throws JsonProcessingException {
 
         Object content = contentService.getContent(module.getContentId());
 
@@ -147,7 +146,7 @@ public class LaunchService {
 
         var contents = contentService.createContents(replaced.toPrettyString());
 
-        var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace, order);
+        var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace);
 
         launchedModuleService.saveLaunchedModule(launchedModule);
     }

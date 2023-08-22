@@ -25,6 +25,8 @@ public class Module extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    Integer order;
+
     @Enumerated(EnumType.STRING)
     private ModuleType type;
 
@@ -32,13 +34,18 @@ public class Module extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sequence_id")
+    private Sequence sequence;
+
     @Column(nullable = false)
     private ObjectId contentId;
 
-    public static Module of(ModuleRequest request, Workspace workspace, ObjectId contentId){
+    public static Module of(ModuleRequest request, Workspace workspace,Sequence sequence, ObjectId contentId){
         return Module.builder()
                 .name(request.getName())
                 .type(request.getType())
+                .order(request.getOrder())
                 .workspace(workspace)
                 .contentId(contentId).build();
     }
@@ -46,5 +53,6 @@ public class Module extends BaseEntity {
     public void modify(ModuleRequest request){
         this.name = request.getName();
         this.type = request.getType();
+        this.order = request.getOrder();
     }
 }
