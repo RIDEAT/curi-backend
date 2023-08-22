@@ -53,17 +53,22 @@ public class WorkspaceService {
     public Workspace getWorkspaceEntityById(Long id){
         return workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
-    @Transactional
-    public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
 
+    public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
+        var savedWorkspace = createWorkspaceEntity(request, currentUser);
+        savedWorkspace.setLogoUrl(amazonS3Service.getSignedUrl(savedWorkspace.getLogoUrl()));
+        return WorkspaceResponse.of(savedWorkspace);
+    }
+
+    @Transactional
+    public Workspace createWorkspaceEntity(WorkspaceRequest request, CurrentUser currentUser){
         Workspace workspace = Workspace.builder().name(request.getName()).email(request.getEmail()).build();
         Workspace savedWorkspace = workspaceRepository.save(workspace);
         userworkspaceService.create(currentUser, savedWorkspace);
 
         createDefaultRole(savedWorkspace);
         createDefaultWorkflow(savedWorkspace);
-
-        return WorkspaceResponse.of(savedWorkspace);
+        return savedWorkspace;
     }
 
     @Transactional
