@@ -55,6 +55,10 @@ jobs:
           AWS_SQS_QUEUE_NAME: ${{ secrets.AWS_SQS_QUEUE_NAME }}
           AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
           AWS_REGION: ap-northeast-2
+          SLACK_CLIENT_ID: temp
+          SLACK_CLIENT_SECRET: temp
+          SLACK_REDIRECT_URL: temp
+          SLACK_BOT_TOKEN: temp
           DDL_AUTO: update
           ENVIRONMENT: build
           AWS_S3_BUCKET: temp

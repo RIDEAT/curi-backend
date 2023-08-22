@@ -13,14 +13,6 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class OAuthRequest {
     @NotNull
-    String clientId;
-    @NotNull
-    String clientSecret;
-    @NotNull
-    String redirectUri;
-    @NotNull
     String code;
-    @NotNull
-    String token;
 
 }

@@ -1,6 +1,5 @@
 package com.backend.curi.slack.controller.dto;
 
-import com.slack.api.methods.SlackApiRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,13 +7,12 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
-
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-
-public class SlackMessageRequest {
+public class ChannelRequest {
     @NotNull
-    String text;
+    String channelName;
 }
+

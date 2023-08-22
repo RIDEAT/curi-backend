@@ -13,6 +13,8 @@ import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -25,6 +27,7 @@ import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -64,6 +67,9 @@ public class DashboardAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
+
+    @MockBean
+    private SlackService slackService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -138,6 +144,10 @@ public class DashboardAcceptanceTest {
 
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
+
+        when(slackService.sendMessage(any(SlackMessageRequest.class)))
+                .thenReturn(new ChatPostMessageResponse());
+
 
         RestAssured.port = port;
 

@@ -80,6 +80,10 @@ jobs:
           AWS_S3_BUCKET: temp
           AWS_CLOUDFRONT_URL: temp
           AWS_CLOUDFRONT_KEYPAIR: temp
+          SLACK_CLIENT_ID: temp
+          SLACK_CLIENT_SECRET: temp
+          SLACK_REDIRECT_URL: temp
+          SLACK_BOT_TOKEN: temp
           ENVIRONMENT: build
           TEST_ENVIRONMENT: data-build
         run: |
