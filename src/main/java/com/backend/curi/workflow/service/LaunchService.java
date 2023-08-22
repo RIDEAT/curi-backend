@@ -99,11 +99,12 @@ public class LaunchService {
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
+        /*
         SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
         slackMessageRequest.setBlocksAsString("\"{\\\"type\\\": \\\"plain_text\\\", \\\"text\\\": \\\"Budget Performance\\\"}\";");
 
         slackService.sendMessage(slackMessageRequest);
-
+*/
 
         return response;
     }
