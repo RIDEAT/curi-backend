@@ -86,6 +86,7 @@ public class LaunchService {
         List<Role> requiredRoleEntities = getRequiredRoles(workflowId).stream().map(RoleResponse -> roleService.getRoleEntity(RoleResponse.getId())).collect(Collectors.toList());
 
         for (Role role : requiredRoleEntities) {
+            System.out.println(role.getId());
             if (role.getName().equals("신규입사자")) memberMap.put(role, member);
             else {
                 Member manager = memberService.getManagerByEmployeeAndRole(member, role);
@@ -93,7 +94,7 @@ public class LaunchService {
             }
         }
 
-        var sequences = workflowService.getSequences(workflowId);
+        var sequences = workflow.getSequences();
         for (var sequence : sequences) {
             launchSequence(launchedWorkflow, sequence, workspace, member);
         }
@@ -110,10 +111,9 @@ public class LaunchService {
         return response;
     }
 
-    private void launchSequence(LaunchedWorkflow launchedWorkflow, SequenceResponse sequence, Workspace workspace, Member member) throws JsonProcessingException {
+    private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member) throws JsonProcessingException {
         var role = sequence.getRole();
         Member assignedMember = memberMap.get(role);
-
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace);
 
         var modules = sequence.getModules();
@@ -131,7 +131,7 @@ public class LaunchService {
             throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
     }
 
-    private void launchModule(LaunchedSequence launchedSequence, ModuleResponse module, Workspace workspace) throws JsonProcessingException {
+    private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace) throws JsonProcessingException {
 
         Object content = contentService.getContent(module.getContentId());
 

@@ -113,8 +113,6 @@ public class DashboardAcceptanceTest {
 
     private Long sequenceId;
 
-    private Long sequenceInWorkflowId;
-
     private Long defaultRoleId;
 
     private Long employeeRoleId;
@@ -188,7 +186,7 @@ public class DashboardAcceptanceTest {
         var module = moduleService.createModule(workspaceId,sequenceId, getModuleRequest());
         templateModuleId = module.getId();
 
-        var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
+        var moduleInSequence = moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
     }
 

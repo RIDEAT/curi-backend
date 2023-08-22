@@ -61,7 +61,7 @@ public class LaunchedSequence extends BaseEntity {
                 .applyDate(launchedSequenceRequest.getApplyDate())/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
      }
 
-     public static LaunchedSequence of (SequenceResponse sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
+     public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
         return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
