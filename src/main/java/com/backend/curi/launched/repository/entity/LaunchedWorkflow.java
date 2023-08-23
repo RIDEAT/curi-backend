@@ -35,7 +35,7 @@ public class LaunchedWorkflow extends BaseEntity {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "membersId")
     private Member member;
 
 
