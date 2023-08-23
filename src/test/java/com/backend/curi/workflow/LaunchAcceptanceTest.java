@@ -289,6 +289,7 @@ public class LaunchAcceptanceTest {
                 .all()
                 .extract();
     }
+
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
         return RestAssured.
                 given()
