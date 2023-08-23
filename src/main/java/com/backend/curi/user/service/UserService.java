@@ -25,10 +25,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserworkspaceService userworkspaceService;
 
-    @Getter
-    @Value("${spring.profiles.active}")
-    private String ENV;
-
     public User_ getUserByUserId(String userId){
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }

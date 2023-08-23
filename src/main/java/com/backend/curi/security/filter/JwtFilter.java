@@ -35,6 +35,7 @@ import java.util.*;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+    private final Constants constants;
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -62,9 +63,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Cookie[] cookies = request.getCookies();
 
-            if(userService.getENV().equals("local")) {
+            if(constants.getENV().equals("local")) {
                 pretendTobeAuthorized(request, response, filterChain);
-                return;
             }
             else {
                 ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
@@ -97,9 +97,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
                 filterChain.doFilter(request, response);
-
-                return;
             }
+            return;
         }
         catch (JsonMappingException e) {
             throw new RuntimeException(e);
@@ -134,7 +133,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(Constants.AUTH_SERVER.concat("/verify"));
+        URI requestUri = URI.create(constants.getAUTH_SERVER().concat("/verify"));
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
