@@ -2,6 +2,7 @@ package com.backend.curi.user;
 
 
 
+
 import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
@@ -145,7 +146,7 @@ public class userAcceptanceTest {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(com.backend.curi.common.configuration.Constants.AUTH_SERVER.concat("/verify"));
+        URI requestUri = URI.create(Constants.AUTH_SERVER.concat("/verify"));
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {

@@ -8,5 +8,5 @@ public final class Constants {
     public static final String workflowName = "workflow1";
 
     public static final String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJOWEhxRVJpcUtWWjlNeGZQdkxnQk5jdHoxZWwyIiwiaWF0IjoxNjkyMjYxNDUzLCJleHAiOjE4MTIyNjE0NTN9.8As-BB35oSekPnEv-pFAS-LffE1dVcKS8pORTbdbT7o";
-
+    public static final String AUTH_SERVER = "https://auth.dev.onbird.team";
 }
