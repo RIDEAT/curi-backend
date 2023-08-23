@@ -1,7 +1,6 @@
 package com.backend.curi.workflow.controller.dto;
 import com.backend.curi.workflow.repository.entity.Module;
 import com.backend.curi.workflow.repository.entity.ModuleType;
-import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
@@ -18,6 +17,7 @@ public class ModuleResponse {
     private Long id;
     private String name;
     private ModuleType type;
+    private Integer order;
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId contentId;
 
@@ -26,6 +26,7 @@ public class ModuleResponse {
                 module.getId(),
                 module.getName(),
                 module.getType(),
+                module.getOrder(),
                 module.getContentId());
     }
 }
