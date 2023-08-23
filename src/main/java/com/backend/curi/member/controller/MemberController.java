@@ -30,7 +30,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/member/manager")
+    @PostMapping("/members/manager")
     public ResponseEntity<MemberResponse> createManager(@RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
@@ -38,7 +38,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/member/manager/{mid}")
+    @PutMapping("/members/manager/{mid}")
     public ResponseEntity<MemberResponse> modifyManager(@PathVariable("mid") Long memberId,
                                                         @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
                                                         Authentication authentication) {
@@ -48,14 +48,14 @@ public class MemberController {
     }
 
 
-    @PostMapping("/member/employee")
+    @PostMapping("/members/employee")
     public ResponseEntity<MemberResponse> createEmployee(@RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                        Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.createMember(currentUser, MemberType.employee , request);
         return ResponseEntity. status(HttpStatus.CREATED).body(response);
     }
-    @PutMapping("/member/employee/{mid}")
+    @PutMapping("/members/employee/{mid}")
     public ResponseEntity<MemberResponse> modifyEmployee(@PathVariable("mid") Long memberId,
                                                          @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
                                                          Authentication authentication) {
@@ -64,7 +64,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/member/{mid}")
+    @DeleteMapping("/members/{mid}")
     public ResponseEntity<MemberResponse> deleteMember(@PathVariable("mid") Long memberId,
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();

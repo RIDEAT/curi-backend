@@ -185,7 +185,7 @@ public class MemberAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(employeeRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/member/employee", workspaceId)
+                .post("/workspaces/{workspaceId}/members/employee", workspaceId)
                 .then()
                 .log()
                 .all()
@@ -199,7 +199,7 @@ public class MemberAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(managerRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/member/manager", workspaceId)
+                .post("/workspaces/{workspaceId}/members/manager", workspaceId)
                 .then()
                 .log()
                 .all()
@@ -213,7 +213,7 @@ public class MemberAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(employeeRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/member/employee/{mid}", workspaceId, employeeId )
+                .put("/workspaces/{workspaceId}/members/employee/{mid}", workspaceId, employeeId )
                 .then()
                 .log()
                 .all()
@@ -227,7 +227,7 @@ public class MemberAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(managerRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/member/manager/{mid}", workspaceId, managerId)
+                .put("/workspaces/{workspaceId}/members/manager/{mid}", workspaceId, managerId)
                 .then()
                 .log()
                 .all()
@@ -240,7 +240,7 @@ public class MemberAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/member/{mid}", workspaceId, employeeId)
+                .delete("/workspaces/{workspaceId}/members/{mid}", workspaceId, employeeId)
                 .then()
                 .log()
                 .all()
@@ -253,7 +253,7 @@ public class MemberAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/member/{mid}", workspaceId, managerId)
+                .delete("/workspaces/{workspaceId}/members/{mid}", workspaceId, managerId)
                 .then()
                 .log()
                 .all()
