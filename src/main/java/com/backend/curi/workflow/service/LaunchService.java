@@ -42,7 +42,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
-
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -73,6 +74,7 @@ public class LaunchService {
 
     private final SlackService slackService;
 
+
     private Map<Role, Member> memberMap = new HashMap<>();
 
     @Transactional
@@ -99,12 +101,16 @@ public class LaunchService {
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
-        /*
+/*
         SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-        slackMessageRequest.setBlocksAsString("\"{\\\"type\\\": \\\"plain_text\\\", \\\"text\\\": \\\"Budget Performance\\\"}\";");
+        slackMessageRequest.setBlocksAsString("[{\"type\": \"divider\"}]");
 
         slackService.sendMessage(slackMessageRequest);
-*/
+        */
+
+
+        slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
+
 
         return response;
     }
@@ -123,6 +129,8 @@ public class LaunchService {
         }
 
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
+        launchedWorkflow.getLaunchedSequences().add(launchedSequence);
+
         var request = SequenceMessageRequest.builder()
                 .id(launchedSequence.getId())
                 .applyDate(launchedSequence.getUpdatedDate())
@@ -150,6 +158,8 @@ public class LaunchService {
         var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace, order);
 
         launchedModuleService.saveLaunchedModule(launchedModule);
+
+        launchedSequence.getLaunchedModules().add(launchedModule);
     }
 
     @Transactional

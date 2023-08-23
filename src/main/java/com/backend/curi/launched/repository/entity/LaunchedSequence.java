@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,7 +54,8 @@ public class LaunchedSequence extends BaseEntity {
     private Workspace workspace;
 
     @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
-    private List<LaunchedModule> launchedModules;
+    @Builder.Default
+    private List<LaunchedModule> launchedModules = new ArrayList<>();
 
     public static LaunchedSequence of (LaunchedSequenceRequest launchedSequenceRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
          return LaunchedSequence.builder().name(launchedSequenceRequest.getName()).status(launchedSequenceRequest.getStatus())

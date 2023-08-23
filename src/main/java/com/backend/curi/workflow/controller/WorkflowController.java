@@ -2,6 +2,8 @@ package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.WorkflowService;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("/workspaces/{workspaceId}/workflows")
 public class WorkflowController {
     private final WorkflowService workflowService;
+    private final LaunchedWorkflowService launchedWorkflowService;
     private final LaunchService launchService;
 
     @GetMapping("/{workflowId}/requiredforlaunch")
@@ -33,8 +36,8 @@ public class WorkflowController {
 
     @PostMapping("/{workflowId}/launch")
     public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId) throws JsonProcessingException {
-        var launchedWorkflowResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(launchedWorkflowResponse);
+        var launchResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(launchResponse);
     }
 
     @PostMapping

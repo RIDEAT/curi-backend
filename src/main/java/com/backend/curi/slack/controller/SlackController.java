@@ -37,11 +37,18 @@ public class SlackController {
     private final SlackService slackService;
 
 
+    @PostMapping("/oauth-member")
+    public ResponseEntity<OAuthV2AccessResponse> oauthMember(@Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {
+        Long memberId = 2L; // memberId 에 대한 정보를 http 헤더에서 얻을 수 있어야 함.
+        var response = slackService.oauthMember(oAuthRequest, memberId);
+        return ResponseEntity.ok(response);
+    }
     @PostMapping("/oauth")
     public ResponseEntity<OAuthV2AccessResponse> oauth(@Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {
         var response = slackService.oauth(oAuthRequest);
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/channel")
     public ResponseEntity<ConversationsCreateResponse> createChannel(@Valid @RequestBody ChannelRequest channelRequest) throws SlackApiException, IOException {
