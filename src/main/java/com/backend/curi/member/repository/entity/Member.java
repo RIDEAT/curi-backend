@@ -20,6 +20,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@Table(name = "members")
 public class Member extends BaseEntity {
 
     @Id
