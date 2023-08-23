@@ -50,7 +50,7 @@ public class WorkflowService {
     public List<WorkflowResponse> getWorkflows(Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflowList = workflowRepository.findAllByWorkspace(workspace);
-        return workflowList.stream().map(WorkflowResponse::of).collect(Collectors.toList());
+        return workflowList.stream().map(WorkflowResponse::listOf).collect(Collectors.toList());
     }
 
     @Transactional
