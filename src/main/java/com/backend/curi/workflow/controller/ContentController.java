@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentController {
     private final ContentService contentService;
 
-    @GetMapping("/{contentId}")
-    public ResponseEntity<ContentResponse> getContent(@PathVariable Long workspaceId, @PathVariable ObjectId contentId){
+    @GetMapping("/{contentIdStr}")
+    public ResponseEntity<ContentResponse> getContent(@PathVariable Long workspaceId, @PathVariable String contentIdStr){
+        ObjectId contentId = new ObjectId(contentIdStr);
         var response = contentService.getContents(contentId);
         return ResponseEntity.ok(response);
     }
