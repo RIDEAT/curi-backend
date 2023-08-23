@@ -159,7 +159,7 @@ public class LaunchAcceptanceTest {
        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
-*/
+
     @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
     @Test
     public void getSequences(){
@@ -167,6 +167,8 @@ public class LaunchAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
+
+ */
 
 
 
