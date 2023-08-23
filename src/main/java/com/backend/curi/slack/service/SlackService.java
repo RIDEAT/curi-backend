@@ -229,7 +229,6 @@ public class SlackService {
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(getAlarmChannelId())
                     .blocks(buildBlocks(launchedWorkflow))
-
             );
 
             return response;
