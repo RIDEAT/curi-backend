@@ -103,17 +103,7 @@ public class LaunchService {
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
-/*
-        SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-        slackMessageRequest.setBlocksAsString("[{\"type\": \"divider\"}]");
-
-        slackService.sendMessage(slackMessageRequest);
-        */
-
-
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-
-
         return response;
     }
 

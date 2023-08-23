@@ -35,7 +35,7 @@ public class MemberController {
                                                          Authentication authentication) {
         var currentUser = (CurrentUser) authentication.getPrincipal();
         var response = memberService.createMember(currentUser, MemberType.manager, request);
-        return ResponseEntity. status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/member/manager/{mid}")
