@@ -20,7 +20,7 @@ public class LaunchedModuleRequest {
     private LaunchedStatus status;
 
     @NotNull
-    @Pattern(regexp = "^(notification|contents|survey|finished)")
+    @Pattern(regexp = "^(notification|contents|survey|finished|slack|google_docs|notion|youtube|google_form|google_drive|web_url)")
     private ModuleType type;
 
     @NotNull
