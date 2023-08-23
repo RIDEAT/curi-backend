@@ -47,6 +47,7 @@ public class Module extends BaseEntity {
                 .type(request.getType())
                 .order(request.getOrder())
                 .workspace(workspace)
+                .sequence(sequence)
                 .contentId(contentId).build();
     }
 
