@@ -1,11 +1,8 @@
 package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
-import com.backend.curi.workflow.controller.dto.ModuleRequest;
 import com.backend.curi.workflow.controller.dto.SequenceRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
-import com.backend.curi.workflow.repository.SequenceModuleRepository;
-import com.backend.curi.workflow.repository.entity.SequenceModule;
 import com.backend.curi.workflow.service.SequenceService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +19,6 @@ import java.util.List;
 public class SequenceController {
     private final SequenceService sequenceService;
 
-    @Hidden
-    @PostMapping("/sequences")
-    public ResponseEntity<SequenceResponse> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId) {
-        var createdSequence = sequenceService.createSequence(workspaceId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(SequenceResponse.of(createdSequence));
-    }
-
     @PostMapping("workflows/{workflowId}/sequences")
     public ResponseEntity<SequenceResponse> createSequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request, @PathVariable Long workspaceId, @PathVariable Long workflowId) {
         var createdSequence = sequenceService.createSequence(workspaceId, workflowId, request);
@@ -41,21 +31,6 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Hidden
-    @GetMapping("/sequences")
-    public ResponseEntity<List<SequenceResponse>> getSequences(@PathVariable Long workspaceId) {
-        var response = sequenceService.getSequences(workspaceId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Hidden
-    @PutMapping("/sequences/{sequenceId}")
-    public ResponseEntity<SequenceResponse> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
-                                               @PathVariable Long sequenceId) {
-        var updatedSequence = sequenceService.modifySequence(sequenceId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(SequenceResponse.of(updatedSequence));
-    }
-
     @PutMapping("workflows/{workflowId}/sequences/{sequenceId}")
     public ResponseEntity<SequenceResponse> modifySequence(@RequestBody @Validated(ValidationSequence.class) SequenceRequest request,
                                                @PathVariable Long workflowId,
@@ -64,17 +39,11 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.OK).body(SequenceResponse.of(updatedSequence));
     }
 
-    @Hidden
-    @DeleteMapping("/sequences/{sequenceId}")
-    public ResponseEntity<Void> deleteSequence(@PathVariable Long sequenceId) {
-        sequenceService.deleteSequence(sequenceId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 
     @DeleteMapping("workflows/{workflowId}/sequences/{sequenceId}")
     public ResponseEntity<Void> deleteWorkflowSequence(@PathVariable Long workflowId,
                                                        @PathVariable Long sequenceId) {
-        sequenceService.deleteWorkflowSequence(workflowId, sequenceId);
+        sequenceService.deleteSequence(sequenceId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

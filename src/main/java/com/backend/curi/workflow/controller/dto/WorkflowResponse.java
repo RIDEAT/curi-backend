@@ -1,7 +1,6 @@
 package com.backend.curi.workflow.controller.dto;
 
 import com.backend.curi.workflow.repository.entity.Workflow;
-import com.backend.curi.workflow.repository.entity.WorkflowSequence;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,8 +27,7 @@ public class WorkflowResponse {
     private List<RoleResponse> requiredRoles;
     public static WorkflowResponse of(Workflow workflow) {
         var sequences =
-                workflow.getWorkflowSequences().stream()
-                        .map(WorkflowSequence::getSequence)
+                workflow.getSequences().stream()
                         .map(SequenceResponse::of).collect(Collectors.toList());
 
         var roles = sequences.stream()

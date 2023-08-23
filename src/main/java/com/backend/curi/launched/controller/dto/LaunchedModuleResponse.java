@@ -24,7 +24,7 @@ public class LaunchedModuleResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId contentId;
 
-    private Long order;
+    private Integer order;
 
     public static LaunchedModuleResponse of (LaunchedModule launchedModule){
         return new LaunchedModuleResponse(
