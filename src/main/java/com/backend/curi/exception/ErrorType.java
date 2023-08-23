@@ -39,6 +39,8 @@ public enum ErrorType {
     WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다."),
 
     SLACK_ACCESS_TOKEN_NOT_EXISTS("SLACK-001", "슬랙의 어세스 토큰이 없습니다."),
+    SLACK_MEMBER_NOT_AUTHORIZED("SLACK-002", "슬랙에 인증되지 않은 멤버입니다."),
+
     INVALID_IMAGE_NAME("COMMON-007", "올바르지 않은 이미지 이름입니다."),
     WORKSPACE_LOGO_ALREADY_EXISTS("WORKSPACE-004", "이미 로고가 존재합니다."),
     WORKSPACE_LOGO_NOT_EXISTS("WORKSPACE-005", "로고가 존재하지 않습니다.");

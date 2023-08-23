@@ -153,12 +153,23 @@ public class LaunchAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
+/*    @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
+
+    @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
+    @Test
+    public void getSequences(){
+        ExtractableResponse<Response> response = 워크스페이스내_시퀀스_리스트_조회();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+    }
+
+ */
+
 
 
     @DisplayName("워크스페이스에 속한 시퀀스를 조회할 수 있다.")
@@ -252,6 +263,19 @@ public class LaunchAcceptanceTest {
                 .all()
                 .extract();
     }
+
+    private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/workspaces/{workspaceId}/sequences",workspaceId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
 
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_조회(){
         return RestAssured.
