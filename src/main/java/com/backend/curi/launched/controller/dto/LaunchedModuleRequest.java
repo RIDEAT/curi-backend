@@ -34,5 +34,5 @@ public class LaunchedModuleRequest {
     @NotNull
     @Min(value = 1, message = "order must be greater than or equal to 1")
     @Max(value = 100, message = "order must be less than or equal to 100")
-    private Long order;
+    private Integer order;
 }
