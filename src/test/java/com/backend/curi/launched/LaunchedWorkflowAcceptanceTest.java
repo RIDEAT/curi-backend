@@ -13,6 +13,8 @@ import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -24,6 +26,8 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -64,6 +68,9 @@ public class LaunchedWorkflowAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
+
+    @MockBean
+    private SlackService slackService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -105,6 +112,7 @@ public class LaunchedWorkflowAcceptanceTest {
     private Long sequenceId;
 
     private Long sequenceInWorkflowId;
+    private Long sequenceInWorkflowId2;
     private Long employeeRoleId;
 
 
@@ -119,7 +127,7 @@ public class LaunchedWorkflowAcceptanceTest {
 
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws JsonProcessingException {
         defaultSet();
         userMakeWorkspace();
         userMakeEmployeeAndManager();
@@ -128,6 +136,9 @@ public class LaunchedWorkflowAcceptanceTest {
     }
 
     private void defaultSet (){
+        when(slackService.sendMessage(any(SlackMessageRequest.class)))
+                .thenReturn(new ChatPostMessageResponse());
+
         when(schedulerOpenFeign.createMessage(any(SequenceMessageRequest.class)))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).build());
 
@@ -165,22 +176,20 @@ public class LaunchedWorkflowAcceptanceTest {
 
     private void userMakeWorkspaceSequenceModule(){
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
-        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
 
         workflowId = workflowResponse.getId();
-        sequenceId = sequence.getId();
 
         var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
         sequenceInWorkflowId = sequenceInWorkflow.getId();
 
-        var module = moduleService.createModule(workspaceId, getModuleRequest());
-        templateModuleId = module.getId();
+        var sequenceInWorkflow2 = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest2());
+        sequenceInWorkflowId2 = sequenceInWorkflow2.getId();
 
         var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
     }
 
-    private void userLaunchWorkflow(){
+    private void userLaunchWorkflow() throws JsonProcessingException {
         //securityContext 설정
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication authentication = Mockito.mock(Authentication.class);
@@ -389,6 +398,17 @@ public class LaunchedWorkflowAcceptanceTest {
         return sequenceRequest;
     }
 
+    private SequenceRequest getSequenceRequest2() {
+        SequenceRequest sequenceRequest = new SequenceRequest();
+        sequenceRequest.setName("적응 시퀀스");
+        sequenceRequest.setDayOffset(-2);
+        sequenceRequest.setPrevSequenceId(0L);
+        sequenceRequest.setRoleId(employeeRoleId);
+
+        return sequenceRequest;
+    }
+
+
     private SequenceRequest getModifiedSequenceRequest() {
         SequenceRequest sequenceRequest = new SequenceRequest();
         sequenceRequest.setName("담당 사수와의 미팅");
@@ -411,7 +431,7 @@ public class LaunchedWorkflowAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} 님 진심으로 반갑습니다.\" }");
+        moduleRequest.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"marks\":[{\"type\":\"bold\"}],\"text\":\"새로운 입사자가 있어요!\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"안녕하세요 {HR매니저} 님,\\n\\n신규 팀원 {신규입사자} 님의 입사 소식을 알려드립니다. {신규입사자} 님은 [날짜]부터 우리 팀에 합류하게 되었습니다. 이를 통해 우리 팀은 한층 더 다양하고 강력한 팀이 될 수 있을 것입니다.\"}]}]}]}\n");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -420,7 +440,7 @@ public class LaunchedWorkflowAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

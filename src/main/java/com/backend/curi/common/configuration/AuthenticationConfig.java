@@ -24,7 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class AuthenticationConfig{
 
     private final UserService userService;
-
+    private final Constants constants;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -41,7 +41,7 @@ public class AuthenticationConfig{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore(new JwtFilter(userService,constants), UsernamePasswordAuthenticationFilter.class )
 
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(

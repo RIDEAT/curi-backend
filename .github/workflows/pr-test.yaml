@@ -24,6 +24,15 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
+      - name: Setup key
+        id: setup-key
+        env:
+          PRIVATE_KEY: ${{ secrets.CLOUD_FRONT_PRIVATE_KEY }}
+        run: |
+          touch ./src/main/resources/key.pem
+          echo "$PRIVATE_KEY" >> "./src/main/resources/key.pem"
+          chmod 400 "./src/main/resources/key.pem"
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
@@ -46,8 +55,15 @@ jobs:
           AWS_SQS_QUEUE_NAME: ${{ secrets.AWS_SQS_QUEUE_NAME }}
           AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
           AWS_REGION: ap-northeast-2
+          SLACK_CLIENT_ID: temp
+          SLACK_CLIENT_SECRET: temp
+          SLACK_REDIRECT_URL: temp
+          SLACK_BOT_TOKEN: temp
           DDL_AUTO: update
           ENVIRONMENT: build
+          AWS_S3_BUCKET: temp
+          AWS_CLOUDFRONT_URL: temp
+          AWS_CLOUDFRONT_KEYPAIR: temp
           TEST_ENVIRONMENT: data-build
         run: |
           echo $ENVIRONMENT

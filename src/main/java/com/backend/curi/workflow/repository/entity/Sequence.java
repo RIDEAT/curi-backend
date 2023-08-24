@@ -24,6 +24,8 @@ public class Sequence extends BaseEntity {
 
     private String name;
 
+    private Integer dayOffset;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
@@ -32,20 +34,27 @@ public class Sequence extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_id")
+    private Workflow workflow;
+
     @OneToMany(mappedBy = "sequence", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<SequenceModule> sequenceModules = new ArrayList<>();
+    private List<Module> modules = new ArrayList<>();
 
-    public static Sequence of(SequenceRequest request, Role role, Workspace workspace) {
+    public static Sequence of(SequenceRequest request, Role role, Workspace workspace, Workflow workflow) {
         return Sequence.builder().
                 name(request.getName()).
                 role(role).
+                dayOffset(request.getDayOffset()).
                 workspace(workspace).
+                workflow(workflow).
                 build();
     }
 
-    public void modify(SequenceRequest request, Role role) {
+    public void modify(SequenceRequest request, Role role){
         this.name = request.getName();
         this.role = role;
+        this.dayOffset = request.getDayOffset();
     }
 }

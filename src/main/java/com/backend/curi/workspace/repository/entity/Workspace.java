@@ -32,11 +32,16 @@ public class Workspace {
     @Column
     private String email;
 
+    @Column
+    @Builder.Default
+    private String logoUrl = "default/logo/example_logo.jpeg";
+
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Workflow> workflows;
+    @Builder.Default
+    private List<Workflow> workflows = new ArrayList<>();
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;

@@ -6,10 +6,7 @@ import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.workflow.controller.dto.LaunchRequest;
 import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 import javax.persistence.*;
@@ -19,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -35,7 +33,7 @@ public class LaunchedWorkflow extends BaseEntity {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "membersId")
     private Member member;
 
 
@@ -52,6 +50,8 @@ public class LaunchedWorkflow extends BaseEntity {
     @OneToMany(mappedBy = "lauchedWorkflow", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LaunchedSequence> launchedSequences = new ArrayList<>();
+
+    
 
     public static LaunchedWorkflow of (LaunchedWorkflowRequest launchedWorkflowRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
         return LaunchedWorkflow.builder().name(launchedWorkflowRequest.getName()).status(launchedWorkflowRequest.getStatus())

@@ -17,18 +17,18 @@ public class ContentService {
 
 
 
-    public ContentResponse getContent (ObjectId contentId){
+    public ContentResponse getContents(ObjectId contentId){
         Content content = contentRepository.findById(contentId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
         return ContentResponse.of(content);
     }
 
-    public Object getMessage(ObjectId contentId){
-        return getContent(contentId).getMessage();
+    public Object getContent(ObjectId contentId){
+        return getContents(contentId).getContents();
     }
 
-    public Content createContent(Object substitutedMessage) {
+    public Content createContents(Object substitutedMessage) {
         Content content = new Content();
-        content.setMessage(substitutedMessage);
+        content.setContent(substitutedMessage);
 
         return contentRepository.save(content);
     }

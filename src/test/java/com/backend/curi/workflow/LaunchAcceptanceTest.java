@@ -10,6 +10,9 @@ import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.OAuthRequest;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -20,9 +23,11 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +42,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
@@ -56,6 +62,8 @@ public class LaunchAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
+
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -73,6 +81,10 @@ public class LaunchAcceptanceTest {
 
     @Autowired
     private ModuleService moduleService;
+
+    @Autowired
+    private SlackService slackService;
+
     @LocalServerPort
     public int port;
 
@@ -92,14 +104,13 @@ public class LaunchAcceptanceTest {
 
     private Long sequenceId;
 
-    private Long sequenceInWorkflowId;
-
     private Long employeeRoleId;
     private Long directManagerRoleId;
     private Long hrManagerRoleId;
 
     private Long templateModuleId;
     private Long moduleInSequenceId;
+
 
     @BeforeEach
     public void setup() {
@@ -108,6 +119,8 @@ public class LaunchAcceptanceTest {
 
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
+
+
 
         RestAssured.port = port;
 
@@ -131,20 +144,15 @@ public class LaunchAcceptanceTest {
         employeeId = employeeResponse.getId();
 
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
-        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
-
         workflowId = workflowResponse.getId();
-        sequenceId = sequence.getId();
 
-        var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
-        sequenceInWorkflowId = sequenceInWorkflow.getId();
+        var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId, getSequenceRequest());
+        sequenceId = sequenceInWorkflow.getId();
 
 
-        var module = moduleService.createModule(workspaceId, getModuleRequest());
-        templateModuleId = module.getId();
-
-        var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
+        var moduleInSequence = moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
+
     }
 
     @DisplayName("워크플로우 launch 전 필요한 role 정보를 받을 수 있다.")
@@ -154,10 +162,13 @@ public class LaunchAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /*
     @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
-       ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
+        slackService.oauthMember( new OAuthRequest("5761031201206.5791559442866.033041a31bd037a0500e297788add2189ec6da28fa436b4951a812ea036ca0d8"),hrManagerId);
+
+        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
@@ -169,19 +180,16 @@ public class LaunchAcceptanceTest {
 
     }
 
+ */
+
+
+
     @DisplayName("워크스페이스에 속한 시퀀스를 조회할 수 있다.")
     @Test
     public void getSequence(){
         ExtractableResponse<Response> response = 워크스페이스내_시퀀스_조회();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-    }
-
-    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 생성할 수 있다.")
-    @Test
-    public void createSequence(){
-        ExtractableResponse<Response> response = 시퀀스_생성(getSequenceRequest());
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 추가할 수 있다.")
@@ -197,13 +205,6 @@ public class LaunchAcceptanceTest {
     }
 
 
-    @DisplayName("워크스페이스 내에 템플릿 시퀀스를 수정할 수 있다.")
-    @Test
-    public void updateSequence(){
-        ExtractableResponse<Response> updateResponse = 시퀀스_수정(getModifiedSequenceRequest());
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
 
     @DisplayName("워크스페이스 내에 워크플로우 아래에 시퀀스를 수정할 수 있다.")
     @Test
@@ -217,15 +218,7 @@ public class LaunchAcceptanceTest {
         assertThat(workflowResponse.getSequences().contains(updatedResponse.as(SequenceResponse.class)));
     }
 
-    @DisplayName("워크 스페이스 내에 템플릿 시퀀스를 삭제할 수 있다.")
-    @Test
-    public void deleteSequence(){
-        ExtractableResponse<Response> response = 시퀀스_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> getResponse = 워크스페이스내_시퀀스_조회();
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
 
     @DisplayName("워크 스페이스 내에 워크플로우 아래에 템플릿 시퀀스를 삭제할 수 있다.")
     @Test
@@ -282,6 +275,7 @@ public class LaunchAcceptanceTest {
                 .all()
                 .extract();
     }
+
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_리스트_조회(){
         return RestAssured.
                 given()
@@ -294,26 +288,13 @@ public class LaunchAcceptanceTest {
                 .extract();
     }
 
+
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_조회(){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .when()
-                .get("/workspaces/{workspaceId}/sequences/{sequenceId}",workspaceId, sequenceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 시퀀스_생성(SequenceRequest sequenceRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(sequenceRequest)
-                .when()
-                .post("/workspaces/{workspaceId}/sequences", workspaceId)
+                .get("/workspaces/{workspaceId}/workflows/{workflows}/sequences/{sequenceId}",workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()
@@ -336,19 +317,6 @@ public class LaunchAcceptanceTest {
 
 
 
-    private ExtractableResponse<Response> 시퀀스_수정(SequenceRequest sequenceRequest){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .body(sequenceRequest)
-                .when()
-                .put("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 
     private ExtractableResponse<Response> 워크플로우내_시퀀스_수정(SequenceRequest sequenceRequest){
         return RestAssured.
@@ -357,26 +325,13 @@ public class LaunchAcceptanceTest {
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(sequenceRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
+                .put("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-
-    private ExtractableResponse<Response> 시퀀스_삭제(){
-        return RestAssured.
-                given()
-                .header("Authorization", "Bearer " + authToken)
-                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
-                .when()
-                .delete("/workspaces/{workspaceId}/sequences/{sequenceId}", workspaceId, sequenceId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 
     private ExtractableResponse<Response> 워크플로우내_시퀀스_삭제(){
         return RestAssured.
@@ -384,7 +339,7 @@ public class LaunchAcceptanceTest {
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .when()
-                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceInWorkflowId)
+                .delete("/workspaces/{workspaceId}/workflows/{workflowId}/sequences/{sequenceId}", workspaceId, workflowId, sequenceId)
                 .then()
                 .log()
                 .all()
@@ -397,7 +352,7 @@ public class LaunchAcceptanceTest {
     private EmployeeRequest getEmployeeRequest(){
         EmployeeRequest employeeRequest = new EmployeeRequest();
         employeeRequest.setName("terry cho");
-        employeeRequest.setEmail("terry@gmail.com");
+        employeeRequest.setEmail("8514199@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
@@ -432,7 +387,7 @@ public class LaunchAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
+        managerRequest.setEmail("8514199@naver.com");
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
@@ -442,7 +397,7 @@ public class LaunchAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("HR");
         managerRequest.setName("hanna");
-        managerRequest.setEmail("hanna@gmail.com");
+        managerRequest.setEmail("rideat63@gmail.com");
         managerRequest.setPhoneNum("010-1111-2222");
         return managerRequest;
     }
@@ -487,7 +442,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -496,7 +451,7 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

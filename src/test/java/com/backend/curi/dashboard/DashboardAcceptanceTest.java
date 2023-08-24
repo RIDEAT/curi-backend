@@ -13,6 +13,8 @@ import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -24,6 +26,8 @@ import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
 import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -63,6 +67,9 @@ public class DashboardAcceptanceTest {
 
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
+
+    @MockBean
+    private SlackService slackService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -106,8 +113,6 @@ public class DashboardAcceptanceTest {
 
     private Long sequenceId;
 
-    private Long sequenceInWorkflowId;
-
     private Long defaultRoleId;
 
     private Long employeeRoleId;
@@ -123,7 +128,7 @@ public class DashboardAcceptanceTest {
 
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws JsonProcessingException {
         defaultSet();
         userMakeWorkspace();
         userMakeEmployeeAndManager();
@@ -137,6 +142,10 @@ public class DashboardAcceptanceTest {
 
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
+
+        when(slackService.sendMessage(any(SlackMessageRequest.class)))
+                .thenReturn(new ChatPostMessageResponse());
+
 
         RestAssured.port = port;
 
@@ -169,22 +178,19 @@ public class DashboardAcceptanceTest {
 
     private void userMakeWorkspaceSequenceModule(){
         var workflowResponse = workflowService.createWorkflow(workspaceId, getWorkflowRequest());
-        var sequence = sequenceService.createSequence(workspaceId, getSequenceRequest());
-
         workflowId = workflowResponse.getId();
+
+        var sequence = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
         sequenceId = sequence.getId();
 
-        var sequenceInWorkflow = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest());
-        sequenceInWorkflowId = sequenceInWorkflow.getId();
-
-        var module = moduleService.createModule(workspaceId, getModuleRequest());
+        var module = moduleService.createModule(workspaceId,sequenceId, getModuleRequest());
         templateModuleId = module.getId();
 
-        var moduleInSequence = moduleService.createModule(workspaceId, sequenceInWorkflowId, getModuleRequest());
+        var moduleInSequence = moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
     }
 
-    private void userLaunchWorkflow(){
+    private void userLaunchWorkflow() throws JsonProcessingException {
         //securityContext 설정
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Authentication authentication = Mockito.mock(Authentication.class);
@@ -345,7 +351,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -354,7 +360,7 @@ public class DashboardAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setMessage(new ArrayList());
+        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

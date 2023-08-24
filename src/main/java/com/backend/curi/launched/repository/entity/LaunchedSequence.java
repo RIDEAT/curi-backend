@@ -3,6 +3,7 @@ package com.backend.curi.launched.repository.entity;
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,7 +36,7 @@ public class LaunchedSequence extends BaseEntity {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "membersId")
     private Member member;
 
 /*
@@ -53,16 +55,17 @@ public class LaunchedSequence extends BaseEntity {
     private Workspace workspace;
 
     @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
-    private List<LaunchedModule> launchedModules;
+    @Builder.Default
+    private List<LaunchedModule> launchedModules = new ArrayList<>();
 
     public static LaunchedSequence of (LaunchedSequenceRequest launchedSequenceRequest/*, Employee employee, Workflow workflow, Workspace workspace*/){
          return LaunchedSequence.builder().name(launchedSequenceRequest.getName()).status(launchedSequenceRequest.getStatus())
                 .applyDate(launchedSequenceRequest.getApplyDate())/*.employee(employee).workflow(workflow).workspace(workspace)*/.build();
      }
 
-     public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace, Integer dayOffset){
+     public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
         return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
-                applyDate(launchedWorkflow.getKeyDate().plusDays(dayOffset)).build();
+                applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
 
      public void modify(LaunchedSequenceRequest launchedSequenceRequest){

@@ -12,7 +12,6 @@ import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.WorkflowRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
-import com.backend.curi.workflow.repository.entity.WorkflowSequence;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,10 +27,6 @@ public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final WorkspaceService workspaceService;
     private static Logger log = LoggerFactory.getLogger(WorkflowService.class);
-
-
-
-
 
     @Transactional
     public WorkflowResponse createWorkflow (Long workspaceId, WorkflowRequest request){
@@ -55,14 +50,14 @@ public class WorkflowService {
     public List<WorkflowResponse> getWorkflows(Long workspaceId){
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflowList = workflowRepository.findAllByWorkspace(workspace);
-        var responseList = workflowList.stream().map(WorkflowResponse::listOf).collect(Collectors.toList());
-        return responseList;
+        return workflowList.stream().map(WorkflowResponse::listOf).collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateWorkflow(Long workflowId, WorkflowRequest request){
+    public WorkflowResponse updateWorkflow(Long workflowId, WorkflowRequest request){
         var workflow = getWorkflowEntity(workflowId);
         workflow.modify(request);
+        return WorkflowResponse.of(workflow);
     }
 
     public void deleteWorkflow (Long workflowId){
@@ -72,33 +67,17 @@ public class WorkflowService {
 
     public List<SequenceResponse> getSequences(Long workflowId){
         var workflow = getWorkflowEntity(workflowId);
-        var sequenceList = workflow.getWorkflowSequences();
+        var sequenceList = workflow.getSequences();
         sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
-        var responseList = sequenceList.stream().map(WorkflowSequence::getSequence).map(SequenceResponse::of).collect(Collectors.toList());
-        return responseList;
-    }
-
-    public List<SimpleEntry<Sequence, Integer>> getSequencesWithDayoffset(Long workflowId){
-        Workflow workflow = getWorkflowEntity(workflowId);
-        List<WorkflowSequence> workflowSequences = workflow.getWorkflowSequences();
-
-        log.info("workflowSequence size: {}", workflowSequences.size());
-
-        workflowSequences.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
-
-        List<SimpleEntry<Sequence, Integer>> responseWithDayoffsetList = new ArrayList<>();
-        for (var workflowSequence : workflowSequences) {
-            var sequence = workflowSequence.getSequence();
-            Integer dayOffset = workflowSequence.getDayOffset();
-            responseWithDayoffsetList.add(new SimpleEntry<>(sequence, dayOffset));
-        }
-        return responseWithDayoffsetList;
+        return sequenceList.stream().map(SequenceResponse::of).collect(Collectors.toList());
     }
 
     public Workflow getWorkflowEntity(Long workflowId){
         return workflowRepository.findById(workflowId)
                 .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
+
+
 
 
 

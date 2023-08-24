@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,10 +35,10 @@ import java.util.*;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+    private final Constants constants;
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         try {
             if (request.getRequestURI().startsWith("/h2-console")){
                 filterChain.doFilter(request, response);
@@ -54,6 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
+
             if (request.getRequestURI().startsWith("/frontoffices") ){
                 filterChain.doFilter(request, response);
                 return;
@@ -62,40 +64,57 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Cookie[] cookies = request.getCookies();
 
-       //     pretendTobeAuthorized(request, response, filterChain);
+            if (request.getRequestURI().startsWith("/health") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            if (request.getRequestURI().startsWith("/slack/oauth-member") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
 
 
 
-            ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
 
-            // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
+            Cookie[] cookies = request.getCookies();
 
-            String responseBody = responseEntity.getBody();
+            if(constants.getENV().equals("local") || constants.getENV().equals("data-local")) {
+                pretendTobeAuthorized(request, response, filterChain);
+            }
+            else {
+                ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
 
-            // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
-            response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
+                // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
 
-            // Parse the responseBody JSON string
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
+                String responseBody = responseEntity.getBody();
 
-            // Extract userId
-            String userId = jsonNode.get("userId").asText();
-            //String userEmail = jsonNode.get("userEmail").asText();
+                // auth token을 헤더에 담으려면 이렇게 해야되지 않겠나.
+                response.setHeader("AuthToken", responseEntity.getHeaders().get("AuthToken").get(0));
 
+                // Parse the responseBody JSON string
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-            CurrentUser currentUser = new CurrentUser();
-            currentUser.setUserId(userId);
-            currentUser.setUserEmail(getUserEmail(userId));
-            currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
+                // Extract userId
+                String userId = jsonNode.get("userId").asText();
+                //String userEmail = jsonNode.get("userEmail").asText();
 
 
-            // 여기에 security context 인증 정보 넣어야 할지도 .
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                CurrentUser currentUser = new CurrentUser();
+                currentUser.setUserId(userId);
+//          currentUser.setUserEmail(getUserEmail(userId));
+                currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
-            filterChain.doFilter(request, response);
+
+                // 여기에 security context 인증 정보 넣어야 할지도 .
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                filterChain.doFilter(request, response);
+            }
             return;
         }
         catch (JsonMappingException e) {
@@ -131,7 +150,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpMethod httpMethod = HttpMethod.GET; // 호출할 HTTP 메서드 선택 (GET, POST, 등)
-        URI requestUri = URI.create(Constants.AUTH_SERVER.concat("/verify"));
+        URI requestUri = URI.create(constants.getAUTH_SERVER().concat("/verify"));
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -157,13 +176,16 @@ public class JwtFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Extract userId
-        String userId = "floN3PYjxbQ9E3MQJmiHhwDxBwb2";
+        String userId = "NXHqERiqKVZ9MxfPvLgBNctz1el2";
         //String userEmail = jsonNode.get("userEmail").asText();
+
+        userService.dbStore(userId, "8514199@gmail.com");
 
 
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
-        currentUser.setUserEmail(getUserEmail(userId));
+        currentUser.setUserEmail("8514199@gmail.com");
+        //currentUser.setUserEmail(getUserEmail(userId));
         currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
 

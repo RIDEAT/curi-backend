@@ -31,6 +31,7 @@ public class Extractor {
             try {
                 return UUID.fromString(id);
             } catch (NumberFormatException e) {
+
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_URL_ERROR);
             }
         }

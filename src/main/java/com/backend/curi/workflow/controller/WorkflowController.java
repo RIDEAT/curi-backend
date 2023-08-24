@@ -2,9 +2,12 @@ package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.WorkflowService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -20,6 +24,7 @@ import java.util.List;
 @RequestMapping("/workspaces/{workspaceId}/workflows")
 public class WorkflowController {
     private final WorkflowService workflowService;
+    private final LaunchedWorkflowService launchedWorkflowService;
     private final LaunchService launchService;
 
     @GetMapping("/{workflowId}/requiredforlaunch")
@@ -30,9 +35,9 @@ public class WorkflowController {
 
 
     @PostMapping("/{workflowId}/launch")
-    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId){
-        var launchedWorkflowResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(launchedWorkflowResponse);
+    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId) throws JsonProcessingException {
+        var launchResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(launchResponse);
     }
 
     @PostMapping
@@ -63,17 +68,21 @@ public class WorkflowController {
     }
 
     @PutMapping("/{workflowId}")
-    public ResponseEntity<Void> updateWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
+    public ResponseEntity<WorkflowResponse> updateWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
                                                @PathVariable Long workflowId,
                                                Authentication authentication) {
-        workflowService.updateWorkflow(workflowId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var response = workflowService.updateWorkflow(workflowId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{workflowId}")
-    public ResponseEntity<Void> deleteWorkflow(@PathVariable Long workflowId,
+    public ResponseEntity<WorkflowResponse> deleteWorkflow(@PathVariable Long workflowId,
                                                Authentication authentication) {
         workflowService.deleteWorkflow(workflowId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        var response = new WorkflowResponse();
+        response.setCreatedDate(LocalDateTime.now());
+        response.setUpdatedDate(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 }
