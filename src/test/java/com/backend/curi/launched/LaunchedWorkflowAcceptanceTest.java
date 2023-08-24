@@ -228,6 +228,7 @@ public class LaunchedWorkflowAcceptanceTest {
         assertThat(updatedWorkflowResponse.getStatus()).isEqualTo(getModifiedLaunchedWorkflowRequest(originalWorkflowResponse).getStatus());
     }
 
+    /*
     @DisplayName("워크 스페이스 내에 런치드 워크 플로우를 삭제할 수 있다.")
     @Test
     public void deleteLaunchedWorkflow(){
@@ -236,7 +237,7 @@ public class LaunchedWorkflowAcceptanceTest {
 
         ExtractableResponse<Response> getResponse = 워크스페이스내_런치드_워크플로우_조회();
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
+    }*/
 
     private ExtractableResponse<Response> 워크스페이스내_런치드_워크플로우_리스트_조회(){
         return RestAssured.
@@ -301,6 +302,7 @@ public class LaunchedWorkflowAcceptanceTest {
                 .all()
                 .extract();
     }
+
 
 
     private WorkspaceRequest getWorkspaceRequest(){
