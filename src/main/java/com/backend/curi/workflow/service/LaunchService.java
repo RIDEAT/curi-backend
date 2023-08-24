@@ -76,10 +76,11 @@ public class LaunchService {
     private final SlackService slackService;
 
 
-    private Map<Role, Member> memberMap = new HashMap<>();
 
     @Transactional
     public LaunchedWorkflowResponse launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId) throws JsonProcessingException {
+        Map<Role, Member> memberMap = new HashMap<>();
+
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -96,25 +97,30 @@ public class LaunchService {
             }
         }
 
+
         var sequences = workflow.getSequences();
         for (var sequence : sequences) {
-            launchSequence(launchedWorkflow, sequence, workspace, member);
+            launchSequence(launchedWorkflow, sequence, workspace, member, memberMap);
         }
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
 
-        slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
+
+        sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
+        //slackService.sendWorkflowLaunchedMessage(response);
+        //awsSMTPService.send("test", "this is test", launchedWorkflow.getMember().getEmail());
+
         return response;
     }
 
-    private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member) throws JsonProcessingException {
+    private void launchSequence(LaunchedWorkflow launchedWorkflow, Sequence sequence, Workspace workspace, Member member, Map<Role, Member> memberMap) throws JsonProcessingException {
         var role = sequence.getRole();
         Member assignedMember = memberMap.get(role);
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace);
 
         var modules = sequence.getModules();
         for (var module : modules) {
-            launchModule(launchedSequence, module, workspace);
+            launchModule(launchedSequence, module, workspace, memberMap);
         }
 
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
@@ -129,7 +135,7 @@ public class LaunchService {
             throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
     }
 
-    private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace) throws JsonProcessingException {
+    private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace,Map<Role, Member> memberMap) throws JsonProcessingException {
 
         Object content = contentService.getContent(module.getContentId());
 
@@ -138,7 +144,7 @@ public class LaunchService {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(content.toString());
 
-        JsonNode replaced = replaceTextInNode(rootNode);
+        JsonNode replaced = replaceTextInNode(rootNode, memberMap);
 
         log.info(replaced.toPrettyString());
 
@@ -173,76 +179,15 @@ public class LaunchService {
 //                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
         awsSMTPService.send("test", "this is test", memberTo);
 
+
+
         var response = schedulerOpenFeign.deleteMessage(launchedSequenceId);
         if (response.getStatusCode() != HttpStatus.NO_CONTENT)
             throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
 
     }
 
-    /*
-    public String substitutePlaceholders(String jsonString) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-            if (jsonNode.isObject()) {
-                JsonNode contentNode = jsonNode.get("content");
-                if (contentNode != null && contentNode.isTextual()) {
-                    String content = contentNode.textValue();
-                    for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
-                        String placeholder = "{" + entry.getKey().getName() + "}";
-                        content = content.replace(placeholder, entry.getValue().getName());
-                    }
-                    ((com.fasterxml.jackson.databind.node.ObjectNode) jsonNode).put("content", content);
-                }
-            }
-
-            return jsonNode.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }*/
-
-    public String substitutePlaceholders(String jsonString) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-            if (jsonNode.isObject()) {
-                JsonNode contentNode = jsonNode.get("content");
-                if (contentNode != null && contentNode.isArray()) {
-                    for (JsonNode item : contentNode) {
-                        if (item.isObject()) {
-                            JsonNode textNode = item.at("/content/0/text");
-                            log.info(textNode.toString());
-                            if (textNode != null && textNode.isTextual()) {
-
-                                String text = textNode.textValue();
-
-                                for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
-                                    String placeholder = "{" + entry.getKey().getName() + "}";
-                                    log.info(placeholder);
-                                    text = text.replace(placeholder, entry.getValue().getName());
-                                }
-                                log.info(text);
-                                ((ObjectNode) textNode).put("text", text);  // Change here
-                            }
-                        }
-
-                    }
-                }
-            }
-
-
-            return jsonNode.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private JsonNode replaceTextInNode(JsonNode node) {
+    private JsonNode replaceTextInNode(JsonNode node, Map<Role, Member> memberMap ) {
         ObjectMapper mapper = new ObjectMapper();
         if (node.isTextual()) {
             String text = node.asText();
@@ -266,7 +211,7 @@ public class LaunchService {
         } else if (node.isArray()) {
             ArrayNode arrayNode = mapper.createArrayNode();
             for (JsonNode element : node) {
-                arrayNode.add(replaceTextInNode(element));
+                arrayNode.add(replaceTextInNode(element, memberMap));
             }
             return arrayNode;
 
@@ -274,7 +219,7 @@ public class LaunchService {
             ObjectNode objectNode = mapper.createObjectNode();
             for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
                 Map.Entry<String, JsonNode> entry = it.next();
-                objectNode.set(entry.getKey(), replaceTextInNode(entry.getValue()));
+                objectNode.set(entry.getKey(), replaceTextInNode(entry.getValue(), memberMap));
             }
             return objectNode;
         }
@@ -296,5 +241,30 @@ public class LaunchService {
                 .map(SequenceResponse::getRole)
                 .distinct()  // 중복 요소 제거
                 .collect(Collectors.toList());
+    }
+
+    void sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap){
+        // send to Admin user
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        log.info("send workflow launch alarm to admin");
+
+        slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
+        awsSMTPService.send("workflow is launched", "this is test", currentUser.getUserEmail());
+
+        log.info ("send workflow launch alarm to employee");
+
+        slackService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow);
+        awsSMTPService.send("workflow is launched", "this is test", launchedWorkflow.getMember().getEmail());
+
+        log.info ("send workflow launch alarm to related managers");
+
+        for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
+            Role role = entry.getKey();
+            Member member = entry.getValue();
+            slackService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, role, member);
+            awsSMTPService.send("workflow is launched", "this is test", member.getEmail());
+        }
+
     }
 }

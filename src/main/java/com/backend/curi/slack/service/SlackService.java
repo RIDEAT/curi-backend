@@ -1,9 +1,11 @@
 package com.backend.curi.slack.service;
 
+import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.ChannelRequest;
 import com.backend.curi.slack.controller.dto.InviteRequest;
@@ -13,6 +15,7 @@ import com.backend.curi.slack.repository.SlackMemberRepository;
 import com.backend.curi.slack.repository.SlackRepository;
 import com.backend.curi.slack.repository.entity.SlackInfo;
 import com.backend.curi.slack.repository.entity.SlackMemberInfo;
+import com.backend.curi.workspace.repository.entity.Role;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -30,6 +33,8 @@ import com.slack.api.model.block.composition.MarkdownTextObject;
 import com.slack.api.model.block.element.BlockElement;
 import com.slack.api.model.block.element.ImageElement;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +56,8 @@ import static org.apache.http.client.utils.DateUtils.formatDate;
 @RequiredArgsConstructor
 public class SlackService {
 
+    private static Logger log = LoggerFactory.getLogger(SlackService.class);
+
     @Value("${slack.client-id}")
     private String clientId;
 
@@ -67,7 +74,8 @@ public class SlackService {
     private final SlackRepository slackRepository;
     private final SlackMemberRepository slackMemberRepository;
 
-    public OAuthV2AccessResponse oauthMember (OAuthRequest oAuthRequest, Long memberId) throws SlackApiException, IOException {
+    public OAuthV2AccessResponse oauthMember (OAuthRequest oAuthRequest, Long memberId) {
+
 
 
         if (!slackMemberRepository.findByMemberId(memberId).isEmpty()) {
@@ -85,22 +93,36 @@ public class SlackService {
                 .build();
 
         MethodsClient methods = slack.methods(botToken);
-        OAuthV2AccessResponse response = methods.oauthV2Access(request);
+        try {
+            OAuthV2AccessResponse response = methods.oauthV2Access(request);
 
-        if (response.isOk()) {
-            SlackMemberInfo slackMemberInfo = new SlackMemberInfo();
-            slackMemberInfo.setMemberId(memberId);
-            slackMemberInfo.setMemberSlackId(response.getAuthedUser().getId());
-            slackMemberInfo.setAccessToken(response.getAccessToken());
-            slackMemberRepository.save(slackMemberInfo);
+            if (response.isOk()) {
+                SlackMemberInfo slackMemberInfo = new SlackMemberInfo();
+                slackMemberInfo.setMemberId(memberId);
+                slackMemberInfo.setMemberSlackId(response.getAuthedUser().getId());
+                slackMemberInfo.setAccessToken(response.getAccessToken());
+                slackMemberRepository.save(slackMemberInfo);
 
-            SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-            slackMessageRequest.setTexts("큐리알람이 추가되었습니다."); // needs to change
+                SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
+                slackMessageRequest.setTexts("온버드 알람이 추가되었습니다."); // needs to change
 
-            sendMessageToMember(slackMessageRequest, memberId);
+                sendMessageToMember(slackMessageRequest, memberId);
+            }
+
+            return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+
+        } catch (SlackApiException e){
+            log.error(e.getMessage());
+
+        } catch (Exception e){
+            log.error(e.getMessage());
         }
 
-        return response;
+        OAuthV2AccessResponse oAuthV2AccessResponse = new OAuthV2AccessResponse();
+        oAuthV2AccessResponse.setOk(false);
+        return oAuthV2AccessResponse;
     }
     public OAuthV2AccessResponse oauth (OAuthRequest oAuthRequest) throws SlackApiException, IOException {
 
@@ -120,7 +142,7 @@ public class SlackService {
 
             slackRepository.save(slackInfo);
 
-            ChannelRequest channelRequest = new ChannelRequest("curi-alarm");
+            ChannelRequest channelRequest = new ChannelRequest("onbird-alarm");
             var res = createChannel(channelRequest);
 
             InviteRequest inviteRequest = new InviteRequest(res.getChannel().getId(),response.getAuthedUser().getId());
@@ -131,7 +153,7 @@ public class SlackService {
             slackRepository.save(slackInfo);
 
             SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-            slackMessageRequest.setTexts("큐리알람이 추가되었습니다.");
+            slackMessageRequest.setTexts("온버드 알람이 추가되었습니다.");
             sendMessage(slackMessageRequest);
 
         }
@@ -162,58 +184,64 @@ public class SlackService {
     }
 
     public ChatPostMessageResponse sendMessage (SlackMessageRequest slackMessageRequest){
-
-        ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
-                .blocksAsString(slackMessageRequest.getBlocksAsString())
-                .text("default")
-                .build();
-
-
-        String accessToken = getAccessToken();
-        MethodsClient methods = slack.methods(accessToken);
-
-
         try {
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                    .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
+                    .blocksAsString(slackMessageRequest.getBlocksAsString())
+                    .text("default")
+                    .build();
+
+
+            String accessToken = getAccessToken();
+            MethodsClient methods = slack.methods(accessToken);
             var response = methods.chatPostMessage(request);
 
-            //ChatPostMessageResponse response = methods.chatPostMessage(request);
-            //System.out.println(response.getError());
             return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+
         } catch (SlackApiException e){
+            log.error(e.getMessage());
 
         } catch (Exception e){
-
+            log.error(e.getMessage());
         }
 
-        throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
-
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     public ChatPostMessageResponse sendMessageToMember (SlackMessageRequest slackMessageRequest, Long memberId){
-        SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(()->new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
-        String accessToken = slackMemberInfo.getAccessToken();
 
-        ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                .channel(slackMemberInfo.getMemberSlackId()) // Use a channel ID `C1234567` is preferable
-                .text(slackMessageRequest.getTexts())
-                .build();
-
-
-        MethodsClient methods = slack.methods(accessToken);
         try {
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(()->new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                    .channel(slackMemberInfo.getMemberSlackId()) // Use a channel ID `C1234567` is preferable
+                    .text(slackMessageRequest.getTexts())
+                    .build();
+
+
+            MethodsClient methods = slack.methods(accessToken);
             var response = methods.chatPostMessage(request);
 
-            //ChatPostMessageResponse response = methods.chatPostMessage(request);
-            //System.out.println(response.getError());
             return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+
         } catch (SlackApiException e){
+            log.info(e.getMessage());
 
         } catch (Exception e){
+            log.error(e.getMessage());
 
         }
 
-        throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
 
     }
 
@@ -221,30 +249,95 @@ public class SlackService {
     public ChatPostMessageResponse sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow){
 
 
-        String accessToken = getAccessToken();
-        MethodsClient methods = slack.methods(accessToken);
-
-
         try {
+            String accessToken = getAccessToken();
+            MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(getAlarmChannelId())
                     .blocks(buildBlocks(launchedWorkflow))
             );
 
             return response;
+        } catch (CuriException e){
+            log.error(e.getMessage());
+
+
         } catch (SlackApiException e){
+            log.error(e.getMessage());
 
         } catch (Exception e){
-
+            log.error(e.getMessage());
         }
 
-        throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.NETWORK_ERROR);
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+    }
 
+    public ChatPostMessageResponse sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow) {
+        try {
+            Long memberId = launchedWorkflow.getMember().getId();
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(()->new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+            MethodsClient methods = slack.methods(accessToken);
+            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
+                    .channel(slackMemberInfo.getMemberSlackId())
+                    .blocks(buildBlocks(launchedWorkflow))
+            );
+
+            return response;
+        } catch (CuriException e){
+            log.error(e.getMessage());
+
+
+        } catch (SlackApiException e){
+            log.error(e.getMessage());
+
+        } catch (Exception e){
+            log.error(e.getMessage());
+
+
+        }
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+
+    }
+    public ChatPostMessageResponse sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Role role, Member member) {
+
+        try {
+            Long memberId = member.getId();
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(()->new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+            MethodsClient methods = slack.methods(accessToken);
+            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
+                    .channel(slackMemberInfo.getMemberSlackId())
+                    .blocks(buildManagerBlocks(launchedWorkflow, role,  member))
+                    .text("default")
+            );
+
+            return response;
+        } catch (CuriException e){
+            log.error(e.getMessage());
+
+
+        } catch (SlackApiException e){
+            log.error(e.getMessage());
+
+        } catch (Exception e){
+            log.error(e.getMessage());
+
+
+        }
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     String getAccessToken (){
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String accessToken = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getAccessToken();
+
         return accessToken;
     }
 
@@ -285,5 +378,49 @@ public class SlackService {
     }
 
 
+    private List<LayoutBlock> buildManagerBlocks (LaunchedWorkflow launchedWorkflow, Role role, Member manager) {
+        List<LayoutBlock> blocks = new ArrayList<>();
+        Member employee = launchedWorkflow.getMember();
+
+        String message = "*안녕하세요. " + manager.getName() + "님 ! 당신은 " +
+                employee.getName() + "님의 " + role.getName() + " 입니다. *\n" +
+                employee.getName() + "님의 성공적인 온보딩을 함께 해주세요!\n";
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(message).build())
+                .build());
+
+        blocks.add(DividerBlock.builder().build());
+
+        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getEmployee().getStartDate();
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(employeeInfoHeader).build())
+                .build());
+
+        blocks.add(DividerBlock.builder().build());
+
+        String sequenceHeader = "*"+manager.getName() + "님이 "+ employee.getName() +"님의 " + role.getName() +"으로서 참여할 활동*\n";
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(sequenceHeader).build())
+                .build());
+
+        for (LaunchedSequence sequence: launchedWorkflow.getLaunchedSequences()) {
+            if (sequence.getMember().equals(manager)) {
+                blocks.add(SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getName()).build()).build());
+                blocks.add(SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getApplyDate().toString()).build()).build());
+
+            }
+        }
+
+        return blocks;
+    }
+
+
+    private SectionBlock getSequenceBlock (LaunchedSequence sequence){
+        return SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getName()).build()).build();
+
+    }
 
 }

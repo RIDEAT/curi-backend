@@ -2,6 +2,10 @@ package com.backend.curi.smtp;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.workflow.service.LaunchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class AwsSMTPService {
     private final AmazonSimpleEmailService amazonSimpleEmailService;
+    private static Logger log = LoggerFactory.getLogger(AwsSMTPService.class);
+
 
     private final String from;
 
@@ -25,8 +31,10 @@ public class AwsSMTPService {
 
         var sendEmailRequest = createSendEmailRequest(subject, content, to);
 
+        log.info ("send mail to {}", to);
         amazonSimpleEmailService.sendEmail(sendEmailRequest);
     }
+
 
     private SendEmailRequest createSendEmailRequest(String subject, String content, String... to) {
         return new SendEmailRequest()
