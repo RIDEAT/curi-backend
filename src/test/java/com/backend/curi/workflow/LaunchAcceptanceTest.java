@@ -10,6 +10,7 @@ import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.OAuthRequest;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
@@ -26,6 +27,7 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
@@ -78,6 +81,10 @@ public class LaunchAcceptanceTest {
 
     @Autowired
     private ModuleService moduleService;
+
+    @Autowired
+    private SlackService slackService;
+
     @LocalServerPort
     public int port;
 
@@ -103,6 +110,7 @@ public class LaunchAcceptanceTest {
 
     private Long templateModuleId;
     private Long moduleInSequenceId;
+
 
     @BeforeEach
     public void setup() {
@@ -144,6 +152,7 @@ public class LaunchAcceptanceTest {
 
         var moduleInSequence = moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
+
     }
 
     @DisplayName("워크플로우 launch 전 필요한 role 정보를 받을 수 있다.")
@@ -153,10 +162,13 @@ public class LaunchAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-/*    @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
+    /*
+    @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
-       ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
+        slackService.oauthMember( new OAuthRequest("5761031201206.5791559442866.033041a31bd037a0500e297788add2189ec6da28fa436b4951a812ea036ca0d8"),hrManagerId);
+
+        ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
@@ -340,7 +352,7 @@ public class LaunchAcceptanceTest {
     private EmployeeRequest getEmployeeRequest(){
         EmployeeRequest employeeRequest = new EmployeeRequest();
         employeeRequest.setName("terry cho");
-        employeeRequest.setEmail("terry@gmail.com");
+        employeeRequest.setEmail("8514199@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
@@ -375,7 +387,7 @@ public class LaunchAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
+        managerRequest.setEmail("8514199@naver.com");
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
@@ -385,7 +397,7 @@ public class LaunchAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("HR");
         managerRequest.setName("hanna");
-        managerRequest.setEmail("hanna@gmail.com");
+        managerRequest.setEmail("rideat63@gmail.com");
         managerRequest.setPhoneNum("010-1111-2222");
         return managerRequest;
     }

@@ -71,7 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Cookie[] cookies = request.getCookies();
 
-            if(constants.getENV().equals("local")) {
+            if(constants.getENV().equals("local") || constants.getENV().equals("data-local")) {
                 pretendTobeAuthorized(request, response, filterChain);
             }
             else {
@@ -167,15 +167,15 @@ public class JwtFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Extract userId
-        String userId = "floN3PYjxbQ9E3MQJmiHhwDxBwb2";
+        String userId = "NXHqERiqKVZ9MxfPvLgBNctz1el2";
         //String userEmail = jsonNode.get("userEmail").asText();
 
-        userService.dbStore(userId, "mock123@gmail.com");
+        userService.dbStore(userId, "8514199@gmail.com");
 
 
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
-        currentUser.setUserEmail("mock123@gmail.com");
+        currentUser.setUserEmail("8514199@gmail.com");
         //currentUser.setUserEmail(getUserEmail(userId));
         currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
