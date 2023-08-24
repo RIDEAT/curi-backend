@@ -13,12 +13,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class FrontofficeResponse {
+public class FrontOfficeResponse {
     private UUID id;
     private LaunchedSequenceResponse launchedSequenceResponse;
 
-    public static FrontofficeResponse of (FrontOffice frontoffice){
-        return new FrontofficeResponse(frontoffice.getId(), LaunchedSequenceResponse.of(frontoffice.getLaunchedSequence()));
+    public static FrontOfficeResponse of (FrontOffice frontoffice){
+        return new FrontOfficeResponse(frontoffice.getId(), LaunchedSequenceResponse.of(frontoffice.getLaunchedSequence()));
     }
 
 }
