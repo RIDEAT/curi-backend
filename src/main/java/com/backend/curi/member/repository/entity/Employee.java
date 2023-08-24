@@ -5,10 +5,7 @@ import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
@@ -29,6 +26,7 @@ public class Employee extends BaseEntity {
     @OneToOne(mappedBy = "employee")
     private Member member;
 
+    @Setter
     private LocalDate startDate;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)

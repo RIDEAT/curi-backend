@@ -42,29 +42,56 @@ public class MemberService {
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
 
-    public MemberResponse getMember(CurrentUser currentUser, Long memberId) {
-        var member = getMemberEntity(memberId, currentUser);
-        return MemberResponse.of(member);
-    }
 
-    public MemberResponse deleteMember(CurrentUser currentUser, Long memberId) {
-        var member = getMemberEntity(memberId, currentUser);
+    public MemberResponse deleteMember(Long memberId) {
+        var member = getMember(memberId);
         memberRepository.delete(member);
 
         return MemberResponse.of(member);
     }
 
     @Transactional
-    public MemberResponse modifyMember(CurrentUser currentUser, Long memberId, MemberRequest request) {
-        var member = getMemberEntity(memberId, currentUser);
+    public MemberResponse modifyMember(Long memberId, MemberRequest request) {
+        var member = getMember(memberId);
         member.modifyInformation(request);
-        modifyEmployeeManager(currentUser, member, request);
+        modifyEmployeeManager(member, request);
+        return MemberResponse.of(member);
+    }
+
+    @Transactional
+    public MemberResponse updateEmployee(Long memberId, EmployeeUpdateRequest request) {
+        var member = getMember(memberId);
+        if(request.getName() != null)
+            member.setName(request.getName());
+        if(request.getEmail() != null)
+            member.setEmail(request.getEmail());
+        if(request.getPhoneNum() != null)
+            member.setPhoneNum(request.getPhoneNum());
+        if(request.getDepartment() != null)
+            member.setDepartment(request.getDepartment());
+        if(request.getStartDate() != null)
+            member.setStartDate(LocalDate.parse(request.getStartDate()));
+        if(request.getManagers() != null)
+            setEmployeeManager(member, request.getManagers());
+        return MemberResponse.of(member);
+    }
+
+    @Transactional
+    public MemberResponse updateManager(Long memberId, ManagerUpdateRequest request) {
+        var member = getMember(memberId);
+        if(request.getName() != null)
+            member.setName(request.getName());
+        if(request.getEmail() != null)
+            member.setEmail(request.getEmail());
+        if(request.getPhoneNum() != null)
+            member.setPhoneNum(request.getPhoneNum());
+        if(request.getDepartment() != null)
+            member.setDepartment(request.getDepartment());
         return MemberResponse.of(member);
     }
 
 
-
-    public List<MemberResponse> getMemberList(CurrentUser currentUser, Long workspaceId, MemberType memberType) {
+    public List<MemberResponse> getMemberList(Long workspaceId, MemberType memberType) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var memberList = memberRepository.findAllByWorkspaceAndType(workspace, memberType);
         var responseList = memberList.stream()
@@ -74,16 +101,13 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse createMember(CurrentUser currentUser, MemberType type, MemberRequest request) {
+    public MemberResponse createMember(MemberType type, MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
-
-
         var memberBuilder = Member.of(request).type(type).workspace(workspace);
         setMemberDetail(memberBuilder, type, request);
         var member = memberBuilder.build();
         memberRepository.save(member);
-        setEmployeeManager(currentUser, member, request);
-
+        setEmployeeManager(member, request);
         return MemberResponse.of(member);
     }
 
@@ -100,30 +124,25 @@ public class MemberService {
         }
     }
 
-    public Member getMemberEntity(Long id, CurrentUser currentUser) {
-        var member = memberRepository.findById(id)
+    public Member getMember(Long id) {
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));
-        var workspace = member.getWorkspace();
-
-
-        return member;
     }
 
 
     @Transactional
-    public void setEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
-        if(member.getType() != MemberType.employee){
+    public void setEmployeeManager(Member member, MemberRequest request) {
+        if (member.getType() != MemberType.employee) {
             return;
         }
-        var req = (EmployeeRequest)request;
-        var managerList = req.getManagers();
-        var workspace = member.getWorkspace();
+        setEmployeeManager(member, ((EmployeeRequest) request).getManagers());
+        var req = (EmployeeRequest) request;
+    }
 
-        for(var info : managerList){
-            var manager = getMemberEntity(info.getId(), currentUser);
+    private void setEmployeeManager(Member member, List<EmployeeManagerDetail> managers){
+        for(var info : managers){
+            var manager = getMember(info.getId());
             var role = roleService.getRoleEntity(info.getRoleId());
-            //var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
-            //roleRepository.save(role);
 
             if(member.equals(manager)){
                 throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
@@ -145,7 +164,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void modifyEmployeeManager(CurrentUser currentUser, Member member, MemberRequest request) {
+    public void modifyEmployeeManager(Member member, MemberRequest request) {
         if(member.getType() != MemberType.employee){
             return;
         }
@@ -153,7 +172,7 @@ public class MemberService {
         var managerList = req.getManagers();
         var workspace = member.getWorkspace();
         for(var info : managerList) {
-            var manager = getMemberEntity(info.getId(), currentUser);
+            var manager = getMember(info.getId());
             var role = roleService.getRoleEntity(info.getRoleId());
 
            // var role = Role.builder().name(info.getRoleName()).workspace(workspace).build();
@@ -190,8 +209,6 @@ public class MemberService {
 
     @Transactional
     public boolean deleteEmployeeManager(){
-        CurrentUser currentUser = new CurrentUser();
-
         Long employeeManagerId = 1L;
         Long employeeId = 1L;
 
@@ -199,7 +216,7 @@ public class MemberService {
         var employManager = employeeManagerRepository.findById(employeeManagerId)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.NOT_ALLOWED_PERMISSION_ERROR));
 
-        var employee = getMemberEntity(employeeId, currentUser);
+        var employee = getMember(employeeId);
 
         if(!employManager.getEmployee().equals(employee)){
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_REQUEST_ERROR);
@@ -212,12 +229,11 @@ public class MemberService {
 
     public Member getManagerByEmployeeAndRole (Member member, Role role){
         var employeeManagers = member.getEmployeeManagers();
-        var managers = employeeManagers.stream().filter(employeeManager -> employeeManager.getRole().equals(role)).map(EmployeeManager::getManager).collect(Collectors.toList());
-
-        if (managers.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_MEMBER_NOT_EXISTS);
-        var manager = managers.get(0).getMember();
-
-        return manager;
+        var manager = employeeManagers.stream()
+                .filter(employeeManager -> employeeManager.getRole().equals(role))
+                .map(EmployeeManager::getManager).findFirst();
+        if (manager.isEmpty()) throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_MEMBER_NOT_EXISTS);
+        return manager.get().getMember();
     }
     public Employee getEmployeeById(Long employeeId){
        return employeeRepository.findById(employeeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MEMBER_NOT_EXISTS));

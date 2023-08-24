@@ -23,52 +23,59 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/members")
-    public ResponseEntity<List<MemberResponse>> getMemberList (@PathVariable("workspaceId") Long workspaceId, @RequestParam("type")MemberType memberType, Authentication authentication){
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.getMemberList(currentUser, workspaceId, memberType);
-
+    public ResponseEntity<List<MemberResponse>> getMemberList (@PathVariable("workspaceId") Long workspaceId, @RequestParam("type")MemberType memberType){
+        var response = memberService.getMemberList(workspaceId, memberType);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/members/manager")
-    public ResponseEntity<MemberResponse> createManager(@RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
-                                                         Authentication authentication) {
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.createMember(currentUser, MemberType.manager, request);
+    public ResponseEntity<MemberResponse> createManager(@PathVariable("workspaceId") Long workspaceId,
+            @RequestBody @Validated(ValidationSequence.class) ManagerRequest request){
+        var response = memberService.createMember(MemberType.manager, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/members/manager/{mid}")
-    public ResponseEntity<MemberResponse> modifyManager(@PathVariable("mid") Long memberId,
-                                                        @RequestBody @Validated(ValidationSequence.class) ManagerRequest request,
-                                                        Authentication authentication) {
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.modifyMember(currentUser, memberId, request);
+    public ResponseEntity<MemberResponse> modifyManager(@PathVariable("workspaceId") Long workspaceId,
+                                                        @PathVariable("mid") Long memberId,
+                                                        @RequestBody @Validated(ValidationSequence.class) ManagerRequest request) {
+        var response = memberService.modifyMember(memberId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PatchMapping("/members/manager/{mid}")
+    public ResponseEntity<MemberResponse> updateManager(@PathVariable("workspaceId") Long workspaceId,
+                                                        @PathVariable("mid") Long memberId,
+                                                         @RequestBody @Validated(ValidationSequence.class) ManagerUpdateRequest request) {
+        var response = memberService.updateManager(memberId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-
     @PostMapping("/members/employee")
-    public ResponseEntity<MemberResponse> createEmployee(@RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
-                                                       Authentication authentication) {
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.createMember(currentUser, MemberType.employee , request);
+    public ResponseEntity<MemberResponse> createEmployee(@PathVariable("workspaceId") Long workspaceId,
+                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request) {
+        var response = memberService.createMember(MemberType.employee , request);
         return ResponseEntity. status(HttpStatus.CREATED).body(response);
     }
     @PutMapping("/members/employee/{mid}")
-    public ResponseEntity<MemberResponse> modifyEmployee(@PathVariable("mid") Long memberId,
-                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request,
-                                                         Authentication authentication) {
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.modifyMember(currentUser, memberId, request);
+    public ResponseEntity<MemberResponse> modifyEmployee(@PathVariable("workspaceId") Long workspaceId,
+                                                         @PathVariable("mid") Long memberId,
+                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request) {
+        var response = memberService.modifyMember(memberId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/members/employee/{mid}")
+    public ResponseEntity<MemberResponse> updateEmployee(@PathVariable("workspaceId") Long workspaceId,
+                                                         @PathVariable("mid") Long memberId,
+                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeUpdateRequest request) {
+        var response = memberService.updateEmployee(memberId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/members/{mid}")
-    public ResponseEntity<MemberResponse> deleteMember(@PathVariable("mid") Long memberId,
-                                                         Authentication authentication) {
-        var currentUser = (CurrentUser) authentication.getPrincipal();
-        var response = memberService.deleteMember(currentUser, memberId);
+    public ResponseEntity<MemberResponse> deleteMember(@PathVariable("workspaceId") Long workspaceId,
+                                                       @PathVariable("mid") Long memberId) {
+        var response = memberService.deleteMember(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
