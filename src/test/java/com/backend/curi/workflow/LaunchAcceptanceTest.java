@@ -171,7 +171,7 @@ public class LaunchAcceptanceTest {
     @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
-        slackService.oauthMember( new OAuthRequest("5761031201206.5791559442866.033041a31bd037a0500e297788add2189ec6da28fa436b4951a812ea036ca0d8"),hrManagerId);
+        slackService.oauthMember( new OAuthRequest("5761031201206.5794310066130.504f91ee78fcc2d24870a44756a29bf54526d85d5b266a14c4521b4aa42f5712"),hrManagerId);
 
         ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
