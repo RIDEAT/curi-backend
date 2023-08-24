@@ -6,12 +6,15 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.service.UserService;
+import com.backend.curi.workflow.service.WorkflowService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +37,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static Logger log = LoggerFactory.getLogger(JwtFilter.class);
     private final UserService userService;
     private final Constants constants;
     // 권한을 부여.
@@ -101,7 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 CurrentUser currentUser = new CurrentUser();
                 currentUser.setUserId(userId);
-//          currentUser.setUserEmail(getUserEmail(userId));
+                currentUser.setUserEmail(getUserEmail(userId));
                 currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
@@ -163,7 +167,12 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String getUserEmail(String userId){
-        return userService.getEmailByUserId(userId);
+        try{
+            return userService.getEmailByUserId(userId);
+        } catch (CuriException e){
+            log.info("user에게 할당된 이메일이 없습니다.");
+            return "rideat63@gmail.com";
+        }
     }
 
     private void pretendTobeAuthorized (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
