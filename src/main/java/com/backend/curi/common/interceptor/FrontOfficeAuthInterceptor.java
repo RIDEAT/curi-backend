@@ -19,9 +19,7 @@ public class FrontOfficeAuthInterceptor implements HandlerInterceptor {
     private final FrontOfficeService frontofficeService;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long workspaceId = Extractor.extractLongFromUrl(request, "workspaces");
-        Long launchedmoduleId = Extractor.extractLongFromUrl(request, "modules");
-        UUID frontOfficeId = Extractor.extractUUIDFromUrl(request, "frontoffices");
+        UUID frontOfficeId = Extractor.extractUUIDFromUrl(request, "front-offices");
         UUID accessToken = getAccessToken(request);
 
         frontofficeService.checkAuth(frontOfficeId, accessToken);

@@ -60,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
 
-            if (request.getRequestURI().startsWith("/frontoffices") ){
+            if (request.getRequestURI().startsWith("/front-offices") ){
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -71,11 +71,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
-
-            if (request.getRequestURI().startsWith("/slack/oauth-member") ){
-                filterChain.doFilter(request, response);
-                return;
-            }
 
 
 

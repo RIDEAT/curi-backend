@@ -35,7 +35,7 @@ public class AuthenticationConfig{
                 .authorizeRequests()
                 .antMatchers("h2-console").permitAll()
                 .antMatchers("/backend-api-docs/**", "/swagger-ui/**").permitAll()
-                .antMatchers("frontoffices").permitAll()
+                .antMatchers("front-offices").permitAll()
                 .antMatchers("*").authenticated()
                 .and()
                 .sessionManagement()

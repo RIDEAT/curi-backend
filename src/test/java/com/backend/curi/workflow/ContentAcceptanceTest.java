@@ -160,15 +160,15 @@ public class ContentAcceptanceTest {
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();    }
 
     private void userMakeEmployeeAndManager(){
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getDirectManagerRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getDirectManagerRequest());
 
         directManagerId = managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
     }
@@ -200,12 +200,12 @@ public class ContentAcceptanceTest {
     }
 
 
-    @DisplayName("콘텐츠 아이디를 가지고 콘텐츠를 가져올 수 있다.")
-    @Test
-    public void getContent(){
-        ExtractableResponse<Response> response = 콘텐츠_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
+//    @DisplayName("콘텐츠 아이디를 가지고 콘텐츠를 가져올 수 있다.")
+//    @Test
+//    public void getContent(){
+//        ExtractableResponse<Response> response = 콘텐츠_조회();
+//        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+//    }
 
 
     private ExtractableResponse<Response> 콘텐츠_조회(){

@@ -106,11 +106,11 @@ public class ModuleAcceptanceTest {
         workspaceId2 = workspaceResponse2.getId();
         defaultRoleId = workspaceResponse.getRoles().get(1).getId();
 
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
 
         managerId = managerResponse.getId();
 
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 

@@ -18,8 +18,5 @@ public class SlackMessageRequest {
     @NotNull
     String texts;
 
-    String blocksAsString;
-
-
 }
 

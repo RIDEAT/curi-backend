@@ -5,10 +5,7 @@ import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -31,12 +28,16 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "workspaceId")
     private Workspace workspace;
 
+    @Setter
     private String name;
 
+    @Setter
     private String email;
 
+    @Setter
     private String phoneNum;
 
+    @Setter
     private String department;
 
     @Enumerated(EnumType.STRING)
@@ -81,6 +82,11 @@ public class Member extends BaseEntity {
         } else {
             this.manager.modify(request);
         }
+    }
+
+    public void setStartDate(LocalDate startDate){
+        if(type == MemberType.employee)
+            getEmployee().setStartDate(startDate);
     }
 
     public List<EmployeeManager> getEmployeeManagers() {

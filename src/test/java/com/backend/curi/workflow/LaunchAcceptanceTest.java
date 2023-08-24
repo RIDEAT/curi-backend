@@ -4,6 +4,7 @@ package com.backend.curi.workflow;
 import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.EmployeeRequest;
 import com.backend.curi.member.controller.dto.ManagerRequest;
@@ -16,6 +17,7 @@ import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
+import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.ModuleService;
 import com.backend.curi.workflow.service.SequenceService;
 import com.backend.curi.workflow.service.WorkflowService;
@@ -85,6 +87,9 @@ public class LaunchAcceptanceTest {
     @Autowired
     private SlackService slackService;
 
+    @Autowired
+    private LaunchService launchService;
+
     @LocalServerPort
     public int port;
 
@@ -131,15 +136,15 @@ public class LaunchAcceptanceTest {
         directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
 
         directManagerId= managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 
@@ -170,6 +175,10 @@ public class LaunchAcceptanceTest {
 
         ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        LaunchedWorkflowResponse launchedWorkflowResponse = response.as(LaunchedWorkflowResponse.class);
+
+        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequences().get(0).getId());
     }
 /*
     @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
