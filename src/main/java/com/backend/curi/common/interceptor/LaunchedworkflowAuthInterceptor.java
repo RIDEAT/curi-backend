@@ -19,8 +19,8 @@ public class LaunchedworkflowAuthInterceptor implements HandlerInterceptor {
     private final LaunchedWorkflowService launchedWorkflowService;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long workspaceId = Extractor.extractFromUrl(request, "workspaces");
-        Long launchedworkflowId = Extractor.extractFromUrl(request, "launchedworkflows");
+        Long workspaceId = Extractor.extractLongFromUrl(request, "workspaces");
+        Long launchedworkflowId = Extractor.extractLongFromUrl(request, "launchedworkflows");
 
 
         var launchedWorkflow = launchedWorkflowService.getLaunchedWorkflowEntity(launchedworkflowId);

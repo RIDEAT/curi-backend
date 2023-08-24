@@ -4,6 +4,8 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.frontoffice.repository.entity.FrontOffice;
+import com.backend.curi.frontoffice.service.FrontOfficeService;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
@@ -64,6 +66,7 @@ public class LaunchService {
     private final WorkflowService workflowService;
     private final MemberService memberService;
     private final WorkspaceService workspaceService;
+    private final FrontOfficeService frontofficeService;
 
     private final AwsSMTPService awsSMTPService;
 
@@ -126,6 +129,8 @@ public class LaunchService {
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
         launchedWorkflow.getLaunchedSequences().add(launchedSequence);
 
+
+        frontofficeService.createFrontOffice(launchedSequence);
         var request = SequenceMessageRequest.builder()
                 .id(launchedSequence.getId())
                 .applyDate(launchedSequence.getUpdatedDate())

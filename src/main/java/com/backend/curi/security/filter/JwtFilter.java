@@ -40,7 +40,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-
             if (request.getRequestURI().startsWith("/h2-console")){
                 filterChain.doFilter(request, response);
                 return;
@@ -56,10 +55,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
+
+            if (request.getRequestURI().startsWith("/frontoffices") ){
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
             if (request.getRequestURI().startsWith("/health") ){
                 filterChain.doFilter(request, response);
                 return;
             }
+
 
             if (request.getRequestURI().startsWith("/slack/oauth-member") ){
                 filterChain.doFilter(request, response);
@@ -69,7 +76,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
 
-            Cookie[] cookies = request.getCookies();
 
             if(constants.getENV().equals("local") || constants.getENV().equals("data-local")) {
                 pretendTobeAuthorized(request, response, filterChain);

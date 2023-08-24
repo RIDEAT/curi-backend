@@ -20,8 +20,8 @@ public class WorkflowAuthInterceptor implements HandlerInterceptor {
     private final WorkflowService workflowService;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long workspaceId = Extractor.extractFromUrl(request, "workspaces");
-        Long workflowId = Extractor.extractFromUrl(request, "workflows");
+        Long workspaceId = Extractor.extractLongFromUrl(request, "workspaces");
+        Long workflowId = Extractor.extractLongFromUrl(request, "workflows");
 
         List<WorkflowResponse> workflowResponseList = workflowService.getWorkflows(workspaceId);
         boolean found = workflowResponseList.stream()
