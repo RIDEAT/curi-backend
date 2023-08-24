@@ -126,6 +126,7 @@ public class LaunchService {
         launchedWorkflow.getLaunchedSequences().add(launchedSequence);
 
         frontofficeService.createFrontOffice(launchedSequence);
+
         var request = SequenceMessageRequest.builder()
                 .id(launchedSequence.getId())
                 .applyDate(launchedSequence.getUpdatedDate())

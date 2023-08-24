@@ -60,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
 
-            if (request.getRequestURI().startsWith("/frontoffices") ){
+            if (request.getRequestURI().startsWith("/front-offices") ){
                 filterChain.doFilter(request, response);
                 return;
             }
