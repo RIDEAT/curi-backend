@@ -34,11 +34,8 @@ public class MessageService {
         awsSMTPService.send("할당된 시퀀스입니다. 아래에 접속하시면 됩니다.", "프론트 오피스 url: https://app.dev.onbird.team/front-offices/" + frontOffice.getId() +"\n접속 시 아래의 비밀번호를 입력하시면 됩니다.\n 비밀번호 : " + frontOffice.getAccessToken(), memberTo);
         //여기서 슬랙도 보내고 슬랙 연동이 안된경우 슬랙 연동 url 도 보내고
         log.info("슬랙 전송 to : {}",memberTo );
-        var sendResult = slackService.sendMessageToMember(new SlackMessageRequest("프론트 오피스로 접속하세요 url, password"), launchedSequence.getMember().getId());
-        if(!sendResult.isOk()){
-            log.info("슬랙 연동 전송 to : {}",memberTo );
-            awsSMTPService.send("slack 연동 시 시퀀스 정보를 slack으로 받을 수 있습니다. ", "아래의 링크에서 슬랙 연동하기\n" + "https://app.dev.onbird.team/front-offices/" + frontOffice.getId()+"/oauth", memberTo);
-        }
+        slackService.sendMessageToMember(new SlackMessageRequest("프론트 오피스로 접속하세요 url, password"), launchedSequence.getMember().getId());
+
     }
 
     public void sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap){
@@ -47,11 +44,8 @@ public class MessageService {
 
         log.info("send workflow launch alarm to admin");
 
-        var sendResult = slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-        if(!sendResult.isOk()){
-            log.info("슬랙 연동 전송 to : {}", currentUser.getUserEmail());
-            awsSMTPService.send("slack 연동 시 시퀀스 정보를 slack으로 받을 수 있습니다. ", "아래의 링크에서 슬랙 연동하기\\n\" +https://app.dev.onbird.team/slack-oauth", currentUser.getUserEmail());
-        }
+        slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
+
 
         awsSMTPService.send("워크플로우가 런치되었습니다.", "워크플로우가 런치되었습니다.", currentUser.getUserEmail());
 
