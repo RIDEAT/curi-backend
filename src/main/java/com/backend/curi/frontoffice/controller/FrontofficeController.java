@@ -1,8 +1,7 @@
 package com.backend.curi.frontoffice.controller;
 
 import com.backend.curi.frontoffice.controller.dto.FrontofficeResponse;
-import com.backend.curi.frontoffice.service.FrontofficeService;
-import com.backend.curi.launched.controller.dto.LaunchedSequenceResponse;
+import com.backend.curi.frontoffice.service.FrontOfficeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +16,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FrontofficeController {
 
-    private final FrontofficeService frontofficeService;
+    private final FrontOfficeService frontofficeService;
 
     @GetMapping("/{frontofficeId}")
     public ResponseEntity<FrontofficeResponse> getLaunchedsequence(@PathVariable UUID frontofficeId){
-        FrontofficeResponse frontofficeResponse =  frontofficeService.getFrontoffice(frontofficeId);
+        FrontofficeResponse frontofficeResponse =  frontofficeService.getFrontOffice(frontofficeId);
         return ResponseEntity.ok(frontofficeResponse);
     }
 

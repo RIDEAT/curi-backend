@@ -2,7 +2,7 @@ package com.backend.curi.common.interceptor;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.frontoffice.service.FrontofficeService;
+import com.backend.curi.frontoffice.service.FrontOfficeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,16 +15,16 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class FrontofficeAuthInterceptor implements HandlerInterceptor {
-    private final FrontofficeService frontofficeService;
+public class FrontOfficeAuthInterceptor implements HandlerInterceptor {
+    private final FrontOfficeService frontofficeService;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Long workspaceId = Extractor.extractLongFromUrl(request, "workspaces");
         Long launchedmoduleId = Extractor.extractLongFromUrl(request, "modules");
-        UUID frontofficeId = Extractor.extractUUIDFromUrl(request, "frontoffices");
+        UUID frontOfficeId = Extractor.extractUUIDFromUrl(request, "frontoffices");
         UUID accessToken = getAccessToken(request);
 
-        frontofficeService.checkAuth(frontofficeId, accessToken);
+        frontofficeService.checkAuth(frontOfficeId, accessToken);
 
         return true;
     }

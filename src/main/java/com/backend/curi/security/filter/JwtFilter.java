@@ -62,8 +62,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
 
-            Cookie[] cookies = request.getCookies();
-
             if (request.getRequestURI().startsWith("/health") ){
                 filterChain.doFilter(request, response);
                 return;
@@ -78,7 +76,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
 
-            Cookie[] cookies = request.getCookies();
 
             if(constants.getENV().equals("local") || constants.getENV().equals("data-local")) {
                 pretendTobeAuthorized(request, response, filterChain);

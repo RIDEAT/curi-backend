@@ -4,8 +4,8 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.frontoffice.repository.entity.Frontoffice;
-import com.backend.curi.frontoffice.service.FrontofficeService;
+import com.backend.curi.frontoffice.repository.entity.FrontOffice;
+import com.backend.curi.frontoffice.service.FrontOfficeService;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
@@ -66,7 +66,7 @@ public class LaunchService {
     private final WorkflowService workflowService;
     private final MemberService memberService;
     private final WorkspaceService workspaceService;
-    private final FrontofficeService frontofficeService;
+    private final FrontOfficeService frontofficeService;
 
     private final AwsSMTPService awsSMTPService;
 
@@ -121,19 +121,6 @@ public class LaunchService {
         Member assignedMember = memberMap.get(role);
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace);
 
-        var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace, dayOffset);
-
-
-        var sequenceModules = sequence.getSequenceModules();
-        for (var sequenceModule : sequenceModules) {
-            var module = sequenceModule.getModule();
-            var order = sequenceModule.getOrderNum();
-            launchModule(launchedSequence, module, workspace, Long.valueOf(order));
-        }
-
-        launchedSequenceService.saveLaunchedSequence(launchedSequence);
-        frontofficeService.createFrontoffice(launchedSequence);
-
         var modules = sequence.getModules();
         for (var module : modules) {
             launchModule(launchedSequence, module, workspace, memberMap);
@@ -143,6 +130,7 @@ public class LaunchService {
         launchedWorkflow.getLaunchedSequences().add(launchedSequence);
 
 
+        frontofficeService.createFrontOffice(launchedSequence);
         var request = SequenceMessageRequest.builder()
                 .id(launchedSequence.getId())
                 .applyDate(launchedSequence.getUpdatedDate())

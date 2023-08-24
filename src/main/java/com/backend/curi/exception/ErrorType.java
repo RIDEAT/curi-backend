@@ -40,7 +40,7 @@ public enum ErrorType {
 
 
     FRONTOFFICE_NOT_EXISTS("FRONTOFFICE-001", "존재하지 않는 프론트오피스입니다."),
-    FRONTOFFICE_UNAUTHORIZED ("FRONTOFFICE-002", "프론트오피스 접근권한이 없습니다.");
+    FRONTOFFICE_UNAUTHORIZED ("FRONTOFFICE-002", "프론트오피스 접근권한이 없습니다."),
 
     SLACK_ACCESS_TOKEN_NOT_EXISTS("SLACK-001", "슬랙의 어세스 토큰이 없습니다."),
     SLACK_MEMBER_NOT_AUTHORIZED("SLACK-002", "슬랙에 인증되지 않은 멤버입니다."),
