@@ -3,10 +3,7 @@ package com.backend.curi.workflow.repository.entity;
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.workflow.controller.dto.ModuleRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.bson.types.ObjectId;
 
 import javax.persistence.*;
@@ -22,9 +19,11 @@ public class Module extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Setter
     @Column(nullable = false)
     private String name;
 
+    @Setter
     Integer order;
 
     @Enumerated(EnumType.STRING)

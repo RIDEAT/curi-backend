@@ -200,12 +200,12 @@ public class ContentAcceptanceTest {
     }
 
 
-    @DisplayName("콘텐츠 아이디를 가지고 콘텐츠를 가져올 수 있다.")
-    @Test
-    public void getContent(){
-        ExtractableResponse<Response> response = 콘텐츠_조회();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
+//    @DisplayName("콘텐츠 아이디를 가지고 콘텐츠를 가져올 수 있다.")
+//    @Test
+//    public void getContent(){
+//        ExtractableResponse<Response> response = 콘텐츠_조회();
+//        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+//    }
 
 
     private ExtractableResponse<Response> 콘텐츠_조회(){

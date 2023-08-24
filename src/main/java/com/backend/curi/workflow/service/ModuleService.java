@@ -2,8 +2,8 @@ package com.backend.curi.workflow.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.workflow.controller.dto.ModuleRequest;
-import com.backend.curi.workflow.controller.dto.ModuleResponse;
+import com.backend.curi.workflow.controller.dto.*;
+import com.backend.curi.workflow.controller.dto.ContentUpdateRequest;
 import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.ModuleRepository;
 import com.backend.curi.workflow.repository.entity.*;
@@ -59,13 +59,16 @@ public class ModuleService {
     public Module modifyModule(Long moduleId, ModuleRequest request) {
         var module = getModuleEntity(moduleId);
         module.modify(request);
+        return module;
+    }
 
-        log.info("content id: {}", module.getContentId());
-
-        var content = contentRepository.findById(module.getContentId())
-                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
-        content.modify(request);
-
+    @Transactional
+    public Module updateModule(Long moduleId, ModuleUpdateRequest request) {
+        var module = getModuleEntity(moduleId);
+        if(request.getName()!=null)
+            module.setName(request.getName());
+        if(request.getOrder()!=null)
+            module.setOrder(request.getOrder());
         return module;
     }
 
@@ -79,5 +82,20 @@ public class ModuleService {
         log.info("module id: {}",moduleId );
         return moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS));
+    }
+
+    public ContentResponse getContent(Long moduleId){
+        var module = getModuleEntity(moduleId);
+        var content = contentRepository.findById(module.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
+        return ContentResponse.of(content);
+    }
+
+    @Transactional
+    public ContentResponse updateContent(Long moduleId, ContentUpdateRequest request){
+        var module = getModuleEntity(moduleId);
+        var content = contentRepository.findById(module.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
+        content.setContent(request.getContent());
+        contentRepository.save(content);
+        return ContentResponse.of(content);
     }
 }
