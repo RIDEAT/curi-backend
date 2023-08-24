@@ -72,11 +72,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
 
-            if (request.getRequestURI().startsWith("/slack/oauth-member") ){
-                filterChain.doFilter(request, response);
-                return;
-            }
-
 
 
 

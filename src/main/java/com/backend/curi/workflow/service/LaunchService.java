@@ -16,6 +16,7 @@ import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
+import com.backend.curi.message.service.MessageService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.smtp.AwsSMTPService;
@@ -67,8 +68,8 @@ public class LaunchService {
     private final MemberService memberService;
     private final WorkspaceService workspaceService;
     private final FrontOfficeService frontofficeService;
+    private final MessageService messageService;
 
-    private final AwsSMTPService awsSMTPService;
 
     private final ContentService contentService;
 
@@ -76,7 +77,6 @@ public class LaunchService {
 
     private final SchedulerOpenFeign schedulerOpenFeign;
 
-    private final SlackService slackService;
 
 
 
@@ -107,11 +107,7 @@ public class LaunchService {
         }
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
-
-
-        sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
-        //slackService.sendWorkflowLaunchedMessage(response);
-        //awsSMTPService.send("test", "this is test", launchedWorkflow.getMember().getEmail());
+        messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
         return response;
     }
@@ -128,7 +124,6 @@ public class LaunchService {
 
         launchedSequenceService.saveLaunchedSequence(launchedSequence);
         launchedWorkflow.getLaunchedSequences().add(launchedSequence);
-
 
         frontofficeService.createFrontOffice(launchedSequence);
         var request = SequenceMessageRequest.builder()
@@ -179,12 +174,9 @@ public class LaunchService {
         notification.setStatus(LaunchedStatus.IN_PROGRESS);
 
         var memberTo = launchedSequence.getMember().getEmail();
-        var contentsId = notification.getContentId();
-//        var contents = contentRepository.findById(contentsId)
-//                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
-        awsSMTPService.send("test", "this is test", memberTo);
+        var frontOffice = frontofficeService.getFrontOfficeByLaunchedSequenceId(launchedSequenceId);
 
-
+        messageService.sendLaunchedSequenceMessage(memberTo, frontOffice, launchedSequence);
 
         var response = schedulerOpenFeign.deleteMessage(launchedSequenceId);
         if (response.getStatusCode() != HttpStatus.NO_CONTENT)
@@ -248,28 +240,5 @@ public class LaunchService {
                 .collect(Collectors.toList());
     }
 
-    void sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap){
-        // send to Admin user
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        log.info("send workflow launch alarm to admin");
-
-        slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-        awsSMTPService.send("workflow is launched", "this is test", currentUser.getUserEmail());
-
-        log.info ("send workflow launch alarm to employee");
-
-        slackService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow);
-        awsSMTPService.send("workflow is launched", "this is test", launchedWorkflow.getMember().getEmail());
-
-        log.info ("send workflow launch alarm to related managers");
-
-        for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
-            Role role = entry.getKey();
-            Member member = entry.getValue();
-            slackService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, role, member);
-            awsSMTPService.send("workflow is launched", "this is test", member.getEmail());
-        }
-
-    }
 }

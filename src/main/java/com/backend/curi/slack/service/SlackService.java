@@ -187,7 +187,7 @@ public class SlackService {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(getAlarmChannelId()) // Use a channel ID `C1234567` is preferable
-                    .blocksAsString(slackMessageRequest.getBlocksAsString())
+                    .blocksAsString(slackMessageRequest.getTexts())
                     .text("default")
                     .build();
 
@@ -333,6 +333,7 @@ public class SlackService {
         chatPostMessageResponse.setOk(false);
         return chatPostMessageResponse;
     }
+
 
     String getAccessToken (){
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
