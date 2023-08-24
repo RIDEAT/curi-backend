@@ -3,6 +3,7 @@ package com.backend.curi.workflow.service;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.workflow.controller.dto.*;
+import com.backend.curi.workflow.controller.dto.ContentUpdateRequest;
 import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.ModuleRepository;
 import com.backend.curi.workflow.repository.entity.*;
@@ -89,6 +90,7 @@ public class ModuleService {
         return ContentResponse.of(content);
     }
 
+    @Transactional
     public ContentResponse updateContent(Long moduleId, ContentUpdateRequest request){
         var module = getModuleEntity(moduleId);
         var content = contentRepository.findById(module.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));

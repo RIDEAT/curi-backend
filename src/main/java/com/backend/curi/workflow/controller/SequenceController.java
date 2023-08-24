@@ -3,6 +3,7 @@ package com.backend.curi.workflow.controller;
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.workflow.controller.dto.SequenceRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
+import com.backend.curi.workflow.controller.dto.SequenceUpdateRequest;
 import com.backend.curi.workflow.service.SequenceService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -47,4 +48,10 @@ public class SequenceController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PatchMapping("workflows/{workflowId}/sequences/{sequenceId}")
+    public ResponseEntity<SequenceResponse> updateSequence(@RequestBody @Validated(ValidationSequence.class) SequenceUpdateRequest request,
+                                                           @PathVariable Long workflowId,
+                                                           @PathVariable Long sequenceId) {
+        return ResponseEntity.status(HttpStatus.OK).body(sequenceService.updateSequence(sequenceId, request));
+    }
 }

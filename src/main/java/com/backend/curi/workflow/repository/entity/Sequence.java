@@ -22,10 +22,13 @@ public class Sequence extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Setter
     private String name;
 
+    @Setter
     private Integer dayOffset;
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
