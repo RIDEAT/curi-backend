@@ -86,8 +86,7 @@ public class LaunchService {
 
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
-        var currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var member = memberService.getMemberEntity(launchRequest.getMemberId(), currentUser);
+        var member = memberService.getMember(launchRequest.getMemberId());
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
         List<Role> requiredRoleEntities = getRequiredRoles(workflowId).stream().map(RoleResponse -> roleService.getRoleEntity(RoleResponse.getId())).collect(Collectors.toList());
 
