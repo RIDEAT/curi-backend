@@ -31,7 +31,7 @@ public class MessageService {
 
     public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence){
         log.info("런치드 시퀀스 메일 전송 to : {}, frontOfficeId: {}",memberTo, frontOffice.getId() );
-        awsSMTPService.send("할당된 시퀀스입니다. 아래에 접속하시면 됩니다.", "프론트 오피스 url: https://app.dev.onbird.team/front-offices/" + frontOffice.getId() +"\n접속 시 아래의 비밀번호를 입력하시면 됩니다.\n 비밀번호 : " + frontOffice.getAccessToken(), memberTo);
+        awsSMTPService.send("할당된 시퀀스입니다. 아래에 접속하시면 됩니다.", "프론트 오피스 url: https://view.dev.onbird.team/" + frontOffice.getId() +"?token= " + frontOffice.getAccessToken(), memberTo);
         //여기서 슬랙도 보내고 슬랙 연동이 안된경우 슬랙 연동 url 도 보내고
         log.info("슬랙 전송 to : {}",memberTo );
         slackService.sendMessageToMember(new SlackMessageRequest("프론트 오피스로 접속하세요 url, password"), launchedSequence.getMember().getId());

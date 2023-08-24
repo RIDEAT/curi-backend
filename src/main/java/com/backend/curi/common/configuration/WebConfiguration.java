@@ -18,7 +18,7 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final LaunchedworkflowAuthInterceptor launchedworkflowAuthInterceptor;
     private final LaunchedsequenceAuthInterceptor launchedsequenceAuthInterceptor;
     private final LaunchedmoduleAuthInterceptor launchedmoduleAuthInterceptor;
-    private final SlackMemberAuthInterceptor slackMemberAuthInterceptor;
+    private final FrontOfficeAuthInterceptor frontOfficeAuthInterceptor;
 
 
     @Override
@@ -48,7 +48,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(launchedmoduleAuthInterceptor)
                 .addPathPatterns("/workspaces/{workspaceId}/launchedworkflows/{launchedworkflowId}/sequences/{sequenceId}/modules/{moduleId}/**");
 
-        registry.addInterceptor(slackMemberAuthInterceptor)
-                .addPathPatterns("/slack/oauth-member/**");
+        registry.addInterceptor(frontOfficeAuthInterceptor)
+                .addPathPatterns("/front-offices/**");
     }
 }
