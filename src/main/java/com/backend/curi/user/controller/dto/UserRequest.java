@@ -11,7 +11,7 @@ import javax.validation.constraints.Email;
 @Schema(description = "user Form")
 public class UserRequest {
 
-    @Email
+    @Email(message = "이메일 형식이 올바르지 않습니다.")
     @Schema(description = "email")
     private String email;
 

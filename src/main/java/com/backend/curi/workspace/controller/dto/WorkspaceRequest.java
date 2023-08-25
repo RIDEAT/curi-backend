@@ -16,7 +16,8 @@ public class WorkspaceRequest {
     @Schema(description = "name")
     private String name;
 
-    @Email
+
+    @Email(message = "이메일 형식이 올바르지 않습니다.")
     @Schema(description = "email")
     private String email;
 }
