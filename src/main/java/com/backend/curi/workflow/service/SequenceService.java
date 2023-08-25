@@ -5,6 +5,7 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.workflow.controller.dto.SequenceRequest;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
+import com.backend.curi.workflow.controller.dto.SequenceUpdateRequest;
 import com.backend.curi.workflow.repository.SequenceRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
@@ -65,8 +66,21 @@ public class SequenceService {
         sequenceRepository.delete(sequence);
     }
 
+
     public Sequence getSequenceEntity(Long sequenceId) {
         return sequenceRepository.findById(sequenceId)
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.SEQUENCE_NOT_EXISTS));
+    }
+
+    @Transactional
+    public SequenceResponse updateSequence(Long sequenceId, SequenceUpdateRequest request) {
+        var sequence = getSequenceEntity(sequenceId);
+        if(request.getName()!=null)
+            sequence.setName(request.getName());
+        if(request.getDayOffset()!=null)
+            sequence.setDayOffset(request.getDayOffset());
+        if(request.getRoleId()!=null)
+            sequence.setRole(roleService.getRoleEntity(request.getRoleId()));
+        return SequenceResponse.of(sequence);
     }
 }

@@ -136,15 +136,15 @@ public class LaunchAcceptanceTest {
         directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
 
         directManagerId= managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 

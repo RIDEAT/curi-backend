@@ -161,15 +161,15 @@ public class LaunchedWorkflowAcceptanceTest {
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();    }
 
     private void userMakeEmployeeAndManager(){
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getDirectManagerRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getDirectManagerRequest());
 
         directManagerId = managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
     }

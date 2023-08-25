@@ -11,15 +11,11 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Builder
 public class Content extends BaseEntity {
     @Id
     private ObjectId id;
 
+    @Setter
     private Object content;
-
-    public void modify(ModuleRequest request){
-        this.content = request.getContent();
-    }
 }

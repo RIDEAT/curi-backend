@@ -81,8 +81,8 @@ public class WorkflowAcceptanceTest {
         WorkspaceResponse workspace2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId2 = workspace2.getId();
 
-        var managerResponse = memberService.createMember(getCurrentUser(), MemberType.manager, getManagerRequest());
-        var employeeResponse = memberService.createMember(getCurrentUser(), MemberType.employee, getEmployeeRequest());
+        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
+        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
 
         managerId = managerResponse.getId();
         employeeId = employeeResponse.getId();
