@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 ;
 
 
+import javax.validation.Valid;
 import java.util.*;
 
 @RestController
@@ -42,7 +43,7 @@ public class UserController {
     // 회원가입 하고 보내야함 . 유저 디비에 등록
     @PostMapping
     @Operation(summary = "register", description = "유저 정보를 db에 저장합니다. firebase signup 하고 자동로그인하고 일어나는 게 좋을듯!")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest userForm) {
+    public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userForm) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getUserId();
         String userEmail = userForm.getEmail();
@@ -54,7 +55,7 @@ public class UserController {
 
     @PutMapping(value = "/{userId}")
     @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserRequest userForm) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody @Valid UserRequest userForm) {
         User_ existingUser = userService.getUserByUserId(userId);
 
         existingUser.setEmail(userForm.getEmail());

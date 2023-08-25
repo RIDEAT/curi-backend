@@ -17,7 +17,6 @@ import java.util.List;
 public class EmployeeUpdateRequest {
     private String name;
 
-
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$",
