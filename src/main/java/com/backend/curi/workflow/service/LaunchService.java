@@ -4,7 +4,6 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
@@ -17,16 +16,9 @@ import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.message.service.MessageService;
-import com.backend.curi.security.dto.CurrentUser;
-import com.backend.curi.slack.controller.dto.SlackMessageRequest;
-import com.backend.curi.smtp.AwsSMTPService;
-import com.backend.curi.workflow.controller.dto.LaunchRequest;
-import com.backend.curi.workflow.controller.dto.ModuleResponse;
-import com.backend.curi.workflow.controller.dto.RequiredForLaunchResponse;
-import com.backend.curi.workflow.controller.dto.SequenceResponse;
+import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Module;
-import com.backend.curi.slack.service.SlackService;
 
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
@@ -42,12 +34,9 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -88,17 +77,12 @@ public class LaunchService {
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var member = memberService.getMember(launchRequest.getMemberId());
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
-        List<Role> requiredRoleEntities = getRequiredRoles(workflowId).stream().map(RoleResponse -> roleService.getRoleEntity(RoleResponse.getId())).collect(Collectors.toList());
 
-        for (Role role : requiredRoleEntities) {
-            System.out.println(role.getId());
-            if (role.getName().equals("신규입사자")) memberMap.put(role, member);
-            else {
-                Member manager = memberService.getManagerByEmployeeAndRole(member, role);
-                memberMap.put(role, manager);
-            }
+        for (MemberRoleRequest members : launchRequest.getMembers()){
+            Member manager = memberService.getMember(members.getMemberId());
+            Role role = roleService.getRoleEntity(members.getRoleId());
+            memberMap.put(role, manager);
         }
-
 
         var sequences = workflow.getSequences();
         for (var sequence : sequences) {
