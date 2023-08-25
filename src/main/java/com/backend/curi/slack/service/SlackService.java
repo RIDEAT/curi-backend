@@ -3,6 +3,7 @@ package com.backend.curi.slack.service;
 import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.member.repository.entity.Member;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 import static com.slack.api.model.block.Blocks.*;
@@ -245,6 +247,74 @@ public class SlackService {
 
     }
 
+    public ChatPostMessageResponse sendLaunchedSequenceMessageToMember(LaunchedSequence launchedSequence, FrontOffice frontOffice, Long memberId) {
+        try {
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+
+            List<LayoutBlock> blocks = new ArrayList<>();
+
+            // Add a section block with rich text formatting
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder()
+                            .text("🚀 *오늘 할당된 시퀀스가 도착했습니다!* 🎉")
+                            .build())
+                    .build());
+
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder()
+                            .text("안녕하세요, " + launchedSequence.getMember().getName() + " 님! 🌼")
+                            .build())
+                    .build());
+
+            // Add a divider block for visual separation
+            blocks.add(DividerBlock.builder().build());
+
+            // Add a section block with detailed information
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder()
+                            .text("오늘 할당된 시퀀스에 대한 상세 내용은 아래에서 확인하실 수 있습니다.")
+                            .build())
+                    .build());
+
+            // Add a link to the Front Office URL
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder()
+                            .text("🔗 [프론트 오피스에서 시퀀스 확인하기](" + getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + ")")
+                            .build())
+                    .build());
+
+            // Add a closing message
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder()
+                            .text("시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.\n더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.\n감사합니다. 😊")
+                            .build())
+                    .build());
+
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                    .channel(slackMemberInfo.getMemberSlackId()) // Use a channel ID `C1234567` is preferable
+                    .blocks(blocks)
+                    .text("오늘 할당된 시퀀스가 도착했습니다! 🚀")
+                    .build();
+
+            MethodsClient methods = slack.methods(accessToken);
+            var response = methods.chatPostMessage(request);
+
+            return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+        } catch (SlackApiException e) {
+            log.info(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+    }
+
+
 
     public ChatPostMessageResponse sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow){
 
@@ -366,14 +436,7 @@ public class SlackService {
                         .build())
                 .build());
 
-        //blocks.add(DividerBlock.builder().build());
 
-        // Sample Order List (You can replace this with your actual order details)
-        /*  List<LaunchedSequence> sequences = launchedWorkflow.getLaunchedSequences(); // Replace with your logic to retrieve order items
-        for (LaunchedSequence sequence: sequences) {
-            blocks.add(SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getName()).build()).build());
-
-        }*/
 
         return blocks;
     }
@@ -419,9 +482,8 @@ public class SlackService {
     }
 
 
-    private SectionBlock getSequenceBlock (LaunchedSequence sequence){
-        return SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getName()).build()).build();
 
+    private String getFrontOfficeUrl(UUID id, UUID accessToken) {
+        return "https://view.dev.onbird.team/" + id +"?token=" + accessToken;
     }
-
 }

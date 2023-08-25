@@ -266,7 +266,7 @@ public class MemberAcceptanceTest {
     private EmployeeRequest getEmployeeRequest(){
         EmployeeRequest employeeRequest = new EmployeeRequest();
         employeeRequest.setName("terry cho");
-        employeeRequest.setEmail("terry@gmail.com");
+        employeeRequest.setEmail("terry63@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
@@ -278,7 +278,7 @@ public class MemberAcceptanceTest {
     private EmployeeRequest getModifiedEmployeeRequest(){
         EmployeeRequest employeeRequest = new EmployeeRequest();
         employeeRequest.setName("terry cho");
-        employeeRequest.setEmail("terry@gmail.com");
+        employeeRequest.setEmail("terry63@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("front-end");
@@ -292,7 +292,7 @@ public class MemberAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
+        managerRequest.setEmail("juram63@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
@@ -302,7 +302,7 @@ public class MemberAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("front-end");
         managerRequest.setName("juram");
-        managerRequest.setEmail("juram@gmail.com");
+        managerRequest.setEmail("juram63@unist.ac.kr");
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }

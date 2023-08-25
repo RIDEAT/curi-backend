@@ -1,7 +1,6 @@
 package com.backend.curi.member.controller.dto;
 
 import com.backend.curi.exception.sequence.ValidationGroups;
-import com.backend.curi.member.repository.entity.MemberType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
