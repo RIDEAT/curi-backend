@@ -1,8 +1,6 @@
 package com.backend.curi.member.controller.dto;
 
-import com.backend.curi.common.entity.Regex;
 import com.backend.curi.exception.sequence.ValidationGroups;
-import com.backend.curi.member.repository.entity.MemberType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,9 +21,7 @@ public abstract class MemberRequest {
     @NotBlank(message = "이름을 입력해주세요.")
     protected String name;
 
-    @Pattern(regexp = Regex.EMAIL,
-            message = "이메일 형식이 올바르지 않습니다.",
-            groups = ValidationGroups.PatternCheckGroup.class)
+    @Email(message = "이메일 형식이 올바르지 않습니다.")
     protected String email;
 
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$",

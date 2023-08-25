@@ -302,7 +302,7 @@ public class MemberAcceptanceTest {
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("front-end");
         managerRequest.setName("juram");
-        managerRequest.setEmail("juram63@gmail.com");
+        managerRequest.setEmail("juram63@unist.ac.kr");
         managerRequest.setPhoneNum("010-3333-2222");
         return managerRequest;
     }
