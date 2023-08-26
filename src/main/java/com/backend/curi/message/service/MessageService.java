@@ -54,6 +54,8 @@ public class MessageService {
         for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
             Role role = entry.getKey();
             Member member = entry.getValue();
+            // with following code, prevent self-assigned situation (신규입사자 to 신규입사자)
+            if (role.getName().equals("신규입사자")) continue;
             slackService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, role, member);
             awsSMTPService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, member);
 

@@ -343,8 +343,6 @@ public class SlackService {
 
 
     public ChatPostMessageResponse sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow) {
-
-
         try {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String accessToken = getAccessToken(currentUser.getUserId());
@@ -379,7 +377,7 @@ public class SlackService {
             MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(slackMemberInfo.getMemberSlackId())
-                    .blocks(buildBlocks(launchedWorkflow))
+                    .blocks(buildEmployeeBlocks(launchedWorkflow))
             );
 
             return response;
@@ -495,10 +493,49 @@ public class SlackService {
         return blocks;
     }
 
+    private List<LayoutBlock> buildEmployeeBlocks(LaunchedWorkflow launchedWorkflow) {
+        List<LayoutBlock> blocks = new ArrayList<>();
+
+        Member employee = launchedWorkflow.getMember();
+        String message = "*안녕하세요. " + employee.getName() + "님의 원할한 온보딩을 응원합니다!*\n";
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(message).build())
+                .build());
+
+        blocks.add(DividerBlock.builder().build());
+
+        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getEmployee().getStartDate();
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(employeeInfoHeader).build())
+                .build());
+
+        blocks.add(DividerBlock.builder().build());
+
+        String sequenceHeader = "*" + employee.getName() + "님이 참여할 활동*\n";
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(sequenceHeader).build())
+                .build());
+
+        for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
+            if (sequence.getMember().equals(employee)) {
+                String sequenceDetails = "*활동명: * " + sequence.getName() + "\n" +
+                        "*시작일: * " + sequence.getApplyDate().toString();
+
+                blocks.add(SectionBlock.builder()
+                        .text(MarkdownTextObject.builder().text(sequenceDetails).build())
+                        .build());
+            }
+        }
+        return blocks;
+    }
 
     private List<LayoutBlock> buildManagerBlocks(LaunchedWorkflow launchedWorkflow, Role role, Member manager) {
         List<LayoutBlock> blocks = new ArrayList<>();
         Member employee = launchedWorkflow.getMember();
+
 
         String message = "*안녕하세요. " + manager.getName() + "님 ! 당신은 " +
                 employee.getName() + "님의 " + role.getName() + " 입니다. *\n" +
