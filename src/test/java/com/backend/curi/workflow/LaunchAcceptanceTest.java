@@ -36,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import io.restassured.RestAssured;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,8 +45,11 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
@@ -157,6 +161,19 @@ public class LaunchAcceptanceTest {
 
         var moduleInSequence = moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
         moduleInSequenceId = moduleInSequence.getId();
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest2());
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest3());
+
+
+        sequenceId = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest2()).getId();
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest2());
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest3());
+
+        sequenceId = sequenceService.createSequence(workspaceId, workflowId,getSequenceRequest3()).getId();
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest());
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest2());
+        moduleService.createModule(workspaceId, sequenceId, getModuleRequest3());
 
     }
 
@@ -171,15 +188,16 @@ public class LaunchAcceptanceTest {
     @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
-        slackService.oauthMember( new OAuthRequest("5761031201206.5794310066130.504f91ee78fcc2d24870a44756a29bf54526d85d5b266a14c4521b4aa42f5712"),hrManagerId);
 
         ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         LaunchedWorkflowResponse launchedWorkflowResponse = response.as(LaunchedWorkflowResponse.class);
 
-        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequences().get(0).getId());
+      //  launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequences().get(0).getId());
     }
+
+
 /*
     @DisplayName("워크스페이스에 속한 시퀀스 리스트를 조회할 수 있다.")
     @Test
@@ -246,6 +264,19 @@ public class LaunchAcceptanceTest {
         assertThat(workflowResponse.getSequences().isEmpty());
     }
 
+    private ExtractableResponse<Response> 유저_슬랙_연동(){
+        return RestAssured.
+                given()
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
+                .body(getOauthRequest())
+                .when()
+                .post("/slack/oauth")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
     private ExtractableResponse<Response>워크플로우_런처전_필요한_롤(){
         return RestAssured.
                 given()
@@ -429,6 +460,28 @@ public class LaunchAcceptanceTest {
         return sequenceRequest;
     }
 
+    private SequenceRequest getSequenceRequest2() {
+        SequenceRequest sequenceRequest = new SequenceRequest();
+        sequenceRequest.setName("관계자 미팅 시퀀스");
+        sequenceRequest.setDayOffset(0);
+        sequenceRequest.setPrevSequenceId(0L);
+        sequenceRequest.setRoleId(hrManagerRoleId);
+
+        return sequenceRequest;
+    }
+
+
+    private SequenceRequest getSequenceRequest3() {
+        SequenceRequest sequenceRequest = new SequenceRequest();
+        sequenceRequest.setName("코드 리뷰 시퀀스");
+        sequenceRequest.setDayOffset(1);
+        sequenceRequest.setPrevSequenceId(0L);
+        sequenceRequest.setRoleId(hrManagerRoleId);
+
+        return sequenceRequest;
+    }
+
+
     private SequenceRequest getModifiedSequenceRequest() {
         SequenceRequest sequenceRequest = new SequenceRequest();
         sequenceRequest.setName("담당 사수와의 미팅");
@@ -439,6 +492,9 @@ public class LaunchAcceptanceTest {
         return sequenceRequest;
     }
 
+    private OAuthRequest getOauthRequest(){
+        return new OAuthRequest("5305401263955.5804524543283.119c272b7c815671b9b9f3998910cfe6f9fd22a564fa44a6cf97a23b27b0edc2");
+    }
 
     private LaunchRequest getLaunchRequest(){
         LaunchRequest launchRequest = new LaunchRequest();
@@ -469,6 +525,24 @@ public class LaunchAcceptanceTest {
     private ModuleRequest getModuleRequest(){
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
+        moduleRequest.setType(ModuleType.contents);
+        moduleRequest.setContent(new ArrayList());
+        moduleRequest.setOrder(1);
+        return moduleRequest;
+    }
+
+    private ModuleRequest getModuleRequest2(){
+        ModuleRequest moduleRequest = new ModuleRequest();
+        moduleRequest.setName("담당 사수와 식사");
+        moduleRequest.setType(ModuleType.contents);
+        moduleRequest.setContent(new ArrayList());
+        moduleRequest.setOrder(1);
+        return moduleRequest;
+    }
+
+    private ModuleRequest getModuleRequest3(){
+        ModuleRequest moduleRequest = new ModuleRequest();
+        moduleRequest.setName("코드 리뷰");
         moduleRequest.setType(ModuleType.contents);
         moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);

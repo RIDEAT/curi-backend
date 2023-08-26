@@ -21,7 +21,7 @@ public class LoggingAspect {
         String packageName = joinPoint.getTarget().getClass().getPackage().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        log.info("Before executing: {}.{}.{}", packageName, className, methodName);
+        log.debug("Before executing: {}.{}.{}", packageName, className, methodName);
     }
 
     @After("execution(* com.backend.curi.*.service.*.*(..))")
@@ -29,6 +29,6 @@ public class LoggingAspect {
         String packageName = joinPoint.getTarget().getClass().getPackage().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        log.info("After executing: {}.{}.{}", packageName, className, methodName);
+        log.debug("After executing: {}.{}.{}", packageName, className, methodName);
     }
 }

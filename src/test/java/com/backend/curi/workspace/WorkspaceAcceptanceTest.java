@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource("classpath:application-data.properties")
 public class WorkspaceAcceptanceTest {
 
-
-
-
     @Autowired
     private UserService userService;
     @Autowired

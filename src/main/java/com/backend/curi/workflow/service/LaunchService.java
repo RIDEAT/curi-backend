@@ -92,6 +92,7 @@ public class LaunchService {
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
+
         return response;
     }
 
