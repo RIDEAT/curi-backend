@@ -1,21 +1,90 @@
 package com.backend.curi.workflow.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.workflow.controller.dto.ModuleRequest;
+import com.backend.curi.workflow.repository.entity.contents.DefaultContent;
+import com.backend.curi.workflow.repository.entity.contents.NotionContent;
 import lombok.*;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDateTime;
 
-import javax.persistence.Id;
 @Document(collection = "module_contents")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
-public class Content extends BaseEntity {
+public class Content {
     @Id
     private ObjectId id;
 
+    private ModuleType type;
+
     @Setter
     private Object content;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @Setter
+    @LastModifiedDate
+    private LocalDateTime updatedDate;
+
+    private String createdBy;
+    private String updatedBy;
+
+    @Version
+    private Long version;
+
+    public void setUpdatedBy(CurrentUser currentUser) {
+        this.updatedBy = currentUser.getUserId();
+    }
+
+    public static Content of(ModuleType type, CurrentUser currentUser){
+        var specificContent = specificContent(type);
+        return Content.builder()
+                .type(type)
+                .content(specificContent)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .createdBy(currentUser.getUserId())
+                .updatedBy(currentUser.getUserId())
+                .build();
+    }
+    public static Content of(Content contentToCopy){
+        return Content.builder()
+                .type(contentToCopy.getType())
+                .content(contentToCopy.getContent())
+                .createdDate(contentToCopy.getCreatedDate())
+                .updatedDate(contentToCopy.getUpdatedDate())
+                .createdBy(contentToCopy.getCreatedBy())
+                .updatedBy(contentToCopy.getUpdatedBy())
+                .build();
+    }
+    private static Object specificContent(ModuleType type){
+        switch (type){
+            case notion:
+                return new NotionContent();
+            case notification:
+            case contents:
+            case survey:
+            case finished:
+            case slack:
+            case google_docs:
+            case google_form:
+            case google_drive:
+            case youtube:
+            case web_url:
+        }
+
+        return new DefaultContent();
+    }
 }
+
+

@@ -1,6 +1,7 @@
 package com.backend.curi.workflow;
 
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
@@ -69,6 +70,8 @@ public class LaunchAcceptanceTest {
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
 
+    @MockBean
+    private Common common;
 
     @Autowired
     private UserService userService;
@@ -129,6 +132,8 @@ public class LaunchAcceptanceTest {
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
 
+        when(common.getCurrentUser())
+                .thenReturn(getCurrentUser());
 
 
         RestAssured.port = port;
@@ -526,7 +531,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -535,7 +539,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("담당 사수와 식사");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -544,7 +547,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("코드 리뷰");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -553,7 +555,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

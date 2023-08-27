@@ -3,6 +3,7 @@ package com.backend.curi.workflow.controller;
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.controller.dto.ContentUpdateRequest;
+import com.backend.curi.workflow.repository.entity.contents.NotionContent;
 import com.backend.curi.workflow.service.ModuleService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -58,21 +59,5 @@ public class ModuleController {
                                                      @PathVariable Long sequenceId, @PathVariable Long moduleId) {
         moduleService.deleteModule(moduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-
-    @PatchMapping("workflows/{workflowId}/sequences/{sequenceId}/modules/{moduleId}/content")
-    public ResponseEntity<ContentResponse> updateContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest request,
-                                                      @PathVariable Long workspaceId, @PathVariable Long workflowId,
-                                                      @PathVariable Long sequenceId, @PathVariable Long moduleId) {
-        var response = moduleService.updateContent(moduleId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("workflows/{workflowId}/sequences/{sequenceId}/modules/{moduleId}/content")
-    public ResponseEntity<ContentResponse> getContent(@PathVariable Long workspaceId, @PathVariable Long workflowId,
-                                                         @PathVariable Long sequenceId, @PathVariable Long moduleId) {
-        var response = moduleService.getContent(moduleId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

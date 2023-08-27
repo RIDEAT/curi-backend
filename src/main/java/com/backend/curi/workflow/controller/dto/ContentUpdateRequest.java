@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ContentUpdateRequest {
-    private Object content;
+public class ContentUpdateRequest<T> {
+    private T content;
 }

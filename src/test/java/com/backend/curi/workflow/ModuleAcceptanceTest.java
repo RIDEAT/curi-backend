@@ -1,6 +1,7 @@
 package com.backend.curi.workflow;
 
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.Constants;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
@@ -34,12 +35,14 @@ import io.restassured.RestAssured;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.annotation.meta.When;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +50,14 @@ import java.util.Map;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-data.properties")
 public class ModuleAcceptanceTest {
 
-
+    @MockBean
+    private Common common;
 
     @Autowired
     private ContentRepository contentRepository;
@@ -96,6 +102,8 @@ public class ModuleAcceptanceTest {
 
     @BeforeEach
     public void setup() {
+        when(common.getCurrentUser()).thenReturn(getCurrentUser());
+
         RestAssured.port = port;
 
         userService.dbStore(userId, userEmail);
@@ -294,7 +302,6 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -303,7 +310,6 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"niece {employee} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

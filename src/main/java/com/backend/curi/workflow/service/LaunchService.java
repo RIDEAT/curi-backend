@@ -1,5 +1,6 @@
 package com.backend.curi.workflow.service;
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
@@ -58,7 +59,6 @@ public class LaunchService {
     private final WorkspaceService workspaceService;
     private final FrontOfficeService frontofficeService;
     private final MessageService messageService;
-
 
     private final ContentService contentService;
 
@@ -122,19 +122,11 @@ public class LaunchService {
 
     private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace,Map<Role, Member> memberMap) throws JsonProcessingException {
 
-        Object content = contentService.getContent(module.getContentId());
+        var contentToCopy = contentService.getContent(module.getContentId());
 
-        log.info(content.toString());
+        log.info(contentToCopy.toString());
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode rootNode = mapper.readTree(content.toString());
-
-        JsonNode replaced = replaceTextInNode(rootNode, memberMap);
-
-        log.info(replaced.toPrettyString());
-
-        var contents = contentService.createContents(replaced.toPrettyString());
-
+        var contents = contentService.copyContents(contentToCopy);
         var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace);
 
         launchedModuleService.saveLaunchedModule(launchedModule);
