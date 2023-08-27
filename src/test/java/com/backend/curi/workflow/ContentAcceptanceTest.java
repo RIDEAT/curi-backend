@@ -329,7 +329,6 @@ public class ContentAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} 님 진심으로 반갑습니다.\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -338,7 +337,6 @@ public class ContentAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
