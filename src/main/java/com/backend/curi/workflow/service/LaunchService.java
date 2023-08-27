@@ -89,7 +89,7 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequence, workspace, member, memberMap);
         }
 
-        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
+        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, memberMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
 
