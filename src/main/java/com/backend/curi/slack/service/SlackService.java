@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -152,6 +153,7 @@ public class SlackService {
                 ChannelRequest channelRequest = new ChannelRequest("onbird-alarm");
                 var res = createChannel(channelRequest);
                 if (res.isOk()) log.info("onbird alaram 이 생겼습니다. userId : {}", currentUser.getUserId());
+                else log.error(res.getError());
 
                 InviteRequest inviteRequest = new InviteRequest(res.getChannel().getId(), response.getAuthedUser().getId());
                 invite(inviteRequest);
@@ -164,6 +166,8 @@ public class SlackService {
                 slackMessageRequest.setTexts("온버드 알람이 추가되었습니다.");
                 sendMessage(slackMessageRequest);
 
+            } else {
+                log.error(response.getError());
             }
 
             return response;
@@ -651,5 +655,10 @@ public class SlackService {
 
     private String getFrontOfficeUrl(UUID id, UUID accessToken) {
         return "https://view.dev.onbird.team/" + id + "?token=" + accessToken;
+    }
+
+    public Boolean isAuthorized() {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return !slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty();
     }
 }
