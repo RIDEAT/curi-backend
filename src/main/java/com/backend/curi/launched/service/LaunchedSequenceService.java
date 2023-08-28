@@ -63,9 +63,8 @@ public class LaunchedSequenceService {
         launchedSequenceRepository.delete(launchedSequence);
     }
 
-    public LaunchedSequenceResponse saveLaunchedSequence (LaunchedSequence launchedSequence){
-        LaunchedSequence savedLaunchedSequence = launchedSequenceRepository.save(launchedSequence);
-        return LaunchedSequenceResponse.of(savedLaunchedSequence);
+    public void saveLaunchedSequence (LaunchedSequence launchedSequence){
+        launchedSequenceRepository.save(launchedSequence);
     }
 
 }

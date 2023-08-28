@@ -2,6 +2,7 @@ package com.backend.curi.workflow.controller;
 
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowsResponse;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.workflow.controller.dto.*;
@@ -35,8 +36,8 @@ public class WorkflowController {
 
 
     @PostMapping("/{workflowId}/launch")
-    public ResponseEntity<LaunchedWorkflowResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) LaunchRequest launchRequest, @PathVariable Long workspaceId, @PathVariable Long workflowId) throws JsonProcessingException {
-        var launchResponse = launchService.launchWorkflow(workflowId, launchRequest, workspaceId);
+    public ResponseEntity<LaunchedWorkflowsResponse> launchWorkflow(@RequestBody @Validated(ValidationSequence.class) List<LaunchRequest> launchRequests, @PathVariable Long workspaceId, @PathVariable Long workflowId) throws JsonProcessingException {
+        var launchResponse = launchService.launchWorkflows(workflowId, launchRequests, workspaceId);
         return ResponseEntity.status(HttpStatus.CREATED).body(launchResponse);
     }
 

@@ -28,47 +28,25 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/members/manager")
+    @PostMapping("/members")
     public ResponseEntity<MemberResponse> createManager(@PathVariable("workspaceId") Long workspaceId,
-            @RequestBody @Validated(ValidationSequence.class) ManagerRequest request){
-        var response = memberService.createMember(MemberType.manager, request);
+            @RequestBody @Validated(ValidationSequence.class) MemberRequest request){
+        var response = memberService.createMember(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/members/manager/{mid}")
+    @PutMapping("/members/{mid}")
     public ResponseEntity<MemberResponse> modifyManager(@PathVariable("workspaceId") Long workspaceId,
                                                         @PathVariable("mid") Long memberId,
-                                                        @RequestBody @Validated(ValidationSequence.class) ManagerRequest request) {
+                                                        @RequestBody @Validated(ValidationSequence.class) MemberRequest request) {
         var response = memberService.modifyMember(memberId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    @PatchMapping("/members/manager/{mid}")
+    @PatchMapping("/members/{mid}")
     public ResponseEntity<MemberResponse> updateManager(@PathVariable("workspaceId") Long workspaceId,
                                                         @PathVariable("mid") Long memberId,
-                                                         @RequestBody @Validated(ValidationSequence.class) ManagerUpdateRequest request) {
-        var response = memberService.updateManager(memberId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @PostMapping("/members/employee")
-    public ResponseEntity<MemberResponse> createEmployee(@PathVariable("workspaceId") Long workspaceId,
-                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request) {
-        var response = memberService.createMember(MemberType.employee , request);
-        return ResponseEntity. status(HttpStatus.CREATED).body(response);
-    }
-    @PutMapping("/members/employee/{mid}")
-    public ResponseEntity<MemberResponse> modifyEmployee(@PathVariable("workspaceId") Long workspaceId,
-                                                         @PathVariable("mid") Long memberId,
-                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeRequest request) {
-        var response = memberService.modifyMember(memberId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @PatchMapping("/members/employee/{mid}")
-    public ResponseEntity<MemberResponse> updateEmployee(@PathVariable("workspaceId") Long workspaceId,
-                                                         @PathVariable("mid") Long memberId,
-                                                         @RequestBody @Validated(ValidationSequence.class) EmployeeUpdateRequest request) {
-        var response = memberService.updateEmployee(memberId, request);
+                                                         @RequestBody @Validated(ValidationSequence.class) MemberUpdateRequest request) {
+        var response = memberService.updateMember(memberId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

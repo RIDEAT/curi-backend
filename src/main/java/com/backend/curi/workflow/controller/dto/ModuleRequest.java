@@ -19,8 +19,5 @@ public class ModuleRequest {
     private ModuleType type;
 
     @NotNull
-    private Object content;
-
-    @NotNull
     private Integer order;
 }

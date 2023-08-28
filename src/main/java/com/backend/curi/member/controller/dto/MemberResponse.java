@@ -29,16 +29,11 @@ public class MemberResponse {
 
     private String department;
 
-    private String type;
+    private MemberType type;
 
-    private Object detail;
+    private LocalDate startDate;
 
     public static MemberResponse of(Member member) {
-        Object memberDetail = null;
-        if(member.getType() == MemberType.employee)
-            memberDetail = EmployeeDetail.of(member.getEmployee());
-        else if(member.getType() == MemberType.manager)
-            memberDetail = ManagerDetail.of(member.getManager());
         return new MemberResponse(
                 member.getId(),
                 member.getWorkspace().getId(),
@@ -46,7 +41,7 @@ public class MemberResponse {
                 member.getPhoneNum(),
                 member.getEmail(),
                 member.getDepartment(),
-                member.getType().toString(),
-                memberDetail);
+                member.getType(),
+                member.getStartDate());
     }
 }

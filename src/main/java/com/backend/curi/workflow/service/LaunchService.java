@@ -1,10 +1,12 @@
 package com.backend.curi.workflow.service;
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowsResponse;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
@@ -59,7 +61,6 @@ public class LaunchService {
     private final FrontOfficeService frontofficeService;
     private final MessageService messageService;
 
-
     private final ContentService contentService;
 
     private final RoleService roleService;
@@ -67,21 +68,36 @@ public class LaunchService {
     private final SchedulerOpenFeign schedulerOpenFeign;
 
 
+    @Transactional
+    public LaunchedWorkflowsResponse launchWorkflows(Long workflowId, List<LaunchRequest> launchRequests, Long workspaceId) throws JsonProcessingException {
+        var launchedWorkflows = launchRequests.stream().map(request-> {
+            try {
+                return launchWorkflow(workflowId, request, workspaceId);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
 
+        return LaunchedWorkflowsResponse.of(launchedWorkflows);
+    }
 
     @Transactional
     public LaunchedWorkflowResponse launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId) throws JsonProcessingException {
         Map<Role, Member> memberMap = new HashMap<>();
+        Map<Role, Member> managerMap = new HashMap<>();
 
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
+        var employeeRole = workspace.getRoles().get(0);
         var member = memberService.getMember(launchRequest.getMemberId());
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
 
+        memberMap.put(employeeRole, member);
         for (MemberRoleRequest members : launchRequest.getMembers()){
             Member manager = memberService.getMember(members.getMemberId());
             Role role = roleService.getRoleEntity(members.getRoleId());
             memberMap.put(role, manager);
+            managerMap.put(role, manager);
         }
 
         var sequences = workflow.getSequences();
@@ -89,7 +105,7 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequence, workspace, member, memberMap);
         }
 
-        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow);
+        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, managerMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
 
@@ -122,19 +138,11 @@ public class LaunchService {
 
     private void launchModule(LaunchedSequence launchedSequence, Module module, Workspace workspace,Map<Role, Member> memberMap) throws JsonProcessingException {
 
-        Object content = contentService.getContent(module.getContentId());
+        var contentToCopy = contentService.getContent(module.getContentId());
 
-        log.info(content.toString());
+        log.info(contentToCopy.toString());
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode rootNode = mapper.readTree(content.toString());
-
-        JsonNode replaced = replaceTextInNode(rootNode, memberMap);
-
-        log.info(replaced.toPrettyString());
-
-        var contents = contentService.createContents(replaced.toPrettyString());
-
+        var contents = contentService.copyContents(contentToCopy);
         var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace);
 
         launchedModuleService.saveLaunchedModule(launchedModule);

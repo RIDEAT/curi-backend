@@ -1,11 +1,8 @@
 package com.backend.curi.member;
 
 import com.backend.curi.common.Constants;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.controller.dto.MemberResponse;
-import com.backend.curi.member.repository.EmployeeRepository;
-import com.backend.curi.member.repository.entity.Employee;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -74,8 +71,8 @@ public class MemberAcceptanceTest {
         WorkspaceResponse workspace = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspace.getId();
 
-        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var managerResponse = memberService.createMember(getManagerRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
         managerId = managerResponse.getId();
         employeeId = employeeResponse.getId();
@@ -178,56 +175,56 @@ public class MemberAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 신입사원_생성(EmployeeRequest employeeRequest){
+    private ExtractableResponse<Response> 신입사원_생성(MemberRequest employeeRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(employeeRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/members/employee", workspaceId)
+                .post("/workspaces/{workspaceId}/members", workspaceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 기존직원_생성(ManagerRequest managerRequest){
+    private ExtractableResponse<Response> 기존직원_생성(MemberRequest managerRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(managerRequest)
                 .when()
-                .post("/workspaces/{workspaceId}/members/manager", workspaceId)
+                .post("/workspaces/{workspaceId}/members", workspaceId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 신입사원_수정(EmployeeRequest employeeRequest){
+    private ExtractableResponse<Response> 신입사원_수정(MemberRequest employeeRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(employeeRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/members/employee/{mid}", workspaceId, employeeId )
+                .put("/workspaces/{workspaceId}/members/{mid}", workspaceId, employeeId )
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> 기존직원_수정(ManagerRequest managerRequest){
+    private ExtractableResponse<Response> 기존직원_수정(MemberRequest managerRequest){
         return RestAssured.
                 given()
                 .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON) // JSON 형식으로 request body를 설정
                 .body(managerRequest)
                 .when()
-                .put("/workspaces/{workspaceId}/members/manager/{mid}", workspaceId, managerId)
+                .put("/workspaces/{workspaceId}/members/{mid}", workspaceId, managerId)
                 .then()
                 .log()
                 .all()
@@ -263,47 +260,51 @@ public class MemberAcceptanceTest {
         return new WorkspaceRequest(workspaceName, workspaceEmail);
     }
 
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("terry63@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(new ArrayList<>());
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
-    private EmployeeRequest getModifiedEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getModifiedEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("terry63@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("front-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(new ArrayList<>());
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
-    private ManagerRequest getManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
+        managerRequest.setStartDate("2020-10-09");
         managerRequest.setName("juram");
         managerRequest.setEmail("juram63@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
-    private ManagerRequest getModifiedManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getModifiedManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("front-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("juram63@unist.ac.kr");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setType(MemberType.manager);
+        managerRequest.setStartDate("2020-10-09");
         return managerRequest;
     }
 

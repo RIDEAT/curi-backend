@@ -1,7 +1,12 @@
 package com.backend.curi.slack.controller;
 
+
 import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.slack.controller.dto.*;
+import com.backend.curi.slack.controller.dto.ChannelRequest;
+import com.backend.curi.slack.controller.dto.InviteRequest;
+import com.backend.curi.slack.controller.dto.OAuthRequest;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
