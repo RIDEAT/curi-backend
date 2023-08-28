@@ -7,8 +7,7 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -145,15 +144,15 @@ public class LaunchAcceptanceTest {
         directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
-        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(getManagerRequest());
 
         directManagerId= managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 
@@ -394,16 +393,15 @@ public class LaunchAcceptanceTest {
         return new WorkspaceRequest(workspaceName, workspaceEmail);
     }
 
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("8514199@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(getManagers());
-
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
@@ -427,23 +425,27 @@ public class LaunchAcceptanceTest {
     }
 
 
-    private ManagerRequest getManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("8514199@naver.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
-    private ManagerRequest getHrManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getHrManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("HR");
         managerRequest.setName("hanna");
         managerRequest.setEmail("rideat63@gmail.com");
         managerRequest.setPhoneNum("010-1111-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 

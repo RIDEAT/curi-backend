@@ -1,6 +1,7 @@
 package com.backend.curi.member.controller.dto;
 
 import com.backend.curi.exception.sequence.ValidationGroups;
+import com.backend.curi.member.repository.entity.MemberType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,20 +15,27 @@ import javax.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class MemberRequest {
+public class MemberRequest {
 
-    protected Long wid;
+    private Long wid;
 
     @NotBlank(message = "이름을 입력해주세요.")
-    protected String name;
+    private String name;
 
     @Email(message = "이메일 형식이 올바르지 않습니다.")
-    protected String email;
+    private String email;
 
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$",
             message = "전화번호 형식이 올바르지 않습니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
-    protected String phoneNum;
+    private String phoneNum;
 
-    protected String department;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$",
+            message = "입사일 형식이 올바르지 않습니다.",
+            groups = ValidationGroups.PatternCheckGroup.class)
+    private String startDate;
+
+    private String department;
+
+    private MemberType type;
 }
