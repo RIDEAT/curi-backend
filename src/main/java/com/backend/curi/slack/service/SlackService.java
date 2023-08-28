@@ -151,6 +151,7 @@ public class SlackService {
 
                 ChannelRequest channelRequest = new ChannelRequest("onbird-alarm");
                 var res = createChannel(channelRequest);
+                if (res.isOk()) log.info("onbird alaram 이 생겼습니다. userId : {}", currentUser.getUserId());
 
                 InviteRequest inviteRequest = new InviteRequest(res.getChannel().getId(), response.getAuthedUser().getId());
                 invite(inviteRequest);
@@ -216,8 +217,7 @@ public class SlackService {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(getAlarmChannelId(currentUser.getUserId())) // Use a channel ID `C1234567` is preferable
-                    .blocksAsString(slackMessageRequest.getTexts())
-                    .text("default")
+                    .text(slackMessageRequest.getTexts())
                     .build();
 
 
