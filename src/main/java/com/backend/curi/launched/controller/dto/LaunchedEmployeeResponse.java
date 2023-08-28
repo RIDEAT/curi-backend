@@ -34,7 +34,7 @@ public class LaunchedEmployeeResponse {
                 response.getEmployee().getDepartment(),
                 response.getEmployee().getPhoneNum(),
                 response.getEmployee().getType(),
-                response.getEmployee().getStartDate(),
+                response.getKeyDate(),
                 response.getRoleDetails()
         );
     }

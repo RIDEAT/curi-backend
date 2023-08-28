@@ -529,6 +529,8 @@ public class LaunchAcceptanceTest {
         launchRequest.setMembers(list);
         List<LaunchRequest> launchRequests = new ArrayList<>();
         launchRequests.add(launchRequest);
+        launchRequests.add(launchRequest);
+        launchRequests.add(launchRequest);
         return launchRequests;
     }
 
