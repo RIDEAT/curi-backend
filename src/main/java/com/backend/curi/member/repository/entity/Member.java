@@ -65,6 +65,7 @@ public class Member extends BaseEntity {
                 .type(request.getType())
                 .department(request.getDepartment())
                 .workspace(workspace)
+                .startDate(LocalDate.parse(request.getStartDate()))
                 .build();
     }
     public void modifyInformation(MemberRequest request) {
