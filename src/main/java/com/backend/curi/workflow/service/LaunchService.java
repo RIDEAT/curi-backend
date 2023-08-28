@@ -75,9 +75,11 @@ public class LaunchService {
 
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
+        var employeeRole = workspace.getRoles().get(0);
         var member = memberService.getMember(launchRequest.getMemberId());
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
 
+        memberMap.put(employeeRole, member);
         for (MemberRoleRequest members : launchRequest.getMembers()){
             Member manager = memberService.getMember(members.getMemberId());
             Role role = roleService.getRoleEntity(members.getRoleId());

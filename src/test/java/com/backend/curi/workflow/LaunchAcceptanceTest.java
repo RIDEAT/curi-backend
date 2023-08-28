@@ -507,9 +507,9 @@ public class LaunchAcceptanceTest {
         LaunchRequest launchRequest = new LaunchRequest();
         launchRequest.setMemberId(employeeId);
         launchRequest.setKeyDate(LocalDate.of(2000,10,9));
-        MemberRoleRequest memberRoleRequest = new MemberRoleRequest();
-        memberRoleRequest.setMemberId(employeeId);
-        memberRoleRequest.setRoleId(employeeRoleId);
+//        MemberRoleRequest memberRoleRequest = new MemberRoleRequest();
+//        memberRoleRequest.setMemberId(employeeId);
+//        memberRoleRequest.setRoleId(employeeRoleId);
 
 
         MemberRoleRequest memberRoleRequest2 = new MemberRoleRequest();
@@ -521,7 +521,7 @@ public class LaunchAcceptanceTest {
         memberRoleRequest3.setRoleId(directManagerRoleId);
 
         List<MemberRoleRequest> list = new ArrayList<>();
-        list.add(memberRoleRequest);
+//        list.add(memberRoleRequest);
         list.add(memberRoleRequest2);
         list.add(memberRoleRequest3);
 
