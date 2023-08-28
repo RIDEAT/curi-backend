@@ -6,6 +6,7 @@ import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowsResponse;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
@@ -67,11 +68,23 @@ public class LaunchService {
     private final SchedulerOpenFeign schedulerOpenFeign;
 
 
+    @Transactional
+    public LaunchedWorkflowsResponse launchWorkflows(Long workflowId, List<LaunchRequest> launchRequests, Long workspaceId) throws JsonProcessingException {
+        var launchedWorkflows = launchRequests.stream().map(request-> {
+            try {
+                return launchWorkflow(workflowId, request, workspaceId);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
 
+        return LaunchedWorkflowsResponse.of(launchedWorkflows);
+    }
 
     @Transactional
     public LaunchedWorkflowResponse launchWorkflow(Long workflowId, LaunchRequest launchRequest, Long workspaceId) throws JsonProcessingException {
         Map<Role, Member> memberMap = new HashMap<>();
+        Map<Role, Member> managerMap = new HashMap<>();
 
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
@@ -84,6 +97,7 @@ public class LaunchService {
             Member manager = memberService.getMember(members.getMemberId());
             Role role = roleService.getRoleEntity(members.getRoleId());
             memberMap.put(role, manager);
+            managerMap.put(role, manager);
         }
 
         var sequences = workflow.getSequences();
@@ -91,7 +105,7 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequence, workspace, member, memberMap);
         }
 
-        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, memberMap);
+        var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, managerMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
 

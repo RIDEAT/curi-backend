@@ -6,6 +6,7 @@ import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowsResponse;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.repository.entity.MemberType;
@@ -196,9 +197,9 @@ public class LaunchAcceptanceTest {
         ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        LaunchedWorkflowResponse launchedWorkflowResponse = response.as(LaunchedWorkflowResponse.class);
+        LaunchedWorkflowsResponse launchedWorkflowResponse = response.as(LaunchedWorkflowsResponse.class);
 
-        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequences().get(0).getId());
+        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequenceResponses().get(0).getId());
     }
 
 
@@ -503,7 +504,7 @@ public class LaunchAcceptanceTest {
         return new OAuthRequest("5305401263955.5804524543283.119c272b7c815671b9b9f3998910cfe6f9fd22a564fa44a6cf97a23b27b0edc2");
     }
 
-    private LaunchRequest getLaunchRequest(){
+    private List<LaunchRequest> getLaunchRequest(){
         LaunchRequest launchRequest = new LaunchRequest();
         launchRequest.setMemberId(employeeId);
         launchRequest.setKeyDate(LocalDate.of(2000,10,9));
@@ -526,7 +527,9 @@ public class LaunchAcceptanceTest {
         list.add(memberRoleRequest3);
 
         launchRequest.setMembers(list);
-        return launchRequest;
+        List<LaunchRequest> launchRequests = new ArrayList<>();
+        launchRequests.add(launchRequest);
+        return launchRequests;
     }
 
     private ModuleRequest getModuleRequest(){
