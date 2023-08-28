@@ -1,10 +1,7 @@
 package com.backend.curi.slack.controller;
 
 import com.backend.curi.member.controller.dto.ManagerRequest;
-import com.backend.curi.slack.controller.dto.ChannelRequest;
-import com.backend.curi.slack.controller.dto.InviteRequest;
-import com.backend.curi.slack.controller.dto.OAuthRequest;
-import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.controller.dto.*;
 import com.backend.curi.slack.service.SlackService;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
@@ -41,9 +38,10 @@ public class SlackController {
     }
 
     @DeleteMapping("/oauth")
-    public ResponseEntity<Boolean> deleteOauth() throws SlackApiException, IOException {
+    public ResponseEntity<DeleteResponse> deleteOauth() throws SlackApiException, IOException {
         slackService.deleteOauth();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(true);
+        DeleteResponse deleteResponse = new DeleteResponse(true);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(deleteResponse);
     }
 
 
