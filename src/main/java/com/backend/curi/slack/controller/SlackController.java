@@ -38,6 +38,13 @@ public class SlackController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/oauth")
+    public ResponseEntity<Void> deleteOauth() throws SlackApiException, IOException {
+        slackService.deleteOauth();
+        return ResponseEntity.noContent().build();
+    }
+
+
     @GetMapping("/isAuthorized")
     public ResponseEntity<Boolean> isAuthorized(){
         var response = slackService.isAuthorized();
