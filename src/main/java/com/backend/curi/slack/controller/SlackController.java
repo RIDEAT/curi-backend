@@ -16,6 +16,7 @@ import com.slack.api.methods.response.conversations.ConversationsInviteResponse;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +40,9 @@ public class SlackController {
     }
 
     @DeleteMapping("/oauth")
-    public ResponseEntity<Void> deleteOauth() throws SlackApiException, IOException {
+    public ResponseEntity<Boolean> deleteOauth() throws SlackApiException, IOException {
         slackService.deleteOauth();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(true);
     }
 
 
