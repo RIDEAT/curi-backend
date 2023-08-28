@@ -20,9 +20,6 @@ public class SlackInfo {
     String userFirebaseId;
 
     @Column
-    String channelId;
-
-    @Column
     String userSlackId;
 
     @Column
