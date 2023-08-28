@@ -56,7 +56,7 @@ public class AwsSMTPService {
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
-                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getEmployee().getStartDate() + "</li>" +
+                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
                 "</ul>" +
                 "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
                 "<p>감사합니다.</p>" +
@@ -74,7 +74,7 @@ public class AwsSMTPService {
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
-                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getEmployee().getStartDate() + "</li>" +
+                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
                 "</ul>" +
                 "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
                 "<p>시작하신 워크플로우가 성공적으로 진행되길 바랍니다!</p>" +
@@ -93,7 +93,7 @@ public class AwsSMTPService {
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
-                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getEmployee().getStartDate() + "</li>" +
+                "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
                 "</ul>" +
                 "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
                 "<p>"+ launchedWorkflow.getMember().getName() +"님의 성공적인 온보딩을 함께 해주세요!</p>" +

@@ -2,8 +2,7 @@ package com.backend.curi.workflow;
 
 
 import com.backend.curi.common.Constants;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -89,8 +88,8 @@ public class SequenceAcceptanceTest {
         workspaceId = workspaceResponse.getId();
         defaultRoleId = workspaceResponse.getRoles().get(1).getId();
 
-        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var managerResponse = memberService.createMember(getManagerRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
 
         managerId = managerResponse.getId();
@@ -231,26 +230,28 @@ public class SequenceAcceptanceTest {
         return new WorkspaceRequest(workspaceName, workspaceEmail);
     }
 
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("terry@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(new ArrayList<>());
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
 
-    private ManagerRequest getManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("juram@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 

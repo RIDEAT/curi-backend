@@ -1,6 +1,5 @@
 package com.backend.curi.slack.controller;
 
-import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.slack.controller.dto.ChannelRequest;
 import com.backend.curi.slack.controller.dto.InviteRequest;
 import com.backend.curi.slack.controller.dto.OAuthRequest;

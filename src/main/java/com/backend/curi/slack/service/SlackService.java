@@ -505,7 +505,7 @@ public class SlackService {
 
         blocks.add(DividerBlock.builder().build());
 
-        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getEmployee().getStartDate();
+        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getStartDate();
 
         blocks.add(SectionBlock.builder()
                 .text(MarkdownTextObject.builder().text(employeeInfoHeader).build())
@@ -547,7 +547,7 @@ public class SlackService {
 
         blocks.add(DividerBlock.builder().build());
 
-        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getEmployee().getStartDate();
+        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getStartDate();
 
         blocks.add(SectionBlock.builder()
                 .text(MarkdownTextObject.builder().text(employeeInfoHeader).build())
