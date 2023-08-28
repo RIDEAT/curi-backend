@@ -95,7 +95,7 @@ public class SlackService {
         OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .redirectUri(redirectUri + "member")
+                .redirectUri(redirectUri + "/member")
                 .code(oAuthRequest.getCode())
                 .build();
 
@@ -148,17 +148,7 @@ public class SlackService {
                 CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 SlackInfo slackInfo = SlackInfo.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
 
-                slackRepository.save(slackInfo);
-
-                ChannelRequest channelRequest = new ChannelRequest("onbird-alarm");
-                var res = createChannel(channelRequest);
-                if (res.isOk()) log.info("onbird alaram 이 생겼습니다. userId : {}", currentUser.getUserId());
-                else log.error(res.getError());
-
-                InviteRequest inviteRequest = new InviteRequest(res.getChannel().getId(), response.getAuthedUser().getId());
-                invite(inviteRequest);
-
-                slackInfo.setChannelId(res.getChannel().getId());
+                slackInfo.setChannelId(response.getAuthedUser().getId());
 
                 slackRepository.save(slackInfo);
 
@@ -660,5 +650,11 @@ public class SlackService {
     public Boolean isAuthorized() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return !slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty();
+    }
+
+    public void deleteOauth() {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SlackInfo slackInfo = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.SLACK_ADMIN_USER_NOT_AUTHORIZED));
+        slackRepository.delete(slackInfo);
     }
 }
