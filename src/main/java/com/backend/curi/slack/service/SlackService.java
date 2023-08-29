@@ -134,6 +134,14 @@ public class SlackService {
 
     public OAuthV2AccessResponse oauth(OAuthRequest oAuthRequest) {
         try {
+            CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty()) {
+                var response = new OAuthV2AccessResponse();
+                response.setOk(false);
+                response.setError("이미 인증받은 어드민입니다.");
+                return response;
+            }
+
             OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                     .clientId(clientId)
                     .clientSecret(clientSecret)
@@ -145,11 +153,8 @@ public class SlackService {
             OAuthV2AccessResponse response = methods.oauthV2Access(request);
 
             if (response.isOk()) {
-                CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 SlackInfo slackInfo = SlackInfo.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
-
-                slackInfo.setChannelId(response.getAuthedUser().getId());
-
+                
                 slackRepository.save(slackInfo);
 
                 SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
@@ -210,7 +215,7 @@ public class SlackService {
         try {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel(getAlarmChannelId(currentUser.getUserId())) // Use a channel ID `C1234567` is preferable
+                    .channel(getSlackId(currentUser.getUserId())) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
                     .build();
 
@@ -342,7 +347,7 @@ public class SlackService {
             String accessToken = getAccessToken(currentUser.getUserId());
             MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(getAlarmChannelId(currentUser.getUserId()))
+                    .channel(getSlackId(currentUser.getUserId()))
                     .blocks(buildBlocks(launchedWorkflow))
             );
 
@@ -432,7 +437,7 @@ public class SlackService {
             String accessToken = slackInfo.getAccessToken();
             MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(slackInfo.getChannelId())
+                    .channel(slackInfo.getUserSlackId())
                     .blocks(buildDashBoardBlocks(launchedWorkflow))
                     .text("현재 대시보드 현황입니다.")
             );
@@ -461,9 +466,9 @@ public class SlackService {
         return accessToken;
     }
 
-    protected String getAlarmChannelId(String userId) {
-        String channelId = slackRepository.findByUserFirebaseId(userId).orElseThrow(() -> new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getChannelId();
-        return channelId;
+    protected String getSlackId(String userId) {
+        String slackId = slackRepository.findByUserFirebaseId(userId).orElseThrow(() -> new CuriException(HttpStatus.FORBIDDEN, ErrorType.SLACK_ACCESS_TOKEN_NOT_EXISTS)).getUserSlackId();
+        return slackId;
     }
 
     private List<LayoutBlock> buildBlocks(LaunchedWorkflow launchedWorkflow) {
