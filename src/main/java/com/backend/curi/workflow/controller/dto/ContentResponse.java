@@ -1,6 +1,7 @@
 package com.backend.curi.workflow.controller.dto;
 
 import com.backend.curi.workflow.repository.entity.Content;
+import com.backend.curi.workflow.repository.entity.Module;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.contents.NotionContent;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class ContentResponse {
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
-
+    private String title;
     private Object contents;
     private ModuleType type;
     private String createdBy;
@@ -27,9 +28,10 @@ public class ContentResponse {
     private LocalDateTime updatedDate;
 
 
-    public static ContentResponse of(Content content) {
+    public static ContentResponse of(Content content, Module module) {
         return ContentResponse.builder()
                 .id(content.getId())
+                .title(module.getName())
                 .contents(content.getContent())
                 .type(content.getType())
                 .createdBy(content.getCreatedBy())

@@ -92,7 +92,7 @@ public class ModuleService {
     public ContentResponse getContent(Long moduleId){
         var module = getModuleEntity(moduleId);
         var content = contentRepository.findById(module.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
-        return ContentResponse.of(content);
+        return ContentResponse.of(content, module);
     }
 
     @Transactional
@@ -106,6 +106,6 @@ public class ModuleService {
         content.setUpdatedDate(LocalDateTime.now());
 
         contentRepository.save(content);
-        return ContentResponse.of(content);
+        return ContentResponse.of(content, module);
     }
 }
