@@ -134,6 +134,14 @@ public class SlackService {
 
     public OAuthV2AccessResponse oauth(OAuthRequest oAuthRequest) {
         try {
+            CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty()) {
+                var response = new OAuthV2AccessResponse();
+                response.setOk(false);
+                response.setError("이미 인증받은 어드민입니다.");
+                return response;
+            }
+
             OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                     .clientId(clientId)
                     .clientSecret(clientSecret)
@@ -145,7 +153,6 @@ public class SlackService {
             OAuthV2AccessResponse response = methods.oauthV2Access(request);
 
             if (response.isOk()) {
-                CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 SlackInfo slackInfo = SlackInfo.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
                 
                 slackRepository.save(slackInfo);
