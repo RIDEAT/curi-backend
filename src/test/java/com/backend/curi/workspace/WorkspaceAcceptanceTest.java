@@ -43,7 +43,7 @@ public class WorkspaceAcceptanceTest {
     @LocalServerPort
     public int port;
 
-    private final String userId = Constants.userId;
+    private final String userId = Constants.userEmail;
     private final String userEmail = Constants.userEmail;
     private final String workspaceName = Constants.workspaceName;
     private final String workspaceEmail = Constants.workspaceEmail;
@@ -55,7 +55,7 @@ public class WorkspaceAcceptanceTest {
     public void setup() {
         RestAssured.port = port;
 
-        userService.dbStore(userId, userEmail);
+        userService.dbStore(userId);
         WorkspaceResponse workspace = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspace.getId();
     }
@@ -173,7 +173,6 @@ public class WorkspaceAcceptanceTest {
     private CurrentUser getCurrentUser(){
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
-        currentUser.setUserEmail(userEmail);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
 
         return currentUser;

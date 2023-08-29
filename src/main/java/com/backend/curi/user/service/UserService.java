@@ -45,10 +45,6 @@ public class UserService {
         return UserResponse.of(user);
     }
     
-    public String getEmailByUserId (String userId){
-        return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS)).getEmail();
-    }
-
     public UserResponse updateUser(User_ user){
         User_ updatedUser = userRepository.save(user);
         UserResponse userResponse = UserResponse.of(updatedUser);
@@ -62,8 +58,8 @@ public class UserService {
     }
 
 
-    public UserResponse dbStore (String userId, String email) {
-        User_ user = User_.builder().userId(userId).email(email).build();
+    public UserResponse dbStore (String userId) {
+        User_ user = User_.builder().userId(userId).build();
         userRepository.save(user);
         UserResponse userResponse = UserResponse.of(user);
         return userResponse;

@@ -21,18 +21,15 @@ public class Userworkspace extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User_ user;
-    @Column (nullable = false, updatable = false)
-    String userEmail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspaceId",nullable = false, updatable = false)
     private Workspace workspace;
 
     @Builder
-    public Userworkspace(Long id, User_ user, String userEmail, Workspace workspace){
+    public Userworkspace(Long id, User_ user, Workspace workspace){
         this.id = id;
         this.user = user;
-        this.userEmail = userEmail;
         this.workspace = workspace;
     }
 

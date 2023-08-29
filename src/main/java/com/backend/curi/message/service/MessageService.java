@@ -43,7 +43,7 @@ public class MessageService {
 
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserEmail());
+        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
 
         log.info ("send workflow launch alarm to employee");
         String employeeEmail = launchedWorkflow.getMember().getEmail();

@@ -11,12 +11,9 @@ import java.util.Date;
 @Getter
 @Setter
 public class UserResponse {
-    private String id;
-    private String email;
+    private String userId;
 
     public static UserResponse of(User_ user) {
-        return new UserResponse(
-                user.getUserId(),
-                user.getEmail());
+        return new UserResponse(user.getUserId());
     }
 }

@@ -17,8 +17,6 @@ public class User_ {
     @Id
     private String userId;
 
-    @Column
-    private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;
@@ -26,9 +24,8 @@ public class User_ {
     public User_(){}
 
     @Builder
-    public User_(String userId, String email){
+    public User_(String userId){
         this.userId = userId;
-        this.email = email;
     }
 
     @Override

@@ -46,24 +46,23 @@ public class UserController {
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userForm) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getUserId();
-        String userEmail = userForm.getEmail();
 
-        UserResponse userResponse = userService.dbStore(userId, userEmail);
+        UserResponse userResponse = userService.dbStore(userId);
 
         return new ResponseEntity(userResponse, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{userId}")
-    @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody @Valid UserRequest userForm) {
-        User_ existingUser = userService.getUserByUserId(userId);
-
-        existingUser.setEmail(userForm.getEmail());
-
-        UserResponse updatedUser = userService.updateUser(existingUser);
-
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
+//    @PutMapping(value = "/{userId}")
+//    @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
+//    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody @Valid UserRequest userForm) {
+//        User_ existingUser = userService.getUserByUserId(userId);
+//
+//        existingUser.setEmail(userForm.getEmail());
+//
+//        UserResponse updatedUser = userService.updateUser(existingUser);
+//
+//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+//    }
 
     @DeleteMapping(value = "/{userId}")
     @Operation(summary = "delete user", description = "유저를 삭제합니다.")

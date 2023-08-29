@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CurrentUser {
-    String userEmail, userId, newAuthToken;
+    String userId, newAuthToken;
 
     public CurrentUser(){}
 

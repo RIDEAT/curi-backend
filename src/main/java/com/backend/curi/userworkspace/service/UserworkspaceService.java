@@ -35,7 +35,7 @@ public class UserworkspaceService {
     private final AwsS3Service amazonS3Service;
     public Userworkspace create (CurrentUser currentUser, Workspace workspace){
         var user = userRepository.findByUserId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
-        return userworkspaceRepository.save(Userworkspace.builder().user(user).userEmail(user.getEmail()).workspace(workspace).build());
+        return userworkspaceRepository.save(Userworkspace.builder().user(user).workspace(workspace).build());
     }
 
     public List<Workspace> getWorkspaceListByUser(CurrentUser currentUser) {
@@ -55,10 +55,6 @@ public class UserworkspaceService {
         return workspaceList;
     }
 
-    public List<Workspace> getWorkspaceListByUserEmails(String userEmail){
-        List<Userworkspace> userworkspaceList = userworkspaceRepository.findAllByUserEmail(userEmail);
-        return userworkspaceList.stream().map(Userworkspace::getWorkspace).collect(Collectors.toList());
-    }
 
     public List<User_> getUserListByWorkspaceId(Long workspaceId){
         var userworkspaceList = userworkspaceRepository.findAllByWorkspaceId(workspaceId);

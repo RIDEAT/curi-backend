@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface UserworkspaceRepository extends JpaRepository<Userworkspace, Integer> {
     List<Userworkspace> findAllByUser(User_ user);
-    List<Userworkspace> findAllByUserEmail(String userEmail);
     List<Userworkspace> findAllByWorkspaceId(Long workspaceId);
 
     List<Userworkspace> findAllByUserAndWorkspace(User_ user, Workspace workspace);

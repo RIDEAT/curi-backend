@@ -94,13 +94,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
 
                 // Extract userId
-                String userId = jsonNode.get("userId").asText();
+                String userId = jsonNode.get("userEmail").asText();
                 //String userEmail = jsonNode.get("userEmail").asText();
 
 
                 CurrentUser currentUser = new CurrentUser();
                 currentUser.setUserId(userId);
-                currentUser.setUserEmail(getUserEmail(userId));
                 currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
@@ -161,15 +160,6 @@ public class JwtFilter extends OncePerRequestFilter {
         return responseEntity;
     }
 
-    private String getUserEmail(String userId){
-        try{
-            return userService.getEmailByUserId(userId);
-        } catch (CuriException e){
-            log.info("user에게 할당된 이메일이 없습니다.");
-            return "rideat63@gmail.com";
-        }
-    }
-
     private void pretendTobeAuthorized (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         response.setHeader("AuthToken",  "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
@@ -177,15 +167,14 @@ public class JwtFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Extract userId
-        String userId = "NXHqERiqKVZ9MxfPvLgBNctz1el2";
+        String userId = "8514199@gmail.com";
         //String userEmail = jsonNode.get("userEmail").asText();
 
-        userService.dbStore(userId, "8514199@gmail.com");
+        userService.dbStore(userId);
 
 
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
-        currentUser.setUserEmail("8514199@gmail.com");
         //currentUser.setUserEmail(getUserEmail(userId));
         currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
