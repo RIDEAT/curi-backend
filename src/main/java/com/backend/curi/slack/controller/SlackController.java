@@ -1,22 +1,16 @@
 package com.backend.curi.slack.controller;
 
-import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.slack.controller.dto.*;
 import com.backend.curi.slack.service.SlackService;
-import com.slack.api.Slack;
-import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import com.slack.api.methods.request.oauth.OAuthV2AccessRequest;
+
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.methods.response.conversations.ConversationsCreateResponse;
 import com.slack.api.methods.response.conversations.ConversationsInviteResponse;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
