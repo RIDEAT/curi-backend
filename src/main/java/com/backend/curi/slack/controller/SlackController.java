@@ -39,7 +39,7 @@ public class SlackController {
     public ResponseEntity<DeleteResponse> deleteOauth() throws SlackApiException, IOException {
         slackService.deleteOauth();
         DeleteResponse deleteResponse = new DeleteResponse(true);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(deleteResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(deleteResponse);
     }
 
 
