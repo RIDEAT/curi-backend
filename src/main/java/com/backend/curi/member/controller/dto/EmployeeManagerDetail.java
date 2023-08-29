@@ -1,8 +1,7 @@
 package com.backend.curi.member.controller.dto;
 
 
-import com.backend.curi.member.repository.entity.Employee;
-import com.backend.curi.member.repository.entity.EmployeeManager;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflowManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +17,11 @@ public class EmployeeManagerDetail {
     private Long id;
     private Long roleId;
 
-    public static EmployeeManagerDetail of(EmployeeManager manager) {
+    public static EmployeeManagerDetail of(LaunchedWorkflowManager manager) {
         return new EmployeeManagerDetail(
-                manager.getManager().getMember().getName(),
+                manager.getMember().getName(),
                 manager.getRole().getName(),
-                manager.getManager().getMember().getId(),
+                manager.getMember().getId(),
                 manager.getRole().getId());
     }
 }

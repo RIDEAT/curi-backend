@@ -6,8 +6,6 @@ package com.backend.curi.user;
 import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.controller.dto.UserRequest;

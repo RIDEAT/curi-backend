@@ -1,8 +1,6 @@
 package com.backend.curi.member.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
 import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
@@ -40,16 +38,11 @@ public class Member extends BaseEntity {
     @Setter
     private String department;
 
+    @Setter
+    private LocalDate startDate;
+
     @Enumerated(EnumType.STRING)
     private MemberType type;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "employeeId")
-    private Employee employee;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "managerId")
-    private Manager manager;
 
     @Override
     public boolean equals(Object o) {
@@ -64,36 +57,22 @@ public class Member extends BaseEntity {
         return Objects.hash(id);
     }
 
-    public static MemberBuilder of(MemberRequest request) {
+    public static Member of(MemberRequest request, Workspace workspace) {
         return Member.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNum(request.getPhoneNum())
-                .department(request.getDepartment());
+                .type(request.getType())
+                .department(request.getDepartment())
+                .workspace(workspace)
+                .startDate(LocalDate.parse(request.getStartDate()))
+                .build();
     }
     public void modifyInformation(MemberRequest request) {
         this.name = request.getName();
         this.email = request.getEmail();
         this.phoneNum = request.getPhoneNum();
         this.department = request.getDepartment();
-
-        if(type == MemberType.employee) {
-            getEmployee().modify(request);
-        } else {
-            this.manager.modify(request);
-        }
-    }
-
-    public void setStartDate(LocalDate startDate){
-        if(type == MemberType.employee)
-            getEmployee().setStartDate(startDate);
-    }
-
-    public List<EmployeeManager> getEmployeeManagers() {
-        if(type == MemberType.employee) {
-            return getEmployee().getEmployeeManagers();
-        } else {
-            return this.manager.getEmployeeManagers();
-        }
+        this.startDate = LocalDate.parse(request.getStartDate());
     }
 }

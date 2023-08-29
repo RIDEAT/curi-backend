@@ -45,7 +45,9 @@ public class LaunchedWorkflow extends BaseEntity {
     @JoinColumn(name = "workspaceId")
     private Workspace workspace;
 
-
+    @OneToMany(mappedBy = "launchedWorkflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<LaunchedWorkflowManager> launchedWorkflowManagers = new ArrayList<>();
 
     @OneToMany(mappedBy = "lauchedWorkflow", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

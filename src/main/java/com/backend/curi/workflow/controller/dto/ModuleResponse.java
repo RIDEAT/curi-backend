@@ -18,15 +18,13 @@ public class ModuleResponse {
     private String name;
     private ModuleType type;
     private Integer order;
-    @JsonSerialize(using = ToStringSerializer.class)
-    private ObjectId contentId;
+
 
     public static ModuleResponse of(Module module) {
         return new ModuleResponse(
                 module.getId(),
                 module.getName(),
                 module.getType(),
-                module.getOrder(),
-                module.getContentId());
+                module.getOrder());
     }
 }

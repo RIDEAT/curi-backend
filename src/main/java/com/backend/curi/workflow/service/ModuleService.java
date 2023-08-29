@@ -1,7 +1,9 @@
 package com.backend.curi.workflow.service;
 
+import com.backend.curi.common.Common;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.controller.dto.ContentUpdateRequest;
 import com.backend.curi.workflow.repository.ContentRepository;
@@ -12,9 +14,11 @@ import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +31,7 @@ public class ModuleService {
     private final SequenceService sequenceService;
     private final ModuleRepository moduleRepository;
     private final ContentRepository contentRepository;
-
+    private final Common common;
 
     public ModuleResponse getModule (Long workspaceId, Long moduleId){
         log.info("get module");
@@ -45,8 +49,9 @@ public class ModuleService {
     public Module createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
+        var currentUser = common.getCurrentUser();
 
-        var content = Content.builder().content(request.getContent()).build();
+        var content = Content.of(request.getType(), currentUser);
         contentRepository.save(content);
 
         var module = Module.of(request, workspace, sequence, content.getId());
@@ -91,10 +96,15 @@ public class ModuleService {
     }
 
     @Transactional
-    public ContentResponse updateContent(Long moduleId, ContentUpdateRequest request){
+    public<T> ContentResponse updateContent(Long moduleId, ContentUpdateRequest<T> request){
         var module = getModuleEntity(moduleId);
         var content = contentRepository.findById(module.getContentId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.CONTENT_NOT_EXISTS));
+        var currentUser = common.getCurrentUser();
+
         content.setContent(request.getContent());
+        content.setUpdatedBy(currentUser);
+        content.setUpdatedDate(LocalDateTime.now());
+
         contentRepository.save(content);
         return ContentResponse.of(content);
     }

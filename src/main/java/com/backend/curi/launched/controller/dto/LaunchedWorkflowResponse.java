@@ -3,6 +3,7 @@ package com.backend.curi.launched.controller.dto;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 
+import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.MemberResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,8 @@ public class LaunchedWorkflowResponse {
 
     private List<LaunchedSequenceResponse> launchedSequences;
 
+    private List<EmployeeManagerDetail> roleDetails;
+
     private MemberResponse employee;
 
 
@@ -48,12 +51,13 @@ public class LaunchedWorkflowResponse {
                 launchedWorkflow.getName(),
                 launchedWorkflow.getStatus(),
                 launchedWorkflow.getKeyDate(),
-                launchedWorkflow.getLaunchedSequences() != null
-                        ? launchedWorkflow.getLaunchedSequences().stream()
+                launchedWorkflow.getLaunchedSequences().stream()
                         .map(LaunchedSequenceResponse::of)
                         .sorted(Comparator.comparing(LaunchedSequenceResponse::getApplyDate))
-                        .collect(Collectors.toList())
-                        : Collections.emptyList(),
+                        .collect(Collectors.toList()),
+                launchedWorkflow.getLaunchedWorkflowManagers().stream()
+                        .map(EmployeeManagerDetail::of)
+                        .collect(Collectors.toList()),
                 MemberResponse.of(launchedWorkflow.getMember())
 
 

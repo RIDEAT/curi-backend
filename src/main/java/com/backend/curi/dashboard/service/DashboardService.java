@@ -10,7 +10,6 @@ import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.launched.service.LaunchedSequenceService;
 import com.backend.curi.launched.service.LaunchedWorkflowService;
-import com.backend.curi.member.controller.dto.EmployeeDetail;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.entity.Workflow;
@@ -90,7 +89,7 @@ public class DashboardService {
 
         dashboardMemberResponse.setName(launchedWorkflowResponse.getEmployee().getName());
 
-        dashboardMemberResponse.setStartDate(((EmployeeDetail)launchedWorkflowResponse.getEmployee().getDetail()).getStartDate());
+        dashboardMemberResponse.setStartDate(launchedWorkflowResponse.getEmployee().getStartDate());
       //  dashboardMemberResponse.setENPS(launchedWorkflow.getMember().getEnps);
         dashboardMemberResponse.setLaunchedStatus(launchedWorkflowResponse.getStatus());
         dashboardMemberResponse.setLaunchedSequences(launchedWorkflowResponse.getLaunchedSequences());

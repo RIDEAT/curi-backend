@@ -4,14 +4,20 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.repository.LaunchedWorkflowManagerRepository;
 import com.backend.curi.launched.repository.LaunchedWorkflowRepository;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflowManager;
+import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.workspace.repository.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LaunchedWorkflowService {
     private final LaunchedWorkflowRepository launchedWorkflowRepository;
-
+    private final LaunchedWorkflowManagerRepository launchedWorkflowManagerRepository;
 
     public List<LaunchedWorkflowResponse> getLaunchedWorkflowList (Long workspaceId){
         List<LaunchedWorkflow> launchedWorkflowList = launchedWorkflowRepository.findAllByWorkspaceId(workspaceId);
@@ -76,8 +82,15 @@ public class LaunchedWorkflowService {
     }
 
 
-    public LaunchedWorkflowResponse saveLaunchedWorkflow (LaunchedWorkflow launchedWorkflow){
+    @Transactional
+    public LaunchedWorkflowResponse saveLaunchedWorkflow (LaunchedWorkflow launchedWorkflow, Map<Role, Member> managers){
         LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(launchedWorkflow);
+
+        for (var manager : managers.entrySet()){
+            var launchedWorkflowManager =
+                    launchedWorkflowManagerRepository.save(LaunchedWorkflowManager.of(savedLaunchedWorkflow, manager.getKey(), manager.getValue()));
+            savedLaunchedWorkflow.getLaunchedWorkflowManagers().add(launchedWorkflowManager);
+        }
         return LaunchedWorkflowResponse.of(savedLaunchedWorkflow);
     }
 

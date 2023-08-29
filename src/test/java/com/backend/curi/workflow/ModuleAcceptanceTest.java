@@ -1,12 +1,13 @@
 package com.backend.curi.workflow;
 
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.Constants;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
+import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -34,12 +35,14 @@ import io.restassured.RestAssured;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.annotation.meta.When;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +50,14 @@ import java.util.Map;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-data.properties")
 public class ModuleAcceptanceTest {
 
-
+    @MockBean
+    private Common common;
 
     @Autowired
     private ContentRepository contentRepository;
@@ -96,6 +102,8 @@ public class ModuleAcceptanceTest {
 
     @BeforeEach
     public void setup() {
+        when(common.getCurrentUser()).thenReturn(getCurrentUser());
+
         RestAssured.port = port;
 
         userService.dbStore(userId, userEmail);
@@ -106,11 +114,11 @@ public class ModuleAcceptanceTest {
         workspaceId2 = workspaceResponse2.getId();
         defaultRoleId = workspaceResponse.getRoles().get(1).getId();
 
-        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(getManagerRequest());
 
         managerId = managerResponse.getId();
 
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 
@@ -229,15 +237,15 @@ public class ModuleAcceptanceTest {
         return new WorkspaceRequest(workspaceName, workspaceEmail);
     }
 
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("terry@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(getManagers());
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
     private List<EmployeeManagerDetail> getManagers(){
@@ -252,13 +260,15 @@ public class ModuleAcceptanceTest {
     }
 
 
-    private ManagerRequest getManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("juram@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setType(MemberType.manager);
+        managerRequest.setStartDate("2020-10-09");
         return managerRequest;
     }
 
@@ -294,7 +304,6 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -303,7 +312,6 @@ public class ModuleAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"niece {employee} nice to meet you!\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

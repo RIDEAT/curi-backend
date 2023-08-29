@@ -1,13 +1,14 @@
 package com.backend.curi.workflow;
 
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.Constants;
 import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.common.feign.dto.SequenceMessageRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowsResponse;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -69,6 +70,8 @@ public class LaunchAcceptanceTest {
     @MockBean
     private SchedulerOpenFeign schedulerOpenFeign;
 
+    @MockBean
+    private Common common;
 
     @Autowired
     private UserService userService;
@@ -129,6 +132,8 @@ public class LaunchAcceptanceTest {
         when(schedulerOpenFeign.deleteMessage(any(Long.class)))
                 .thenReturn(ResponseEntity.noContent().build());
 
+        when(common.getCurrentUser())
+                .thenReturn(getCurrentUser());
 
 
         RestAssured.port = port;
@@ -140,15 +145,15 @@ public class LaunchAcceptanceTest {
         directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
-        var managerResponse = memberService.createMember(MemberType.manager, getManagerRequest());
+        var managerResponse = memberService.createMember(getManagerRequest());
 
         directManagerId= managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
 
@@ -192,9 +197,9 @@ public class LaunchAcceptanceTest {
         ExtractableResponse<Response> response = 워크스페이스내_워크플로우_런치();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        LaunchedWorkflowResponse launchedWorkflowResponse = response.as(LaunchedWorkflowResponse.class);
+        LaunchedWorkflowsResponse launchedWorkflowResponse = response.as(LaunchedWorkflowsResponse.class);
 
-        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequences().get(0).getId());
+        launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequenceResponses().get(0).getId());
     }
 
 
@@ -389,16 +394,15 @@ public class LaunchAcceptanceTest {
         return new WorkspaceRequest(workspaceName, workspaceEmail);
     }
 
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("8514199@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(getManagers());
-
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
@@ -422,23 +426,27 @@ public class LaunchAcceptanceTest {
     }
 
 
-    private ManagerRequest getManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("8514199@naver.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
-    private ManagerRequest getHrManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getHrManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("HR");
         managerRequest.setName("hanna");
         managerRequest.setEmail("rideat63@gmail.com");
         managerRequest.setPhoneNum("010-1111-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
@@ -496,13 +504,13 @@ public class LaunchAcceptanceTest {
         return new OAuthRequest("5305401263955.5804524543283.119c272b7c815671b9b9f3998910cfe6f9fd22a564fa44a6cf97a23b27b0edc2");
     }
 
-    private LaunchRequest getLaunchRequest(){
+    private List<LaunchRequest> getLaunchRequest(){
         LaunchRequest launchRequest = new LaunchRequest();
         launchRequest.setMemberId(employeeId);
         launchRequest.setKeyDate(LocalDate.of(2000,10,9));
-        MemberRoleRequest memberRoleRequest = new MemberRoleRequest();
-        memberRoleRequest.setMemberId(employeeId);
-        memberRoleRequest.setRoleId(employeeRoleId);
+//        MemberRoleRequest memberRoleRequest = new MemberRoleRequest();
+//        memberRoleRequest.setMemberId(employeeId);
+//        memberRoleRequest.setRoleId(employeeRoleId);
 
 
         MemberRoleRequest memberRoleRequest2 = new MemberRoleRequest();
@@ -514,19 +522,22 @@ public class LaunchAcceptanceTest {
         memberRoleRequest3.setRoleId(directManagerRoleId);
 
         List<MemberRoleRequest> list = new ArrayList<>();
-        list.add(memberRoleRequest);
+//        list.add(memberRoleRequest);
         list.add(memberRoleRequest2);
         list.add(memberRoleRequest3);
 
         launchRequest.setMembers(list);
-        return launchRequest;
+        List<LaunchRequest> launchRequests = new ArrayList<>();
+        launchRequests.add(launchRequest);
+        launchRequests.add(launchRequest);
+        launchRequests.add(launchRequest);
+        return launchRequests;
     }
 
     private ModuleRequest getModuleRequest(){
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -535,7 +546,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("담당 사수와 식사");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -544,7 +554,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("코드 리뷰");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -553,7 +562,6 @@ public class LaunchAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }

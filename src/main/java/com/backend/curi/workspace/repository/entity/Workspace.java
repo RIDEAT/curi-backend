@@ -1,7 +1,5 @@
 package com.backend.curi.workspace.repository.entity;
 
-import com.backend.curi.member.repository.entity.Employee;
-import com.backend.curi.member.repository.entity.Manager;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.userworkspace.repository.entity.Userworkspace;
 import com.backend.curi.workflow.repository.entity.Workflow;

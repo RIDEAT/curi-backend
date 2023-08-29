@@ -9,8 +9,7 @@ import com.backend.curi.launched.controller.dto.LaunchedWorkflowRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
-import com.backend.curi.member.controller.dto.EmployeeRequest;
-import com.backend.curi.member.controller.dto.ManagerRequest;
+import com.backend.curi.member.controller.dto.MemberRequest;
 import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
@@ -160,15 +159,15 @@ public class ContentAcceptanceTest {
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();    }
 
     private void userMakeEmployeeAndManager(){
-        var managerResponse = memberService.createMember(MemberType.manager, getDirectManagerRequest());
+        var managerResponse = memberService.createMember(getDirectManagerRequest());
 
         directManagerId = managerResponse.getId();
 
-        var hrManagerResponse = memberService.createMember(MemberType.manager, getHrManagerRequest());
+        var hrManagerResponse = memberService.createMember(getHrManagerRequest());
 
         hrManagerId = hrManagerResponse.getId();
 
-        var employeeResponse = memberService.createMember(MemberType.employee, getEmployeeRequest());
+        var employeeResponse = memberService.createMember(getEmployeeRequest());
 
         employeeId = employeeResponse.getId();
     }
@@ -235,16 +234,15 @@ public class ContentAcceptanceTest {
         workflowRequest.setName(originalLaunchedWorkflowResponse.getName());
         return workflowRequest;
     }
-    private EmployeeRequest getEmployeeRequest(){
-        EmployeeRequest employeeRequest = new EmployeeRequest();
+    private MemberRequest getEmployeeRequest(){
+        MemberRequest employeeRequest = new MemberRequest();
         employeeRequest.setName("terry cho");
         employeeRequest.setEmail("terry@gmail.com");
         employeeRequest.setStartDate("2020-10-09");
         employeeRequest.setWid(workspaceId);
         employeeRequest.setDepartment("back-end");
         employeeRequest.setPhoneNum("010-2431-2298");
-        employeeRequest.setManagers(getManagers());
-
+        employeeRequest.setType(MemberType.employee);
         return employeeRequest;
     }
 
@@ -267,23 +265,27 @@ public class ContentAcceptanceTest {
     }
 
 
-    private ManagerRequest getDirectManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getDirectManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
         managerRequest.setName("juram");
         managerRequest.setEmail("juram@gmail.com");
         managerRequest.setPhoneNum("010-3333-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
-    private ManagerRequest getHrManagerRequest(){
-        ManagerRequest managerRequest = new ManagerRequest();
+    private MemberRequest getHrManagerRequest(){
+        MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("HR");
         managerRequest.setName("hanna");
         managerRequest.setEmail("hanna@gmail.com");
         managerRequest.setPhoneNum("010-1111-2222");
+        managerRequest.setStartDate("2020-10-09");
+        managerRequest.setType(MemberType.manager);
         return managerRequest;
     }
 
@@ -329,7 +331,6 @@ public class ContentAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("hello new employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent("{ \"type\" : \"contents\", \"content\" : \"안녕하세요 {신규입사자} 님 진심으로 반갑습니다.\" }");
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
@@ -338,7 +339,6 @@ public class ContentAcceptanceTest {
         ModuleRequest moduleRequest = new ModuleRequest();
         moduleRequest.setName("bye old employee!");
         moduleRequest.setType(ModuleType.contents);
-        moduleRequest.setContent(new ArrayList());
         moduleRequest.setOrder(1);
         return moduleRequest;
     }
