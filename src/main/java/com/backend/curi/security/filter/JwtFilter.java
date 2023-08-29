@@ -76,7 +76,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
 
-            if(constants.getENV().equals("local") || constants.getENV().equals("data-local")) {
+
+            if(constants.getENV().equals("local") || constants.getENV().equals("data-local") || constants.getENV().equals("data-build")) {
                 pretendTobeAuthorized(request, response, filterChain);
             }
             else {
