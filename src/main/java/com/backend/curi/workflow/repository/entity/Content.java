@@ -4,8 +4,7 @@ import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.workflow.controller.dto.ModuleRequest;
-import com.backend.curi.workflow.repository.entity.contents.DefaultContent;
-import com.backend.curi.workflow.repository.entity.contents.NotionContent;
+import com.backend.curi.workflow.repository.entity.contents.*;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
@@ -77,10 +76,14 @@ public class Content {
             case finished:
             case slack:
             case google_docs:
+                return new GoogleDocsContent();
             case google_form:
+                return new GoogleFormContent();
             case google_drive:
             case youtube:
+                return new YoutubeContent();
             case web_url:
+                return new WebContent();
         }
 
         return new DefaultContent();
