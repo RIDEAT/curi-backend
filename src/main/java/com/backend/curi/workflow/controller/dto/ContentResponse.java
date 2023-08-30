@@ -1,5 +1,7 @@
 package com.backend.curi.workflow.controller.dto;
 
+import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
+import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.workflow.repository.entity.Content;
 import com.backend.curi.workflow.repository.entity.Module;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -40,4 +42,19 @@ public class ContentResponse {
                 .updatedDate(content.getUpdatedDate())
                 .build();
     }
+
+    public static ContentResponse of(Content content, LaunchedModule module) {
+        return ContentResponse.builder()
+                .id(content.getId())
+                .title(module.getName())
+                .contents(content.getContent())
+                .type(content.getType())
+                .createdBy(content.getCreatedBy())
+                .updatedBy(content.getUpdatedBy())
+                .createdDate(content.getCreatedDate())
+                .updatedDate(content.getUpdatedDate())
+                .build();
+    }
+
+
 }

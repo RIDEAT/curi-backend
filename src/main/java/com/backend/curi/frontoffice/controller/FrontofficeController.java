@@ -1,6 +1,7 @@
 package com.backend.curi.frontoffice.controller;
 
 import com.backend.curi.frontoffice.controller.dto.FrontOfficeResponse;
+import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 import com.slack.api.methods.SlackApiException;
@@ -24,6 +25,12 @@ public class FrontofficeController {
     public ResponseEntity<FrontOfficeResponse> getFrontOffice(@PathVariable UUID frontOfficeId){
         FrontOfficeResponse frontofficeResponse =  frontofficeService.getFrontOffice(frontOfficeId);
         return ResponseEntity.ok(frontofficeResponse);
+    }
+
+    @GetMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}")
+    public ResponseEntity<LaunchedModuleWithContent> getLaunchedModuleWithContent(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        LaunchedModuleWithContent module =  frontofficeService.getLaunchedModuleWithContent(launchedModuleId);
+        return ResponseEntity.ok(module);
     }
 
     @PostMapping("/{frontOfficeId}/oauth")
