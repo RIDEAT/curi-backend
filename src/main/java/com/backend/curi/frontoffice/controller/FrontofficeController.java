@@ -33,6 +33,14 @@ public class FrontofficeController {
         return ResponseEntity.ok(module);
     }
 
+    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/complete")
+    public ResponseEntity<LaunchedModuleWithContent> completeModule(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        LaunchedModuleWithContent module =  frontofficeService.completeLaunchedModuleWithContent(launchedModuleId);
+        return ResponseEntity.ok(module);
+    }
+
+
+
     @PostMapping("/{frontOfficeId}/oauth")
     public ResponseEntity<OAuthV2AccessResponse> oauthMember(@PathVariable UUID frontOfficeId, @Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {
         FrontOfficeResponse frontofficeResponse =  frontofficeService.getFrontOffice(frontOfficeId);

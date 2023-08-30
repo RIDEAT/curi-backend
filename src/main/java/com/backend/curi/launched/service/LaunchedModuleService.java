@@ -7,6 +7,7 @@ import com.backend.curi.launched.controller.dto.LaunchedModuleResponse;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.LaunchedModuleRepository;
+import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,12 @@ public class LaunchedModuleService {
         LaunchedModule launchedModule = LaunchedModule.of(launchedModuleRequest, launchedSequence);
         LaunchedModule savedLaunchedModule = launchedModuleRepository.save(launchedModule);
         return LaunchedModuleResponse.of(savedLaunchedModule);
+    }
+
+    public LaunchedModule completeLaunchedModule (LaunchedModule launchedModule){
+        launchedModule.setStatus(LaunchedStatus.COMPLETED);
+        LaunchedModule savedModule = launchedModuleRepository.save(launchedModule);
+        return savedModule;
     }
 
     @Transactional
