@@ -9,6 +9,7 @@ import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.controller.dto.LaunchedModuleResponse;
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
+import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 
@@ -47,6 +48,14 @@ public class FrontOfficeService {
         return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(launchedModule), ContentResponse.of(content, launchedModule));
     }
 
+    public LaunchedModuleWithContent completeLaunchedModuleWithContent(Long launchedModuleId) {
+        LaunchedModule launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        ObjectId contentId = launchedModule.getContentId();
+        Content content = contentService.getContent(contentId);
+        LaunchedModule completedModule = launchedModuleService.completeLaunchedModule(launchedModule);
+        return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(completedModule), ContentResponse.of(content, launchedModule));
+    }
+
     public void checkAuth(UUID frontOfficeId, UUID accessToken) {
         FrontOffice frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
         if (!frontOffice.getAccessToken().equals(accessToken)) throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.FRONTOFFICE_UNAUTHORIZED);
@@ -71,6 +80,7 @@ public class FrontOfficeService {
 
         return slackService.oauthMember(oAuthRequest, memberId);
     }
+
 
 
 }
