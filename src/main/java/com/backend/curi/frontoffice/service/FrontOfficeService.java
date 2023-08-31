@@ -81,6 +81,14 @@ public class FrontOfficeService {
         return slackService.oauthMember(oAuthRequest, memberId);
     }
 
+    public Boolean isAuthorized(UUID frontofficeId){
+        FrontOfficeResponse frontOffice = getFrontOffice(frontofficeId);
+        Long memberId = frontOffice.getLaunchedSequenceResponse().getAssignedMember().getId();
+
+        return slackService.isMemberAuthorized(memberId);
+    }
+
+
 
 
 }

@@ -5,6 +5,7 @@ import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.controller.dto.MemberResponse;
+import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,14 +37,8 @@ public class LaunchedWorkflowResponse {
 
     private MemberResponse employee;
 
+    private WorkspaceResponse workspaceResponse;
 
-    /*
-    private Long employeeId;
-
-    private Long workflowId;
-
-    private Long workspaceId;
-*/
 
     public static LaunchedWorkflowResponse of (LaunchedWorkflow launchedWorkflow){
         return new LaunchedWorkflowResponse(
@@ -58,7 +53,7 @@ public class LaunchedWorkflowResponse {
                 launchedWorkflow.getLaunchedWorkflowManagers().stream()
                         .map(EmployeeManagerDetail::of)
                         .collect(Collectors.toList()),
-                MemberResponse.of(launchedWorkflow.getMember())
+                MemberResponse.of(launchedWorkflow.getMember()), WorkspaceResponse.of(launchedWorkflow.getWorkspace())
 
 
                 /*

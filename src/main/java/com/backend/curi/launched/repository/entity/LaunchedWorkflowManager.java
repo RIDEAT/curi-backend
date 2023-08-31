@@ -31,6 +31,7 @@ public class LaunchedWorkflowManager {
     @JoinColumn(name = "launchedWorkflowId")
     private LaunchedWorkflow launchedWorkflow;
 
+
     public static LaunchedWorkflowManager of (LaunchedWorkflow launchedWorkflow, Role role, Member member){
         return LaunchedWorkflowManager.builder().role(role).member(member).launchedWorkflow(launchedWorkflow).build();
     }

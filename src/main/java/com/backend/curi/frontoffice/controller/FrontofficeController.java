@@ -1,5 +1,6 @@
 package com.backend.curi.frontoffice.controller;
 
+import com.backend.curi.frontoffice.controller.dto.AuthorizedResponse;
 import com.backend.curi.frontoffice.controller.dto.FrontOfficeResponse;
 import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
@@ -48,5 +49,11 @@ public class FrontofficeController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{frontOfficeId}/isAuthorized")
+    public ResponseEntity<AuthorizedResponse> isAuthorized(@PathVariable UUID frontOfficeId) throws SlackApiException, IOException {
+        Boolean isAuthorized = frontofficeService.isAuthorized(frontOfficeId);
+        AuthorizedResponse response = new AuthorizedResponse(isAuthorized);
+        return ResponseEntity.ok(response);
+    }
 
 }
