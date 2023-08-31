@@ -5,6 +5,7 @@ import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
+import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,10 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "membersId")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RoleId")
+    private Role role;
+
 /*
     @OneToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "LaunchedSequenceId")
@@ -64,7 +69,7 @@ public class LaunchedSequence extends BaseEntity {
      }
 
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
-        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).member(member).workspace(workspace).
+        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).role(sequence.getRole()).member(member).workspace(workspace).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
 
