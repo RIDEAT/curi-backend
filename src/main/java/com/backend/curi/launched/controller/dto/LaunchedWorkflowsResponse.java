@@ -18,11 +18,11 @@ public class LaunchedWorkflowsResponse {
     private List<LaunchedSequenceResponse> launchedSequenceResponses;
     private List<LaunchedEmployeeResponse> employees;
 
+
     public static LaunchedWorkflowsResponse of(List<LaunchedWorkflowResponse> responses){
         var workflowName = responses.get(0).getName();
         var commonSequences = responses.get(0).getLaunchedSequences();
         var employees = responses.stream().map(LaunchedEmployeeResponse::of).collect(Collectors.toList());
-
         return new LaunchedWorkflowsResponse(
                 workflowName,
                 commonSequences,

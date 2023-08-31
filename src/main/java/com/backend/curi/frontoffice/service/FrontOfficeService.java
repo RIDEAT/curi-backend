@@ -62,6 +62,14 @@ public class FrontOfficeService {
         return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(completedModule), ContentResponse.of(content, launchedModule));
     }
 
+    public LaunchedModuleWithContent startLaunchedModuleWithContent(Long launchedModuleId) {
+        LaunchedModule launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        ObjectId contentId = launchedModule.getContentId();
+        Content content = contentService.getContent(contentId);
+        LaunchedModule startedModule = launchedModuleService.startLaunchedModule(launchedModule);
+        return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(startedModule), ContentResponse.of(content, launchedModule));
+    }
+
     public void checkAuth(UUID frontOfficeId, UUID accessToken) {
         FrontOffice frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
         if (!frontOffice.getAccessToken().equals(accessToken)) throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.FRONTOFFICE_UNAUTHORIZED);
@@ -95,7 +103,6 @@ public class FrontOfficeService {
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_ALREADY_SATISFACTION);
         if(!launchedSequence.getSequence().getCheckSatisfaction())
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_CAN_NOT_SATISFACTION);
-
         launchedSequence.setIsScored(true);
         var satisfaction = SequenceSatisfaction.builder()
                 .score(request.getScore())
@@ -104,6 +111,12 @@ public class FrontOfficeService {
                 .build();
         sequenceSatisfactionRepository.save(satisfaction);
         return SequenceSatisfactionResponse.of(satisfaction);
+    }
+    public Boolean isAuthorized(UUID frontofficeId){
+        FrontOfficeResponse frontOffice = getFrontOffice(frontofficeId);
+        Long memberId = frontOffice.getLaunchedSequenceResponse().getAssignedMember().getId();
+
+        return slackService.isMemberAuthorized(memberId);
     }
 
 }

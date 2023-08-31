@@ -1,5 +1,5 @@
 package com.backend.curi.launched.repository.entity;
 
 public enum LaunchedStatus {
-    NEW, IN_PROGRESS, PENDING, COMPLETED
+    TO_DO, IN_PROGRESS, COMPLETED, SKIPPED, MARKED_AS_COMPLETED, OVERDUE;
 }

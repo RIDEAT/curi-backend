@@ -1,5 +1,6 @@
 package com.backend.curi.frontoffice.controller;
 
+import com.backend.curi.frontoffice.controller.dto.AuthorizedResponse;
 import com.backend.curi.frontoffice.controller.dto.FrontOfficeResponse;
 import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
 import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionRequest;
@@ -43,9 +44,15 @@ public class FrontofficeController {
     }
 
     @PostMapping("/{frontOfficeId}/sequence-satisfaction")
-    public ResponseEntity<SequenceSatisfactionResponse> setSatisfaction(@PathVariable UUID frontOfficeId, @Valid @RequestBody SequenceSatisfactionRequest sequenceSatisfactionRequest){
-        var response =  frontofficeService.setSequenceSatisfaction(frontOfficeId, sequenceSatisfactionRequest);
+    public ResponseEntity<SequenceSatisfactionResponse> setSatisfaction(@PathVariable UUID frontOfficeId, @Valid @RequestBody SequenceSatisfactionRequest sequenceSatisfactionRequest) {
+        var response = frontofficeService.setSequenceSatisfaction(frontOfficeId, sequenceSatisfactionRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/in-progress")
+    public ResponseEntity<LaunchedModuleWithContent> startModule(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        LaunchedModuleWithContent module =  frontofficeService.startLaunchedModuleWithContent(launchedModuleId);
+        return ResponseEntity.ok(module);
     }
 
     @PostMapping("/{frontOfficeId}/oauth")
@@ -55,5 +62,11 @@ public class FrontofficeController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{frontOfficeId}/isAuthorized")
+    public ResponseEntity<AuthorizedResponse> isAuthorized(@PathVariable UUID frontOfficeId) throws SlackApiException, IOException {
+        Boolean isAuthorized = frontofficeService.isAuthorized(frontOfficeId);
+        AuthorizedResponse response = new AuthorizedResponse(isAuthorized);
+        return ResponseEntity.ok(response);
+    }
 
 }

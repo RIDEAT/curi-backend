@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LaunchedEmployeeResponse {
     private Long id;
+    private Long launchedWorkflowId;
     private String name;
     private String email;
     private String department;
@@ -29,6 +30,7 @@ public class LaunchedEmployeeResponse {
 
         return new LaunchedEmployeeResponse(
                 response.getEmployee().getId(),
+                response.getId(),
                 response.getEmployee().getName(),
                 response.getEmployee().getEmail(),
                 response.getEmployee().getDepartment(),

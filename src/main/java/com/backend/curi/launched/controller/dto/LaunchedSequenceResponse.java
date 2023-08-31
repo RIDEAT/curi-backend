@@ -3,6 +3,8 @@ package com.backend.curi.launched.controller.dto;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.member.controller.dto.MemberResponse;
+import com.backend.curi.workspace.controller.dto.RoleResponse;
+import com.backend.curi.workspace.controller.dto.WorkspaceResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,14 +34,11 @@ public class LaunchedSequenceResponse {
 
     private MemberResponse assignedMember;
 
+    private RoleResponse roleResponse;
+
+    private WorkspaceResponse workspaceResponse;
+
     private List<LaunchedModuleResponse> launchedModules;
-/*
-    private Long workflowId;
-
-    private Long nextSequenceId;
-
-    private Long workspaceId;
-*/
 
     public static LaunchedSequenceResponse of (LaunchedSequence launchedSequence){
         return new LaunchedSequenceResponse(
@@ -49,7 +48,9 @@ public class LaunchedSequenceResponse {
                 launchedSequence.getStatus(),
                 launchedSequence.getApplyDate(),
                 MemberResponse.of(launchedSequence.getMember()),
-                launchedSequence.getLaunchedModules().stream()
+                RoleResponse.of(launchedSequence.getRole()),
+                WorkspaceResponse.of(launchedSequence.getWorkspace()),
+               launchedSequence.getLaunchedModules().stream()
                         .map(LaunchedModuleResponse::of)
                         .sorted(Comparator.comparing(LaunchedModuleResponse::getOrder))
                         .collect(Collectors.toList())
