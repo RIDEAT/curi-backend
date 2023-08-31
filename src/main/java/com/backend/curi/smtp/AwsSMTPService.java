@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AwsSMTPService {
@@ -51,54 +53,104 @@ public class AwsSMTPService {
 
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, String userEmail) {
         String message = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f2f2; padding: 20px; border-radius: 10px;\">" +
-                "<h2 style=\"color: #007bff;\">🚀 새로운 워크플로우가 시작되었습니다! 🚀</h2>" +
-                "<p>새로운 워크플로우가 시작되었습니다. 아래는 상세 내용입니다:</p>" +
+                "<h2 style=\"color: #007bff;\">🚀 워크플로우가 런치되었습니다! 🚀</h2>" +
+                "<p>아래는 상세 내용입니다:</p>" +
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
                 "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
-                "</ul>" +
-                "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
-                "<p>감사합니다.</p>" +
-                "</div>";
+                "</ul>";
+
+
+        // Launched sequences details
+        List<LaunchedSequence> launchedSequences = launchedWorkflow.getLaunchedSequences();
+        if (!launchedSequences.isEmpty()) {
+            message += "<p><strong>시퀀스 목록:</strong></p>";
+            message += "<ul>";
+
+            for (LaunchedSequence sequence : launchedSequences) {
+                message += "<li><strong>시퀀스 이름: </strong> " + sequence.getName() + "</li>";
+                message += "<li><strong>시작일: </strong> " + sequence.getApplyDate() + "</li>";
+                message += "<li><strong>대상자: </strong> " + sequence.getMember().getName() + "</li>";
+                message += "<li><strong>역할: </strong> " + sequence.getRole().getName() + "</li>";
+                message += "<br/>";
+            }
+
+            message += "</ul>";
+        }
+
+        // Footer of the email
+        message += "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>";
+        message += "<p>감사합니다.</p>";
+        message += "</div>";
 
         send("워크플로우 런치 알림", message, userEmail);
 
     }
 
-    public void sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow, String employeeEmail) {
+    public void sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow, Member employee) {
+        String employeeEmail = employee.getEmail();
         String message = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f2f2; padding: 20px; border-radius: 10px;\">" +
-                "<h2 style=\"color: #007bff;\">🚀 새로운 워크플로우가 시작되었습니다! 🚀</h2>" +
+                "<h2 style=\"color: #007bff;\">🚀 워크플로우가 할당되었습니다! 🚀</h2>" +
                 "<p>안녕하세요, " + launchedWorkflow.getMember().getName() + " 님! </p>" +
-                "<p>새로운 워크플로우가 시작되었습니다. 아래는 상세 내용입니다:</p>" +
+                "<p>아래는 상세 내용입니다:</p>" +
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
                 "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
-                "</ul>" +
-                "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
-                "<p>시작하신 워크플로우가 성공적으로 진행되길 바랍니다!</p>" +
-                "<p>감사합니다.</p>" +
-                "</div>";
+                "</ul>";
+
+        // Launched sequences details
+        List<LaunchedSequence> launchedSequences = launchedWorkflow.getLaunchedSequences();
+        List<LaunchedSequence> assignedSequences = launchedSequences.stream().filter(launchedSequence -> launchedSequence.getMember().equals(employee))
+                .collect(Collectors.toList());
+
+        if (!assignedSequences.isEmpty()) {
+            message += "<p><strong>시퀀스 목록:</strong></p>";
+            message += "<ul>";
+
+            for (LaunchedSequence sequence : assignedSequences) {
+                message += "<li><strong>시퀀스 이름: </strong> " + sequence.getName() + "</li>";
+                message += "<li><strong>시작일: </strong> " + sequence.getApplyDate() + "</li>";
+                message += "<li><strong>대상자: </strong> " + sequence.getMember().getName() + "</li>";
+                message += "<br/>";
+            }
+
+            message += "</ul>";
+        }
 
         send("워크플로우 런치 알림", message, employeeEmail);
-
     }
 
     public void sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Member member) {
         String message = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f2f2; padding: 20px; border-radius: 10px;\">" +
-                "<h2 style=\"color: #007bff;\">🚀 새로운 워크플로우가 시작되었습니다! 🚀</h2>" +
+                "<h2 style=\"color: #007bff;\">🚀 워크플로우가 할당되었습니다! 🚀</h2>" +
                 "<p>안녕하세요, " + member.getName() + " 님! </p>" +
-                "<p>새로운 워크플로우가 시작되었습니다. 아래는 상세 내용입니다:</p>" +
+                "<p>아래는 상세 내용입니다:</p>" +
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
                 "<li><strong>워크플로우 이름:</strong> " + launchedWorkflow.getName() + "</li>" +
                 "<li><strong>입사 일자:</strong> " + launchedWorkflow.getMember().getStartDate() + "</li>" +
-                "</ul>" +
-                "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>" +
-                "<p>"+ launchedWorkflow.getMember().getName() +"님의 성공적인 온보딩을 함께 해주세요!</p>" +
-                "<p>감사합니다.</p>" +
-                "</div>";
+                "</ul>";
+
+        // Launched sequences details
+        // Launched sequences details
+        List<LaunchedSequence> launchedSequences = launchedWorkflow.getLaunchedSequences();
+        List<LaunchedSequence> assignedSequences = launchedSequences.stream().filter(launchedSequence -> launchedSequence.getMember().equals(member))
+                .collect(Collectors.toList());
+        if (!assignedSequences.isEmpty()) {
+            message += "<p><strong>시퀀스 목록:</strong></p>";
+            message += "<ul>";
+
+            for (LaunchedSequence sequence : assignedSequences) {
+                message += "<li><strong>시퀀스 이름: </strong> " + sequence.getName() + "</li>";
+                message += "<li><strong>시작일: </strong> " + sequence.getApplyDate() + "</li>";
+                message += "<li><strong>대상자: </strong> " + sequence.getMember().getName() + "</li>";
+                message += "<br/>";
+            }
+
+            message += "</ul>";
+        }
 
         send("워크플로우 런치 알림", message, member.getEmail());
     }

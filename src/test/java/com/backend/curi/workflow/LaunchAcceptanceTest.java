@@ -463,7 +463,7 @@ public class LaunchAcceptanceTest {
         sequenceRequest.setName("신입 환영 시퀀스");
         sequenceRequest.setDayOffset(-2);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(hrManagerRoleId);
+        sequenceRequest.setRoleId(employeeRoleId);
 
         return sequenceRequest;
     }
@@ -484,7 +484,7 @@ public class LaunchAcceptanceTest {
         sequenceRequest.setName("코드 리뷰 시퀀스");
         sequenceRequest.setDayOffset(1);
         sequenceRequest.setPrevSequenceId(0L);
-        sequenceRequest.setRoleId(hrManagerRoleId);
+        sequenceRequest.setRoleId(directManagerRoleId);
 
         return sequenceRequest;
     }
