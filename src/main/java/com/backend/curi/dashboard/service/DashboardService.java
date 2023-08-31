@@ -48,17 +48,17 @@ public class DashboardService {
     private DashboardWorkflowResponse getDashboardWorkflowResponse(WorkflowResponse workflowResponse, List<LaunchedWorkflow> launchedWorkflowList){
         DashboardWorkflowResponse dashboardWorkflowResponse = new DashboardWorkflowResponse(workflowResponse.getName(),workflowResponse.getId(),0L,0L,0L,0L);
 
-        for (LaunchedWorkflow launchedWorkflow : launchedWorkflowList){
-            if (launchedWorkflow.getStatus().equals(LaunchedStatus.NEW) || launchedWorkflow.getStatus().equals(LaunchedStatus.PENDING)) {
-                dashboardWorkflowResponse.setPendingCnt(dashboardWorkflowResponse.getPendingCnt() + 1);
-            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.IN_PROGRESS)){
-                dashboardWorkflowResponse.setInProgressCnt(dashboardWorkflowResponse.getInProgressCnt() + 1);
-            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.COMPLETED)){
-                dashboardWorkflowResponse.setCompletedCnt(dashboardWorkflowResponse.getCompletedCnt()+1);
-            } else{
-                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKFLOW_NOT_NORMAL);
-            }
-        }
+//        for (LaunchedWorkflow launchedWorkflow : launchedWorkflowList){
+//            if (launchedWorkflow.getStatus().equals(LaunchedStatus.NEW) || launchedWorkflow.getStatus().equals(LaunchedStatus.PENDING)) {
+//                dashboardWorkflowResponse.setPendingCnt(dashboardWorkflowResponse.getPendingCnt() + 1);
+//            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.IN_PROGRESS)){
+//                dashboardWorkflowResponse.setInProgressCnt(dashboardWorkflowResponse.getInProgressCnt() + 1);
+//            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.COMPLETED)){
+//                dashboardWorkflowResponse.setCompletedCnt(dashboardWorkflowResponse.getCompletedCnt()+1);
+//            } else{
+//                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.WORKFLOW_NOT_NORMAL);
+//            }
+//        }
 
         //dashboardWorkflowResponse.setProgress(100 * dashboardWorkflowResponse.getCompletedCnt() / launchedWorkflowList.size());
         return dashboardWorkflowResponse;
