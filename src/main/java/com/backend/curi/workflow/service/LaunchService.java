@@ -153,18 +153,13 @@ public class LaunchService {
     @Transactional
     public void sendLaunchedSequenceNotification(Long launchedSequenceId) {
         var launchedSequence = launchedSequenceService.getLaunchedSequenceEntity(launchedSequenceId);
-        if (launchedSequence.getStatus() != LaunchedStatus.NEW)
+        if (launchedSequence.getStatus() != LaunchedStatus.TO_DO)
             return;
 
         launchedSequence.setStatus(LaunchedStatus.IN_PROGRESS);
 
         var launchedWorkflow = launchedSequence.getLauchedWorkflow();
         launchedWorkflow.setStatus(LaunchedStatus.IN_PROGRESS);
-
-        var launchedModules = launchedSequence.getLaunchedModules();
-        // 모듈의 맨 첫번 째는 notification이라고 가정
-        var notification = launchedModules.get(0);
-        notification.setStatus(LaunchedStatus.IN_PROGRESS);
 
         var memberTo = launchedSequence.getMember().getEmail();
         var frontOffice = frontofficeService.getFrontOfficeByLaunchedSequenceId(launchedSequenceId);

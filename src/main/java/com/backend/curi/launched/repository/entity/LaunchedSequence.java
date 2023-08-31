@@ -69,7 +69,7 @@ public class LaunchedSequence extends BaseEntity {
      }
 
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
-        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.NEW).lauchedWorkflow(launchedWorkflow).role(sequence.getRole()).member(member).workspace(workspace).
+        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.TO_DO).lauchedWorkflow(launchedWorkflow).role(sequence.getRole()).member(member).workspace(workspace).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
 

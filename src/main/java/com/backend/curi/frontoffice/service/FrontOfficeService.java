@@ -56,6 +56,14 @@ public class FrontOfficeService {
         return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(completedModule), ContentResponse.of(content, launchedModule));
     }
 
+    public LaunchedModuleWithContent startLaunchedModuleWithContent(Long launchedModuleId) {
+        LaunchedModule launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        ObjectId contentId = launchedModule.getContentId();
+        Content content = contentService.getContent(contentId);
+        LaunchedModule startedModule = launchedModuleService.startLaunchedModule(launchedModule);
+        return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(startedModule), ContentResponse.of(content, launchedModule));
+    }
+
     public void checkAuth(UUID frontOfficeId, UUID accessToken) {
         FrontOffice frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
         if (!frontOffice.getAccessToken().equals(accessToken)) throw new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.FRONTOFFICE_UNAUTHORIZED);
@@ -87,7 +95,6 @@ public class FrontOfficeService {
 
         return slackService.isMemberAuthorized(memberId);
     }
-
 
 
 

@@ -57,4 +57,10 @@ public class LaunchedModuleService {
         LaunchedModule savedLaunchedModule = launchedModuleRepository.save(launchedModule);
         return LaunchedModuleResponse.of(savedLaunchedModule);
     }
+
+    public LaunchedModule startLaunchedModule(LaunchedModule launchedModule) {
+        launchedModule.setStatus(LaunchedStatus.IN_PROGRESS);
+        LaunchedModule savedModule = launchedModuleRepository.save(launchedModule);
+        return savedModule;
+    }
 }

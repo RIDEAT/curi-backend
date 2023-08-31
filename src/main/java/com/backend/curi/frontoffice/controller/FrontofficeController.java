@@ -41,6 +41,11 @@ public class FrontofficeController {
     }
 
 
+    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/in-progress")
+    public ResponseEntity<LaunchedModuleWithContent> startModule(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        LaunchedModuleWithContent module =  frontofficeService.startLaunchedModuleWithContent(launchedModuleId);
+        return ResponseEntity.ok(module);
+    }
 
     @PostMapping("/{frontOfficeId}/oauth")
     public ResponseEntity<OAuthV2AccessResponse> oauthMember(@PathVariable UUID frontOfficeId, @Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {

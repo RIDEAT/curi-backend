@@ -52,7 +52,7 @@ public class LaunchedModule extends BaseEntity {
 
 
     public static LaunchedModule of (ObjectId launchedContentId, Module module, LaunchedSequence launchedSequence, Workspace workspace){
-        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.NEW).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(module.getOrder()).build();
+        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.TO_DO).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(module.getOrder()).build();
     }
 
     public void modify (LaunchedModuleRequest request){
