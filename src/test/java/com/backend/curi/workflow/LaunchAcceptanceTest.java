@@ -145,7 +145,7 @@ public class LaunchAcceptanceTest {
         directManagerRoleId = workspaceResponse.getRoles().get(1).getId();
         hrManagerRoleId = workspaceResponse.getRoles().get(2).getId();
 
-        var managerResponse = memberService.createMember(getManagerRequest());
+        var managerResponse = memberService.createMember(getDirectManagerRequest());
 
         directManagerId= managerResponse.getId();
 
@@ -426,7 +426,7 @@ public class LaunchAcceptanceTest {
     }
 
 
-    private MemberRequest getManagerRequest(){
+    private MemberRequest getDirectManagerRequest(){
         MemberRequest managerRequest = new MemberRequest();
         managerRequest.setWid(workspaceId);
         managerRequest.setDepartment("back-end");
