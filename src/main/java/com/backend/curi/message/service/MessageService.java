@@ -46,15 +46,15 @@ public class MessageService {
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
 
         log.info ("send workflow launch alarm to employee");
-        String employeeEmail = launchedWorkflow.getMember().getEmail();
+        Member employee = launchedWorkflow.getMember();
         slackService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow);
-        awsSMTPService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow, employeeEmail);
+        awsSMTPService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow, employee);
 
         log.info ("send workflow launch alarm to related managers");
         for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
             Role role = entry.getKey();
             Member member = entry.getValue();
-            // with following code, prevent self-assigned situation (신규입사자 to 신규입사자)
+            // with following code, we can prevent self-assigned situation (신규입사자 to 신규입사자)
             if (role.getName().equals("신규입사자")) continue;
             slackService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, role, member);
             awsSMTPService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, member);
