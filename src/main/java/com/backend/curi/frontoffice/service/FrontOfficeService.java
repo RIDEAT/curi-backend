@@ -108,6 +108,7 @@ public class FrontOfficeService {
                 .score(request.getScore())
                 .comment(request.getComment())
                 .sequence(launchedSequence.getSequence())
+                .member(launchedSequence.getMember())
                 .build();
         sequenceSatisfactionRepository.save(satisfaction);
         return SequenceSatisfactionResponse.of(satisfaction);
