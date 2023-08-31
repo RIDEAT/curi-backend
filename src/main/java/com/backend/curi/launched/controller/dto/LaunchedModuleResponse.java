@@ -2,6 +2,7 @@ package com.backend.curi.launched.controller.dto;
 
 import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
+import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ public class LaunchedModuleResponse {
 
     private LaunchedStatus status;
 
+    private ModuleType type;
+
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId contentId;
 
@@ -31,6 +34,7 @@ public class LaunchedModuleResponse {
                 launchedModule.getId(),
                 launchedModule.getName(),
                 launchedModule.getStatus(),
+                launchedModule.getType(),
                 launchedModule.getContentId(),
                 launchedModule.getOrderInSequence()
         );
