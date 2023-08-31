@@ -4,8 +4,7 @@ import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.workflow.controller.dto.ModuleRequest;
-import com.backend.curi.workflow.repository.entity.contents.DefaultContent;
-import com.backend.curi.workflow.repository.entity.contents.NotionContent;
+import com.backend.curi.workflow.repository.entity.contents.*;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,6 +25,7 @@ public class Content {
 
     private ModuleType type;
 
+    private Long workspaceId;
     @Setter
     private Object content;
 
@@ -46,11 +46,12 @@ public class Content {
         this.updatedBy = currentUser.getUserId();
     }
 
-    public static Content of(ModuleType type, CurrentUser currentUser){
+    public static Content of(ModuleType type, CurrentUser currentUser, Long workspaceId){
         var specificContent = specificContent(type);
         return Content.builder()
                 .type(type)
                 .content(specificContent)
+                .workspaceId(workspaceId)
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .createdBy(currentUser.getUserId())
@@ -61,6 +62,7 @@ public class Content {
         return Content.builder()
                 .type(contentToCopy.getType())
                 .content(contentToCopy.getContent())
+                .workspaceId(contentToCopy.getWorkspaceId())
                 .createdDate(contentToCopy.getCreatedDate())
                 .updatedDate(contentToCopy.getUpdatedDate())
                 .createdBy(contentToCopy.getCreatedBy())
@@ -77,10 +79,14 @@ public class Content {
             case finished:
             case slack:
             case google_docs:
+                return new GoogleDocsContent();
             case google_form:
+                return new GoogleFormContent();
             case google_drive:
             case youtube:
+                return new YoutubeContent();
             case web_url:
+                return new WebContent();
         }
 
         return new DefaultContent();

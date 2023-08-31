@@ -29,6 +29,10 @@ public class Sequence extends BaseEntity {
     private Integer dayOffset;
 
     @Setter
+    @Builder.Default
+    private Boolean checkSatisfaction = false;
+
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
@@ -50,6 +54,7 @@ public class Sequence extends BaseEntity {
                 name(request.getName()).
                 role(role).
                 dayOffset(request.getDayOffset()).
+                checkSatisfaction(request.getCheckSatisfaction()).
                 workspace(workspace).
                 workflow(workflow).
                 build();

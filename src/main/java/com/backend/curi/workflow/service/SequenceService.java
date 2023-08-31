@@ -81,6 +81,8 @@ public class SequenceService {
             sequence.setDayOffset(request.getDayOffset());
         if(request.getRoleId()!=null)
             sequence.setRole(roleService.getRoleEntity(request.getRoleId()));
+        if(request.getCheckSatisfaction()!=null)
+            sequence.setCheckSatisfaction(request.getCheckSatisfaction());
         return SequenceResponse.of(sequence);
     }
 }

@@ -12,4 +12,5 @@ public class SequenceUpdateRequest {
     private String name;
     private Long roleId;
     private Integer dayOffset;
+    private Boolean checkSatisfaction;
 }

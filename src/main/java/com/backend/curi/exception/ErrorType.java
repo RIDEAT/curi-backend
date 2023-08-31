@@ -37,6 +37,8 @@ public enum ErrorType {
     WORKFLOW_SEQUENCE_NOT_EXISTS("SEQUENCE-001", "워크플로우에 해당 시퀀스가 존재하지 않습니다."),
     SEQUENCE_NOT_EXISTS("SEQUENCE-002", "존재하지 않는 시퀀스 입니다."),
     WORKFLOW_SEQUENCE_ALREADY_EXISTS("SEQUENCE-003", "워크플로우에 해당 시퀀스가 이미 존재합니다. 시퀀스는 중복될 수 없습니다."),
+    SEQUENCE_CAN_NOT_SATISFACTION("SEQUENCE-004", "평가할 수 없는 시퀀스입니다."),
+    SEQUENCE_ALREADY_SATISFACTION("SEQUENCE-005", "이미 평가를 완료한 시퀀스입니다."),
 
 
     FRONTOFFICE_NOT_EXISTS("FRONTOFFICE-001", "존재하지 않는 프론트오피스입니다."),

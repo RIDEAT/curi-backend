@@ -7,10 +7,7 @@ import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -28,6 +25,10 @@ public class LaunchedSequence extends BaseEntity {
     private Long id;
 
     private String name;
+
+    @Builder.Default
+    @Setter
+    private Boolean isScored = false;
 
     private LaunchedStatus status;
 
@@ -59,6 +60,10 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "workspaceId")
     private Workspace workspace;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sequenceId")
+    private Sequence sequence;
+
     @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
     @Builder.Default
     private List<LaunchedModule> launchedModules = new ArrayList<>();
@@ -69,7 +74,7 @@ public class LaunchedSequence extends BaseEntity {
      }
 
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
-        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.TO_DO).lauchedWorkflow(launchedWorkflow).role(sequence.getRole()).member(member).workspace(workspace).
+        return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.TO_DO).lauchedWorkflow(launchedWorkflow).role(sequence.getRole()).member(member).workspace(workspace).sequence(sequence).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
 

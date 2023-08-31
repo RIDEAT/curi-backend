@@ -3,8 +3,7 @@ package com.backend.curi.workflow.controller;
 import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.workflow.controller.dto.ContentResponse;
 import com.backend.curi.workflow.controller.dto.ContentUpdateRequest;
-import com.backend.curi.workflow.repository.entity.contents.DefaultContent;
-import com.backend.curi.workflow.repository.entity.contents.NotionContent;
+import com.backend.curi.workflow.repository.entity.contents.*;
 import com.backend.curi.workflow.service.ModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +34,38 @@ public class ContentController {
 
     @PatchMapping("/notion")
     public ResponseEntity<ContentResponse> updateNotionContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<NotionContent> request,
+                                                               @PathVariable Long workspaceId, @PathVariable Long workflowId,
+                                                               @PathVariable Long sequenceId, @PathVariable Long moduleId) {
+        var response = moduleService.updateContent(moduleId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/web")
+    public ResponseEntity<ContentResponse> updateWebContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<WebContent> request,
+                                                               @PathVariable Long workspaceId, @PathVariable Long workflowId,
+                                                               @PathVariable Long sequenceId, @PathVariable Long moduleId) {
+        var response = moduleService.updateContent(moduleId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/google_docs")
+    public ResponseEntity<ContentResponse> updateGoogleDocsContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<GoogleDocsContent> request,
+                                                               @PathVariable Long workspaceId, @PathVariable Long workflowId,
+                                                               @PathVariable Long sequenceId, @PathVariable Long moduleId) {
+        var response = moduleService.updateContent(moduleId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/google_form")
+    public ResponseEntity<ContentResponse> updateGoogleFormContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<GoogleFormContent> request,
+                                                               @PathVariable Long workspaceId, @PathVariable Long workflowId,
+                                                               @PathVariable Long sequenceId, @PathVariable Long moduleId) {
+        var response = moduleService.updateContent(moduleId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/youtube")
+    public ResponseEntity<ContentResponse> updateYoutubeContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<YoutubeContent> request,
                                                                @PathVariable Long workspaceId, @PathVariable Long workflowId,
                                                                @PathVariable Long sequenceId, @PathVariable Long moduleId) {
         var response = moduleService.updateContent(moduleId, request);

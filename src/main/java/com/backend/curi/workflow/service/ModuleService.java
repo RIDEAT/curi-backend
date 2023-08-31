@@ -51,7 +51,7 @@ public class ModuleService {
         var sequence = sequenceService.getSequenceEntity(sequenceId);
         var currentUser = common.getCurrentUser();
 
-        var content = Content.of(request.getType(), currentUser);
+        var content = Content.of(request.getType(), currentUser, workspaceId);
         contentRepository.save(content);
 
         var module = Module.of(request, workspace, sequence, content.getId());
