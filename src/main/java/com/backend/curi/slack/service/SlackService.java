@@ -657,6 +657,10 @@ public class SlackService {
         return !slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty();
     }
 
+    public Boolean isMemberAuthorized(Long memberId){
+        return !slackMemberRepository.findByMemberId(memberId).isEmpty();
+    }
+
     public void deleteOauth() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         SlackInfo slackInfo = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.SLACK_ADMIN_USER_NOT_AUTHORIZED));
