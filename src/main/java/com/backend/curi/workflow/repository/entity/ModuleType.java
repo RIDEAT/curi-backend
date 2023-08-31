@@ -11,5 +11,7 @@ public enum ModuleType {
     youtube,
     google_form,
     google_drive,
-    web_url
+    web_url,
+    sequence_satisfaction,
+    employee_adaptability
 }

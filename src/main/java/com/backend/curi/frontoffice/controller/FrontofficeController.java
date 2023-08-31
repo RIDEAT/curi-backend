@@ -2,8 +2,11 @@ package com.backend.curi.frontoffice.controller;
 
 import com.backend.curi.frontoffice.controller.dto.FrontOfficeResponse;
 import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
+import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionRequest;
+import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionResponse;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
+import com.backend.curi.workflow.repository.entity.SequenceSatisfaction;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +42,11 @@ public class FrontofficeController {
         return ResponseEntity.ok(module);
     }
 
-
+    @PostMapping("/{frontOfficeId}/sequence-satisfaction")
+    public ResponseEntity<SequenceSatisfactionResponse> setSatisfaction(@PathVariable UUID frontOfficeId, @Valid @RequestBody SequenceSatisfactionRequest sequenceSatisfactionRequest){
+        var response =  frontofficeService.setSequenceSatisfaction(frontOfficeId, sequenceSatisfactionRequest);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/{frontOfficeId}/oauth")
     public ResponseEntity<OAuthV2AccessResponse> oauthMember(@PathVariable UUID frontOfficeId, @Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {

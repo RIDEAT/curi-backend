@@ -24,6 +24,8 @@ public class LaunchedSequenceResponse {
 
     private String name;
 
+    private Boolean checkSatisfaction;
+
     private LaunchedStatus status;
 
     private LocalDate applyDate;
@@ -43,15 +45,14 @@ public class LaunchedSequenceResponse {
         return new LaunchedSequenceResponse(
                 launchedSequence.getId(),
                 launchedSequence.getName(),
+                launchedSequence.getSequence().getCheckSatisfaction(),
                 launchedSequence.getStatus(),
                 launchedSequence.getApplyDate(),
                 MemberResponse.of(launchedSequence.getMember()),
-                launchedSequence.getLaunchedModules() != null
-                        ? launchedSequence.getLaunchedModules().stream()
+                launchedSequence.getLaunchedModules().stream()
                         .map(LaunchedModuleResponse::of)
                         .sorted(Comparator.comparing(LaunchedModuleResponse::getOrder))
                         .collect(Collectors.toList())
-                        : Collections.emptyList()
                /* launchedSequence.getOrderInWorkflow()
 
                 launchedWorkflow.getEmployee().getId(),

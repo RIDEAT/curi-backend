@@ -25,6 +25,7 @@ public class Content {
 
     private ModuleType type;
 
+    private Long workspaceId;
     @Setter
     private Object content;
 
@@ -45,11 +46,12 @@ public class Content {
         this.updatedBy = currentUser.getUserId();
     }
 
-    public static Content of(ModuleType type, CurrentUser currentUser){
+    public static Content of(ModuleType type, CurrentUser currentUser, Long workspaceId){
         var specificContent = specificContent(type);
         return Content.builder()
                 .type(type)
                 .content(specificContent)
+                .workspaceId(workspaceId)
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .createdBy(currentUser.getUserId())
@@ -60,6 +62,7 @@ public class Content {
         return Content.builder()
                 .type(contentToCopy.getType())
                 .content(contentToCopy.getContent())
+                .workspaceId(contentToCopy.getWorkspaceId())
                 .createdDate(contentToCopy.getCreatedDate())
                 .updatedDate(contentToCopy.getUpdatedDate())
                 .createdBy(contentToCopy.getCreatedBy())
