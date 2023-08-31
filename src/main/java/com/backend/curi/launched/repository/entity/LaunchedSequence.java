@@ -8,6 +8,7 @@ import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -26,8 +27,8 @@ public class LaunchedSequence extends BaseEntity {
 
     private String name;
 
-    @Builder.Default
     @Setter
+    @ColumnDefault("false")
     private Boolean isScored = false;
 
     private LaunchedStatus status;

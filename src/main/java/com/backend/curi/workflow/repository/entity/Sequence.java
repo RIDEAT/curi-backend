@@ -6,6 +6,7 @@ import com.backend.curi.workflow.controller.dto.SequenceRequest;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Sequence extends BaseEntity {
     private Integer dayOffset;
 
     @Setter
-    @Builder.Default
+    @ColumnDefault("false")
     private Boolean checkSatisfaction = false;
 
     @Setter

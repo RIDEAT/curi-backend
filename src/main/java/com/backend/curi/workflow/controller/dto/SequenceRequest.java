@@ -1,6 +1,7 @@
 package com.backend.curi.workflow.controller.dto;
 
 import com.backend.curi.workspace.repository.entity.Role;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,8 @@ public class SequenceRequest {
 
     private Integer dayOffset;
 
-    private Boolean checkSatisfaction;
+    @Builder.Default
+    private Boolean checkSatisfaction = false;
 
     private Long prevSequenceId = 0L;
 }
