@@ -6,6 +6,7 @@ import com.backend.curi.member.repository.entity.MemberType;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -52,7 +53,7 @@ public class MemberController {
 
     @DeleteMapping("/members/{mid}")
     public ResponseEntity<MemberResponse> deleteMember(@PathVariable("workspaceId") Long workspaceId,
-                                                       @PathVariable("mid") Long memberId) {
+                                                       @PathVariable("mid") Long memberId) throws DataIntegrityViolationException {
         var response = memberService.deleteMember(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

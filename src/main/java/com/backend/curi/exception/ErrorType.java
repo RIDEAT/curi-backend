@@ -15,6 +15,8 @@ public enum ErrorType {
     ASYNC_HANDLING_ERROR("COMMON-005", "비동기 처리에서 문제가 발생했습니다."),
     NETWORK_ERROR("COMMON-006", "네트워크 처리에서 문제가 발생했습니다."),
     INVALID_URL_ERROR ("COMMON-007", "올바르지 않은 URL입니다."),
+    INVALID_DATA_DELETE ("COMMON-008", "데이터 삭제에서 문제가 발생했습니다."),
+
 
     WORKSPACE_NOT_EXISTS("WORKSPACE-001", "존재하지 않는 워크 스페이스입니다."),
     DUPLICATED_WORKSPACE_NAME("WORKSPACE-002", "중복된 워크 스페이스 이름입니다."),
