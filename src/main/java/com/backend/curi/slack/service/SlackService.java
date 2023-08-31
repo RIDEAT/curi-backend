@@ -488,6 +488,25 @@ public class SlackService {
                         .build())
                 .build());
 
+        blocks.add(DividerBlock.builder().build());
+
+        String sequenceHeader = "* 런치된 시퀀스 정보*\n";
+
+        blocks.add(SectionBlock.builder()
+                .text(MarkdownTextObject.builder().text(sequenceHeader).build())
+                .build());
+
+
+        for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
+                String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
+                        "*시작일: * " + sequence.getApplyDate().toString() +
+                        "*대상자: * " + sequence.getMember().getName();
+
+                blocks.add(SectionBlock.builder()
+                        .text(MarkdownTextObject.builder().text(sequenceDetails).build())
+                        .build());
+
+        }
 
         return blocks;
     }
@@ -520,7 +539,7 @@ public class SlackService {
 
         for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
             if (sequence.getMember().equals(employee)) {
-                String sequenceDetails = "*활동명: * " + sequence.getName() + "\n" +
+                String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
                         "*시작일: * " + sequence.getApplyDate().toString();
 
                 blocks.add(SectionBlock.builder()
@@ -562,9 +581,12 @@ public class SlackService {
 
         for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
             if (sequence.getMember().equals(manager)) {
-                blocks.add(SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getName()).build()).build());
-                blocks.add(SectionBlock.builder().text(MarkdownTextObject.builder().text(sequence.getApplyDate().toString()).build()).build());
+                String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
+                        "*시작일: * " + sequence.getApplyDate().toString();
 
+                blocks.add(SectionBlock.builder()
+                        .text(MarkdownTextObject.builder().text(sequenceDetails).build())
+                        .build());
             }
         }
 
