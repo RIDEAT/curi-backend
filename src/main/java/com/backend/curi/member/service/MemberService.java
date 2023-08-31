@@ -8,11 +8,9 @@ import com.backend.curi.member.repository.MemberRepository;
 import com.backend.curi.member.repository.entity.*;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workspace.repository.RoleRepository;
-import com.backend.curi.workspace.repository.entity.Role;
-import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +33,7 @@ public class MemberService {
     private final UserworkspaceService userworkspaceService;
 
 
-    public MemberResponse deleteMember(Long memberId) {
+    public MemberResponse deleteMember(Long memberId) throws DataIntegrityViolationException {
         var member = getMember(memberId);
         memberRepository.delete(member);
 
