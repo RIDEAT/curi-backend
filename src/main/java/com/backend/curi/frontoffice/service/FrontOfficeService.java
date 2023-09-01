@@ -13,6 +13,7 @@ import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.service.LaunchedModuleService;
+import com.backend.curi.launched.service.LaunchedSequenceService;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 
 import com.backend.curi.slack.service.SlackService;
@@ -39,6 +40,7 @@ public class FrontOfficeService {
     private final SlackService slackService;
     private final FrontOfficeRepository frontOfficeRepository;
     private final LaunchedModuleService launchedModuleService;
+    private final LaunchedSequenceService launchedSequenceService;
     private final ContentService contentService;
     private final SequenceSatisfactionRepository sequenceSatisfactionRepository;
 
@@ -59,7 +61,15 @@ public class FrontOfficeService {
         ObjectId contentId = launchedModule.getContentId();
         Content content = contentService.getContent(contentId);
         LaunchedModule completedModule = launchedModuleService.completeLaunchedModule(launchedModule);
+        checkIfAllModulesCompleted(launchedModule);
         return LaunchedModuleWithContent.of(LaunchedModuleResponse.of(completedModule), ContentResponse.of(content, launchedModule));
+    }
+
+    private void checkIfAllModulesCompleted(LaunchedModule launchedModule) {
+        LaunchedSequence launchedSequence = launchedModule.getLaunchedSequence();
+        if (launchedSequence.getLaunchedModules().stream().allMatch(launchedModule1 -> launchedModule1.getStatus().equals(LaunchedStatus.COMPLETED))) {
+            launchedSequenceService.completeLaunchedSequence(launchedSequence);
+        }
     }
 
     public LaunchedModuleWithContent startLaunchedModuleWithContent(Long launchedModuleId) {

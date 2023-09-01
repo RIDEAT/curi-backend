@@ -67,4 +67,8 @@ public class LaunchedSequenceService {
         launchedSequenceRepository.save(launchedSequence);
     }
 
+    public void completeLaunchedSequence(LaunchedSequence launchedSequence) {
+        launchedSequence.setStatus(LaunchedStatus.COMPLETED);
+        launchedSequenceRepository.save(launchedSequence);
+    }
 }
