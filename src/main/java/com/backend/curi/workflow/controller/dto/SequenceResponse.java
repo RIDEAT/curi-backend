@@ -19,6 +19,7 @@ public class SequenceResponse {
     private String name;
     private RoleResponse role;
     private Integer dayOffset;
+    private Boolean checkSatisfaction;
     private List<ModuleResponse> modules;
 
     public static SequenceResponse of(Sequence sequence) {
@@ -31,6 +32,7 @@ public class SequenceResponse {
                 sequence.getName(),
                 RoleResponse.of(sequence.getRole()),
                 sequence.getDayOffset(),
+                sequence.getCheckSatisfaction(),
                 responseList);
     }
 }

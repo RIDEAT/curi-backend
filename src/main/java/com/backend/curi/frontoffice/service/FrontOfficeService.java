@@ -106,7 +106,7 @@ public class FrontOfficeService {
     }
 
 
-    public SequenceSatisfactionResponse getSequenceSatisfaction(UUID frontOfficeId){
+    public SequenceSatisfactionResponse  getSequenceSatisfaction(UUID frontOfficeId){
         var frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
         var launchedSequence = frontOffice.getLaunchedSequence();
         if(launchedSequence.getIsScored())
