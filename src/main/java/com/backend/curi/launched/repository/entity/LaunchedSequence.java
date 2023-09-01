@@ -5,6 +5,7 @@ import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.entity.Sequence;
+import com.backend.curi.workflow.repository.entity.SequenceSatisfaction;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
@@ -36,7 +37,10 @@ public class LaunchedSequence extends BaseEntity {
     @Builder.Default
     private LocalDate applyDate = LocalDate.of(2000,10,9);
 
-
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "satisfactionId")
+    @Setter
+    private SequenceSatisfaction sequenceSatisfaction;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "membersId")

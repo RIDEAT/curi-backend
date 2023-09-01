@@ -43,6 +43,11 @@ public class FrontofficeController {
         return ResponseEntity.ok(module);
     }
 
+    @GetMapping("/{frontOfficeId}/sequence-satisfaction")
+    public ResponseEntity<SequenceSatisfactionResponse> getSatisfaction(@PathVariable UUID frontOfficeId) {
+        var response = frontofficeService.getSequenceSatisfaction(frontOfficeId);
+        return ResponseEntity.ok(response);
+    }
     @PostMapping("/{frontOfficeId}/sequence-satisfaction")
     public ResponseEntity<SequenceSatisfactionResponse> setSatisfaction(@PathVariable UUID frontOfficeId, @Valid @RequestBody SequenceSatisfactionRequest sequenceSatisfactionRequest) {
         var response = frontofficeService.setSequenceSatisfaction(frontOfficeId, sequenceSatisfactionRequest);

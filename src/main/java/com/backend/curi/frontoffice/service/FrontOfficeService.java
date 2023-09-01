@@ -105,6 +105,15 @@ public class FrontOfficeService {
         return slackService.oauthMember(oAuthRequest, memberId);
     }
 
+
+    public SequenceSatisfactionResponse getSequenceSatisfaction(UUID frontOfficeId){
+        var frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
+        var launchedSequence = frontOffice.getLaunchedSequence();
+        if(launchedSequence.getIsScored())
+            return SequenceSatisfactionResponse.of(launchedSequence.getSequenceSatisfaction());
+        return SequenceSatisfactionResponse.isNone();
+    }
+
     @Transactional
     public SequenceSatisfactionResponse setSequenceSatisfaction(UUID frontOfficeId, SequenceSatisfactionRequest request){
         var frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
@@ -113,7 +122,6 @@ public class FrontOfficeService {
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_ALREADY_SATISFACTION);
         if(!launchedSequence.getSequence().getCheckSatisfaction())
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_CAN_NOT_SATISFACTION);
-        launchedSequence.setIsScored(true);
         var satisfaction = SequenceSatisfaction.builder()
                 .score(request.getScore())
                 .comment(request.getComment())
@@ -121,6 +129,8 @@ public class FrontOfficeService {
                 .member(launchedSequence.getMember())
                 .build();
         sequenceSatisfactionRepository.save(satisfaction);
+        launchedSequence.setSequenceSatisfaction(satisfaction);
+        launchedSequence.setIsScored(true);
         return SequenceSatisfactionResponse.of(satisfaction);
     }
     public Boolean isAuthorized(UUID frontofficeId){
