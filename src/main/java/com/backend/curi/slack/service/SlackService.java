@@ -75,6 +75,9 @@ public class SlackService {
     @Value("${slack.redirect-uri}")
     private String redirectUri;
 
+    @Value("${slack.member-redirect-uri}")
+    private String memberRedirectUri;
+
     @Value("${slack.bot-token}")
     private String botToken;
 
@@ -95,7 +98,7 @@ public class SlackService {
         OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .redirectUri(redirectUri + "/member")
+                .redirectUri(memberRedirectUri)
                 .code(oAuthRequest.getCode())
                 .build();
 
