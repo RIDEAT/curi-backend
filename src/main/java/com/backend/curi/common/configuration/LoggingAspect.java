@@ -1,6 +1,8 @@
 package com.backend.curi.common.configuration;
 
 import com.backend.curi.CuriApplication;
+import com.backend.curi.common.Common;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class LoggingAspect {
     private static Logger log = LoggerFactory.getLogger(LoggingAspect.class);
+    private final Common common;
 
     @Before("execution(* com.backend.curi.*.service.*.*(..))")
     public void logBefore(JoinPoint joinPoint) {
@@ -21,14 +25,17 @@ public class LoggingAspect {
         String packageName = joinPoint.getTarget().getClass().getPackage().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        log.debug("Before executing: {}.{}.{}", packageName, className, methodName);
-    }
+        String userId = common.getCurrentUser().getUserId();
+        log.info("Before method execution: packageName={}, className={}, methodName={}, userId={}",
+                packageName, className, methodName, userId);    }
 
     @After("execution(* com.backend.curi.*.service.*.*(..))")
     public void logAfter(JoinPoint joinPoint) {
         String packageName = joinPoint.getTarget().getClass().getPackage().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        log.debug("After executing: {}.{}.{}", packageName, className, methodName);
+        String userId = common.getCurrentUser().getUserId();
+        log.info("After method execution: packageName={}, className={}, methodName={}, userId={}",
+                packageName, className, methodName, userId);
     }
 }
