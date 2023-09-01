@@ -11,7 +11,7 @@ public class Common {
     public CurrentUser getCurrentUser(){
         try {
             return (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             CurrentUser currentUser = new CurrentUser();
             currentUser.setUserId("no-cuurent-user");
             currentUser.setNewAuthToken("no-cuurent-user");
