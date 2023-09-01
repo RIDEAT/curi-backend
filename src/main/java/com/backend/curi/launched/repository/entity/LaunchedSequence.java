@@ -29,6 +29,7 @@ public class LaunchedSequence extends BaseEntity {
     private String name;
 
     @Setter
+    @Builder.Default
     @ColumnDefault("false")
     private Boolean isScored = false;
 
