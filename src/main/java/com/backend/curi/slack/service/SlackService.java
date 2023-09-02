@@ -89,10 +89,7 @@ public class SlackService {
 
 
         if (!slackMemberRepository.findByMemberId(memberId).isEmpty()) {
-            var response = new OAuthV2AccessResponse();
-            response.setOk(false);
-            response.setError("이미 인증받은 멤버입니다.");
-            return response;
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_OAUTH_ALREADY_EXISTS);
         }
 
         OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
@@ -130,20 +127,16 @@ public class SlackService {
             log.warn(e.getMessage());
         }
 
-        OAuthV2AccessResponse oAuthV2AccessResponse = new OAuthV2AccessResponse();
-        oAuthV2AccessResponse.setOk(false);
-        return oAuthV2AccessResponse;
+        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_OAUTH_FAILED);
     }
 
     public OAuthV2AccessResponse oauth(OAuthRequest oAuthRequest) {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty()) {
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_OAUTH_ALREADY_EXISTS);
+        }
+
         try {
-            CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (!slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty()) {
-                var response = new OAuthV2AccessResponse();
-                response.setOk(false);
-                response.setError("이미 인증받은 어드민입니다.");
-                return response;
-            }
 
             OAuthV2AccessRequest request = OAuthV2AccessRequest.builder()
                     .clientId(clientId)
@@ -185,9 +178,7 @@ public class SlackService {
             log.warn(e.getMessage());
         }
 
-        OAuthV2AccessResponse oAuthV2AccessResponse = new OAuthV2AccessResponse();
-        oAuthV2AccessResponse.setOk(false);
-        return oAuthV2AccessResponse;
+        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_OAUTH_FAILED);
     }
 
     public ConversationsCreateResponse createChannel(ChannelRequest channelRequest) throws SlackApiException, IOException {
