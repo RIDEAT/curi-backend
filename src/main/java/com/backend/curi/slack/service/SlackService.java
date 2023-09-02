@@ -229,7 +229,9 @@ public class SlackService {
             log.error(e.getMessage());
         }
 
-       throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     public ChatPostMessageResponse sendMessageToMember(SlackMessageRequest slackMessageRequest, Long memberId) {
@@ -259,8 +261,9 @@ public class SlackService {
 
         }
 
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
-
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
 
     }
 
@@ -326,8 +329,9 @@ public class SlackService {
             log.error(e.getMessage());
         }
 
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
-
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
 
@@ -352,7 +356,10 @@ public class SlackService {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
+
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     public ChatPostMessageResponse sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow) {
@@ -379,7 +386,10 @@ public class SlackService {
 
 
         }
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+
     }
 
     public ChatPostMessageResponse sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Role role, Member member) {
@@ -408,8 +418,9 @@ public class SlackService {
 
 
         }
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
-
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     public ChatPostMessageResponse sendLaunchedWorkflowDashboard(LaunchedWorkflow launchedWorkflow, String userId) {
@@ -438,8 +449,9 @@ public class SlackService {
 
 
         }
-        throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_MESSAGE_FAILED);
-
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
 
