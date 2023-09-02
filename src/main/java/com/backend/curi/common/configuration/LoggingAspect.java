@@ -26,7 +26,7 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         String userId = common.getCurrentUser().getUserId();
-        log.info("userId={} Before {}.{}.{})",
+        log.info("userId : {} Before {}.{}.{})",
                 userId, packageName, className, methodName);
     }
 
@@ -36,7 +36,7 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         String userId = common.getCurrentUser().getUserId();
-        log.info("userId={} After {}.{}.{})",
+        log.info("userId : {} After {}.{}.{})",
                 userId, packageName, className, methodName);
     }
 }
