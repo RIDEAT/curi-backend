@@ -49,6 +49,9 @@ public enum ErrorType {
     SLACK_ACCESS_TOKEN_NOT_EXISTS("SLACK-001", "슬랙의 어세스 토큰이 없습니다."),
     SLACK_MEMBER_NOT_AUTHORIZED("SLACK-002", "슬랙에 인증되지 않은 멤버입니다."),
     SLACK_ADMIN_USER_NOT_AUTHORIZED ("SLACK-003", "슬랙에 인증되지 않은 어드민 유저입니다."),
+    SLACK_OAUTH_FAILED("SLACK-004", "슬랙의 OAuth 인증에 실패했습니다."),
+    SLACK_OAUTH_ALREADY_EXISTS("SLACK-005", "이미 슬랙에 OAuth 인증이 되어있습니다."),
+    SLACK_MESSAGE_FAILED("SLACK-006", "슬랙 메세지 전송에 실패했습니다."),
 
     INVALID_IMAGE_NAME("COMMON-007", "올바르지 않은 이미지 이름입니다."),
     WORKSPACE_LOGO_ALREADY_EXISTS("WORKSPACE-004", "이미 로고가 존재합니다."),

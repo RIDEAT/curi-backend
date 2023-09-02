@@ -23,14 +23,14 @@ public class GlobalExceptionHandler {
     private final Common common;
     @ExceptionHandler(CuriException.class)
     public ResponseEntity<ExceptionResponse> handleCuriException(CuriException e) {
-        log.warn("Current User Id: {} \nCuriException: {}", common.getCurrentUser().getUserId(), e.getMessage());
+        log.warn("userId : {} \nCuriException: {}", common.getCurrentUser().getUserId(), e.getMessage());
         return ResponseEntity.status(e.getHttpStatus()).body(e.getBody());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<MethodArgumentNotValidExceptionResponse>
     handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.warn("Current User Id: {} \nMethod Argument Not Valid: {}", common.getCurrentUser().getUserId(), e.getMessage());
+        log.warn("userId : {} \nMethod Argument Not Valid: {}", common.getCurrentUser().getUserId(), e.getMessage());
         MethodArgumentNotValidExceptionResponse errorResponse =
                 MethodArgumentNotValidExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR);
         for (FieldError fieldError : e.getFieldErrors()) {
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e){
-        log.warn("Current User Id: {} \nData Integrity Not Valid: {}", common.getCurrentUser().getUserId(), e.getMessage());
+        log.warn("userId : {} \nData Integrity Not Valid: {}", common.getCurrentUser().getUserId(), e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
                 ErrorType.INVALID_DATA_DELETE.getErrorCode(),
                 ErrorType.INVALID_DATA_DELETE.getMessage()));
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
         String unexpectedErrorTrace = ExceptionUtils.getStackTrace(e);
-        log.error("Current User Id: {} \nUnexpected ERROR: {}", common.getCurrentUser().getUserId(), e.getMessage());
+        log.error("userId : {} \nUnexpected ERROR: {}", common.getCurrentUser().getUserId(), e.getMessage());
         return ResponseEntity.internalServerError()
                 .body(
                         new ExceptionResponse(

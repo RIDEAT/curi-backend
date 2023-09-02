@@ -26,8 +26,9 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         String userId = common.getCurrentUser().getUserId();
-        log.info("Before method execution: packageName={}, className={}, methodName={}, userId={}",
-                packageName, className, methodName, userId);    }
+        log.info("userId : {} Before {}.{}.{})",
+                userId, packageName, className, methodName);
+    }
 
     @After("execution(* com.backend.curi.*.service.*.*(..))")
     public void logAfter(JoinPoint joinPoint) {
@@ -35,7 +36,7 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         String userId = common.getCurrentUser().getUserId();
-        log.info("After method execution: packageName={}, className={}, methodName={}, userId={}",
-                packageName, className, methodName, userId);
+        log.info("userId : {} After {}.{}.{})",
+                userId, packageName, className, methodName);
     }
 }
