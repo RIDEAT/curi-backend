@@ -2,8 +2,10 @@ package com.backend.curi.launched.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.launched.controller.dto.LaunchedSequenceUpdateRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowUpdateRequest;
 import com.backend.curi.launched.repository.LaunchedWorkflowManagerRepository;
 import com.backend.curi.launched.repository.LaunchedWorkflowRepository;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -67,8 +69,7 @@ public class LaunchedWorkflowService {
     }
 
     @Transactional
-
-    public LaunchedWorkflowResponse updateLaunchedWorkflow(Long workspaceId, Long launchedWorkflowId, LaunchedWorkflowRequest launchedWorkflowRequestRequest ) {
+    public LaunchedWorkflowResponse modifyLaunchedWorkflow(Long workspaceId, Long launchedWorkflowId, LaunchedWorkflowRequest launchedWorkflowRequestRequest ) {
         //Employee employee = memberService.getEmployeeById(createdLaunchedWorkflow.getEmployeeId());
         //Workspace workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         //Workflow workflow = workflowService.getWorkflowById(createdLaunchedWorkflow.getWorkflowId());
@@ -77,10 +78,20 @@ public class LaunchedWorkflowService {
         LaunchedWorkflow existedLaunchedWorkflow = getLaunchedWorkflowEntity(launchedWorkflowId);
         existedLaunchedWorkflow.modify(launchedWorkflowRequestRequest);
 
-       //LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(newLaunchedWorkflow);
+        //LaunchedWorkflow savedLaunchedWorkflow = launchedWorkflowRepository.save(newLaunchedWorkflow);
         return LaunchedWorkflowResponse.of(existedLaunchedWorkflow);
     }
-
+    @Transactional
+    public LaunchedWorkflowResponse updateLaunchedWorkflow(Long workspaceId, Long launchedWorkflowId, LaunchedWorkflowUpdateRequest request ) {
+        LaunchedWorkflow existedLaunchedWorkflow = getLaunchedWorkflowEntity(launchedWorkflowId);
+        if(request.getStatus() != null)
+            existedLaunchedWorkflow.setStatus(request.getStatus());
+        if(request.getKeyDate() != null) {
+            existedLaunchedWorkflow.setKeyDate(request.getKeyDate());
+            // are sequences apply date need update?
+        }
+        return LaunchedWorkflowResponse.of(existedLaunchedWorkflow);
+    }
 
     @Transactional
     public LaunchedWorkflowResponse saveLaunchedWorkflow (LaunchedWorkflow launchedWorkflow, Map<Role, Member> managers){

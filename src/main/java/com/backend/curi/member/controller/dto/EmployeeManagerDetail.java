@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeManagerDetail {
+    private Long workflowManagerId;
     private String name;
     private String roleName;
     private Long id;
@@ -19,6 +20,7 @@ public class EmployeeManagerDetail {
 
     public static EmployeeManagerDetail of(LaunchedWorkflowManager manager) {
         return new EmployeeManagerDetail(
+                manager.getId(),
                 manager.getMember().getName(),
                 manager.getRole().getName(),
                 manager.getMember().getId(),

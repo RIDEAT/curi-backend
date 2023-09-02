@@ -34,6 +34,7 @@ public class LaunchedSequence extends BaseEntity {
 
     private LaunchedStatus status;
 
+    @Setter
     @Builder.Default
     private LocalDate applyDate = LocalDate.of(2000,10,9);
 
