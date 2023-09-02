@@ -18,7 +18,6 @@ public class SequenceSatisfactionResponse {
     private Long score;
     private String comment;
     private Boolean isScored;
-
     public static SequenceSatisfactionResponse of(SequenceSatisfaction satisfaction){
         return new SequenceSatisfactionResponse(satisfaction.getId(), satisfaction.getScore(), satisfaction.getComment(), true);
     }

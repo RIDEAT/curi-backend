@@ -2,11 +2,11 @@ package com.backend.curi.launched.service;
 
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
-import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
-import com.backend.curi.launched.controller.dto.LaunchedSequenceResponse;
+import com.backend.curi.launched.controller.dto.*;
 import com.backend.curi.launched.repository.LaunchedSequenceRepository;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
+import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -55,6 +55,18 @@ public class LaunchedSequenceService {
     public LaunchedSequenceResponse updateLaunchedSeqeunce(LaunchedSequenceRequest launchedSequenceRequest, Long launchedSequenceId){
         LaunchedSequence launchedSequence = getLaunchedSequenceEntity(launchedSequenceId);
         launchedSequence.modify(launchedSequenceRequest);
+        return LaunchedSequenceResponse.of(launchedSequence);
+    }
+
+    @Transactional
+    public LaunchedSequenceResponse updateLaunchedSeqeunce(LaunchedSequenceUpdateRequest request, Long launchedSequenceId) {
+        var launchedSequence = getLaunchedSequenceEntity(launchedSequenceId);
+        if(request.getStatus() != null)
+            launchedSequence.setStatus(request.getStatus());
+        if(request.getApplyDate() != null)
+            launchedSequence.setApplyDate(request.getApplyDate());
+
+
         return LaunchedSequenceResponse.of(launchedSequence);
     }
 

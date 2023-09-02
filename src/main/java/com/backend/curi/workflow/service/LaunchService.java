@@ -129,7 +129,7 @@ public class LaunchService {
 
         var request = SequenceMessageRequest.builder()
                 .id(launchedSequence.getId())
-                .applyDate(launchedSequence.getUpdatedDate())
+                .applyDate(launchedSequence.getApplyDate().atStartOfDay())
                 .build();
         var response = schedulerOpenFeign.createMessage(request);
         if (response.getStatusCode() != HttpStatus.CREATED)

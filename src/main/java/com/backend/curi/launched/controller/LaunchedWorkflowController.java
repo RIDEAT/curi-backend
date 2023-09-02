@@ -2,6 +2,7 @@ package com.backend.curi.launched.controller;
 
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowRequest;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowUpdateRequest;
 import com.backend.curi.launched.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +40,16 @@ public class LaunchedWorkflowController {
 
 
     @PutMapping("/{launchedworkflowId}")
-    public ResponseEntity<LaunchedWorkflowResponse> updateLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody LaunchedWorkflowRequest launchedWorkflowRequest) {
+    public ResponseEntity<LaunchedWorkflowResponse> modifyLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody LaunchedWorkflowRequest launchedWorkflowRequest) {
         // Here, you can implement the logic to update a specific launched workflow by its ID within the specified workspaceId.
-        LaunchedWorkflowResponse updatedLaunchedWorkflow = launchedWorkflowService.updateLaunchedWorkflow(workspaceId, launchedworkflowId, launchedWorkflowRequest);
+        LaunchedWorkflowResponse updatedLaunchedWorkflow = launchedWorkflowService.modifyLaunchedWorkflow(workspaceId, launchedworkflowId, launchedWorkflowRequest);
+        return ResponseEntity.ok(updatedLaunchedWorkflow);
+    }
+
+    @PatchMapping("/{launchedworkflowId}")
+    public ResponseEntity<LaunchedWorkflowResponse> updateLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody LaunchedWorkflowUpdateRequest request) {
+        // Here, you can implement the logic to update a specific launched workflow by its ID within the specified workspaceId.
+        LaunchedWorkflowResponse updatedLaunchedWorkflow = launchedWorkflowService.updateLaunchedWorkflow(workspaceId, launchedworkflowId, request);
         return ResponseEntity.ok(updatedLaunchedWorkflow);
     }
 

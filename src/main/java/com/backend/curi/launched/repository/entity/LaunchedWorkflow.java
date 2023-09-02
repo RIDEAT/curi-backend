@@ -27,8 +27,10 @@ public class LaunchedWorkflow extends BaseEntity {
 
     private String name;
 
+    @Setter
     private LaunchedStatus status;
 
+    @Setter
     private LocalDate keyDate;
 
 
@@ -65,15 +67,11 @@ public class LaunchedWorkflow extends BaseEntity {
 
     }
 
-    public void setStatus(LaunchedStatus status) {
-        this.status = status;
-    }
-
     public void modify(LaunchedWorkflowRequest launchedWorkflowRequest){
         this.name = launchedWorkflowRequest.getName();
         this.status = launchedWorkflowRequest.getStatus();
         this.keyDate = launchedWorkflowRequest.getKeyDate();
-
-
     }
+
+
 }

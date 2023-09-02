@@ -1,11 +1,14 @@
 package com.backend.curi.launched.controller;
 
+import com.backend.curi.exception.sequence.ValidationSequence;
 import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.launched.controller.dto.LaunchedSequenceResponse;
+import com.backend.curi.launched.controller.dto.LaunchedSequenceUpdateRequest;
 import com.backend.curi.launched.service.LaunchedSequenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,8 +34,14 @@ public class LaunchedSequenceController {
 
 
     @PutMapping("/{sequenceId}")
-    public ResponseEntity<LaunchedSequenceResponse> updateLaunchedSequence(@PathVariable Long workspaceId,@PathVariable Long launchedworkflowId, @RequestBody LaunchedSequenceRequest launchedSequenceRequest, @PathVariable Long sequenceId){
+    public ResponseEntity<LaunchedSequenceResponse> updateLaunchedSequence(@PathVariable Long workspaceId,@PathVariable Long launchedworkflowId, @RequestBody @Validated(ValidationSequence.class) LaunchedSequenceRequest launchedSequenceRequest, @PathVariable Long sequenceId){
         LaunchedSequenceResponse updatedLaunchedSequence = launchedSequenceService.updateLaunchedSeqeunce(launchedSequenceRequest, sequenceId);
+        return ResponseEntity.ok(updatedLaunchedSequence);
+    }
+
+    @PatchMapping("/{sequenceId}")
+    public ResponseEntity<LaunchedSequenceResponse> updateLaunchedSequence(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody @Validated(ValidationSequence.class) LaunchedSequenceUpdateRequest request, @PathVariable Long sequenceId){
+        LaunchedSequenceResponse updatedLaunchedSequence = launchedSequenceService.updateLaunchedSeqeunce(request, sequenceId);
         return ResponseEntity.ok(updatedLaunchedSequence);
     }
 
