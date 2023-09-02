@@ -5,6 +5,8 @@ import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.notification.repository.entity.Notifications;
+import com.backend.curi.notification.service.NotificationService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
@@ -29,6 +31,7 @@ public class MessageService {
 
     private final SlackService slackService;
     private final AwsSMTPService awsSMTPService;
+    private final NotificationService notificationService;
 
 
     public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence){
@@ -44,6 +47,7 @@ public class MessageService {
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
+        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "새로운 워크플로우가 할당되었습니다.");
 
         log.info ("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
