@@ -30,6 +30,7 @@ public class NotificationService {
                 .title(title)
                 .content(content)
                 .timestamp(LocalDateTime.now())
+                .isRead(false)
                 .build();
         notificationRepository.save(notification);
     }

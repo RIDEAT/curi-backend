@@ -17,6 +17,7 @@ public class NotificationResponse {
     private String title;
     private Object contents;
     private String timestamp;
+    private boolean isRead;
     private Long workspaceId;
 
     public static NotificationResponse of(Notifications notifications) {
@@ -25,6 +26,7 @@ public class NotificationResponse {
                 .title(notifications.getTitle())
                 .timestamp(notifications.getTimestamp().toString())
                 .contents(notifications.getContent())
+                .isRead(notifications.isRead())
                 .workspaceId(notifications.getWorkspaceId())
                 .build();
     }
