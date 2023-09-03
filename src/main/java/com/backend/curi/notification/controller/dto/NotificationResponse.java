@@ -1,6 +1,8 @@
 package com.backend.curi.notification.controller.dto;
 
 import com.backend.curi.notification.repository.entity.Notifications;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import org.bson.types.ObjectId;
 
@@ -10,6 +12,7 @@ import org.bson.types.ObjectId;
 @NoArgsConstructor
 @Builder
 public class NotificationResponse {
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
     private Object contents;
     private Long workspaceId;
