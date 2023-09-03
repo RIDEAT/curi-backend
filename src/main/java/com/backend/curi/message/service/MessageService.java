@@ -53,7 +53,7 @@ public class MessageService {
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
 
-        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ") 가 실행되었습니다. D-Day (D-0) :" +launchedWorkflow.getKeyDate().format(formatter));
+        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " +launchedWorkflow.getKeyDate().format(formatter));
 
         log.info ("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
