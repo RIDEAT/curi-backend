@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +34,15 @@ public class MessageService {
     private final SlackService slackService;
     private final AwsSMTPService awsSMTPService;
     private final NotificationService notificationService;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
 
     public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence){
         log.info("런치드 시퀀스 전송");
         awsSMTPService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, memberTo);
         slackService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, launchedSequence.getMember().getId());
+        notificationService.createNotification(launchedSequence.getWorkspace().getId(), "시퀀스 메일 발송", launchedSequence.getMember().getName()+"님에게 할당된 시퀀스(" + launchedSequence.getName() + ") 메일이 발송되었습니다." );
+
     }
 
     public void sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap){
@@ -47,7 +52,8 @@ public class MessageService {
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
-        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행!", "새로운 워크플로우가 실행되었습니다.");
+
+        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ") 가 실행되었습니다. D-Day (D-0) :" +launchedWorkflow.getKeyDate().format(formatter));
 
         log.info ("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
