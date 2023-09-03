@@ -4,8 +4,11 @@ import com.backend.curi.notification.controller.dto.NotificationResponse;
 import com.backend.curi.notification.repository.NotificationRepository;
 import com.backend.curi.notification.repository.entity.Notifications;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,11 +24,17 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    public void createNotification(Long workspaceId, String content) {
+    public void createNotification(Long workspaceId, String title, String content) {
         Notifications notification = Notifications.builder()
                 .workspaceId(workspaceId)
+                .title(title)
                 .content(content)
+                .timestamp(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
+    }
+
+    public void deleteNotification(ObjectId notificationId) {
+        notificationRepository.deleteById(notificationId);
     }
 }

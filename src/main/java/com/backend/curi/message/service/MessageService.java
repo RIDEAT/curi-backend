@@ -47,7 +47,7 @@ public class MessageService {
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
-        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "새로운 워크플로우가 할당되었습니다.");
+        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행!", "새로운 워크플로우가 실행되었습니다.");
 
         log.info ("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
