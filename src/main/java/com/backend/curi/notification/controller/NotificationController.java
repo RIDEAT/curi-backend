@@ -31,5 +31,11 @@ public class NotificationController {
         return ResponseEntity.ok(deleteResponse);
     }
 
+    @PutMapping("/notifications/{notificationId}/mark-as-read")
+    public ResponseEntity<NotificationResponse> markNotificationAsRead(
+            @PathVariable ObjectId notificationId) {
+        NotificationResponse response = notificationService.markNotificationAsRead(notificationId);
+        return ResponseEntity.ok(response);
+    }
 
 }

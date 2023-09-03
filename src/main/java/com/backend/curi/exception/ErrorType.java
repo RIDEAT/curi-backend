@@ -1,5 +1,6 @@
 package com.backend.curi.exception;
 
+import com.backend.curi.notification.repository.entity.Notifications;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -55,7 +56,10 @@ public enum ErrorType {
 
     INVALID_IMAGE_NAME("COMMON-007", "올바르지 않은 이미지 이름입니다."),
     WORKSPACE_LOGO_ALREADY_EXISTS("WORKSPACE-004", "이미 로고가 존재합니다."),
-    WORKSPACE_LOGO_NOT_EXISTS("WORKSPACE-005", "로고가 존재하지 않습니다.");
+    WORKSPACE_LOGO_NOT_EXISTS("WORKSPACE-005", "로고가 존재하지 않습니다."),
+
+
+    NOTIFICATION_NOT_EXISTS("NOTIFICATION-001", "존재하지 않는 알림입니다.");
 
 
 
