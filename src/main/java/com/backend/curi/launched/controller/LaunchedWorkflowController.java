@@ -5,6 +5,7 @@ import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowUpdateRequest;
 import com.backend.curi.launched.service.LaunchedWorkflowService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +57,6 @@ public class LaunchedWorkflowController {
     @DeleteMapping("/{launchedworkflowId}")
     public ResponseEntity<Void> deleteLaunchedWorkflow(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId) {
         launchedWorkflowService.deleteLaunchedWorkflow(launchedworkflowId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

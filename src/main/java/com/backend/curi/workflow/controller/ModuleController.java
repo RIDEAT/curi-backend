@@ -58,6 +58,6 @@ public class ModuleController {
     public ResponseEntity<Void> deleteSequenceModule(@PathVariable Long workspaceId, @PathVariable Long workflowId,
                                                      @PathVariable Long sequenceId, @PathVariable Long moduleId) {
         moduleService.deleteModule(moduleId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

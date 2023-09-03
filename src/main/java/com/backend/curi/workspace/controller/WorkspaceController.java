@@ -69,7 +69,7 @@ public class WorkspaceController {
         CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
         workspaceService.deleteWorkspace(workspaceId, currentUser);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
@@ -85,6 +85,6 @@ public class WorkspaceController {
     @DeleteMapping("workspaces/{workspaceId}/logo")
     public ResponseEntity<Void> deleteWorkspaceLogo(@PathVariable Long workspaceId){
         workspaceService.deleteWorkspaceLogo(workspaceId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

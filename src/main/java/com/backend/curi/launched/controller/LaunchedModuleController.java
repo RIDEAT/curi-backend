@@ -4,6 +4,7 @@ import com.backend.curi.launched.controller.dto.LaunchedModuleRequest;
 import com.backend.curi.launched.controller.dto.LaunchedModuleResponse;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public class LaunchedModuleController {
     @DeleteMapping("/{moduleId}")
     public ResponseEntity<Void> deleteLaunchedModule (@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId, @PathVariable Long moduleId){
         launchedModuleService.deleteLaunchedModule(moduleId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

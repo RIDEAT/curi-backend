@@ -48,7 +48,7 @@ public class LaunchedSequenceController {
     @DeleteMapping("/{sequenceId}")
     public ResponseEntity<Void> deleteLaunchedSequence(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @PathVariable Long sequenceId){
         launchedSequenceService.deleteLaunchedSequence(sequenceId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

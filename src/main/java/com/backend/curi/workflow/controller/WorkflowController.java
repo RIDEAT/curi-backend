@@ -84,6 +84,6 @@ public class WorkflowController {
         response.setCreatedDate(LocalDateTime.now());
         response.setUpdatedDate(LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

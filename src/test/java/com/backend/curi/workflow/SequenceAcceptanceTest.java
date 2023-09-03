@@ -150,7 +150,7 @@ public class SequenceAcceptanceTest {
         assertThat(!workflowResponseBeforeDeleting.getSequences().isEmpty());
 
         ExtractableResponse<Response> response = 워크플로우내_시퀀스_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         ExtractableResponse<Response> workflowGetResponse = 워크스페이스내_워크플로우_조회();
         WorkflowResponse workflowResponse = workflowGetResponse.as(WorkflowResponse.class);

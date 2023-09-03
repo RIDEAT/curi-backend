@@ -45,7 +45,7 @@ public class SequenceController {
     public ResponseEntity<Void> deleteWorkflowSequence(@PathVariable Long workflowId,
                                                        @PathVariable Long sequenceId) {
         sequenceService.deleteSequence(sequenceId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PatchMapping("workflows/{workflowId}/sequences/{sequenceId}")

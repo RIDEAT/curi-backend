@@ -160,7 +160,7 @@ public class ModuleAcceptanceTest {
     @Test
     public void deleteModuleInSequence(){
         ExtractableResponse<Response> response = 시퀀스내_모듈_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     private ExtractableResponse<Response> 워크스페이스내_시퀀스_조회(Long sequenceId){

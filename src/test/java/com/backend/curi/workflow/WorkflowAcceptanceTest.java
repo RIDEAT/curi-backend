@@ -142,7 +142,7 @@ public class WorkflowAcceptanceTest {
     @Test
     public void deleteEmployee(){
         ExtractableResponse<Response> response = 워크플로우_삭제();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         ExtractableResponse<Response> getResponse = 워크스페이스내_워크플로우_조회();
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
