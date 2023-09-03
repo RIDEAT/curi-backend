@@ -541,6 +541,7 @@ public class SlackService {
                         .build());
             }
         }
+
         return blocks;
     }
 

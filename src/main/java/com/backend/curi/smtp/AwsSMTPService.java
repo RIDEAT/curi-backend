@@ -53,7 +53,7 @@ public class AwsSMTPService {
 
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, String userEmail) {
         String message = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f2f2; padding: 20px; border-radius: 10px;\">" +
-                "<h2 style=\"color: #007bff;\">🚀 워크플로우가 런치되었습니다! 🚀</h2>" +
+                "<h2 style=\"color: #007bff;\">🚀 워크플로우가 할당되었습니다! 🚀</h2>" +
                 "<p>아래는 상세 내용입니다:</p>" +
                 "<ul style=\"list-style-type: none; padding-left: 0;\">" +
                 "<li><strong>신규 입사자:</strong> " + launchedWorkflow.getMember().getName() + "</li>" +
@@ -80,11 +80,12 @@ public class AwsSMTPService {
         }
 
         // Footer of the email
+        message += "<p>slack 연동을 하신 경우, 메일뿐 아니라 slack으로도 알림을 받으실 수 있습니다. slack 연동 바로가기</p>";
         message += "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.dev.onbird.team/\" style=\"color: #007bff;\">온버드 웹사이트</a>에서 확인하세요.</p>";
         message += "<p>감사합니다.</p>";
         message += "</div>";
 
-        send("워크플로우 런치 알림", message, userEmail);
+        send("워크플로우 할당 알림", message, userEmail);
 
     }
 
@@ -117,9 +118,16 @@ public class AwsSMTPService {
             }
 
             message += "</ul>";
+
+
         }
 
-        send("워크플로우 런치 알림", message, employeeEmail);
+        String footMessage = "<p>수행할 시퀀스는 시작일자 오전 9시에 메일로 받을 수 있습니다. 또한 slack 연동을 하신 경우 slack으로도 받을 수 있습니다. slack 연동 바로가기\n더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.\n감사합니다. 😊</p>";
+        message += footMessage;
+        message += "</div>";
+
+
+        send("워크플로우 할당 알림", message, employeeEmail);
     }
 
     public void sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Member member) {
@@ -152,7 +160,12 @@ public class AwsSMTPService {
             message += "</ul>";
         }
 
-        send("워크플로우 런치 알림", message, member.getEmail());
+        String footMessage = "<p>수행할 시퀀스는 시작일자 오전 9시에 메일로 받을 수 있습니다. 또한 slack 연동을 하신 경우 slack으로도 받을 수 있습니다. slack 연동 바로가기\n더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.\n감사합니다. 😊</p>";
+        message += footMessage;
+        message += "</div>";
+
+
+        send("워크플로우 할당 알림", message, member.getEmail());
     }
 
     public void sendLaunchedSequenceMessageToMember(LaunchedSequence launchedSequence, FrontOffice frontOffice, String memberTo) {
@@ -160,10 +173,11 @@ public class AwsSMTPService {
         String name = launchedSequence.getMember().getName();
         String emailContent = "<html><body style='font-family: Arial, sans-serif;'>"
                 + "<h2 style='color: #0084ff;'>🌟 오늘 할당된 시퀀스가 있습니다! 🌟</h2>"
-                + "<p>안녕하세요, " + name + " 님! </p>"
+                + "<p>안녕하세요, " + name + " 님! </행p>"
                 + "<p>오늘 할당된 시퀀스를 안내드립니다. 아래 링크를 통해 시퀀스 상세 내용을 확인하실 수 있습니다.</p>"
                 + "<p><strong>URL:</strong> <a href='" + getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + "'>시퀀스 보기</a></p>"
                 + "<p>시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.</p>"
+                + "<p>slack 연동을 하신 경우, 메일뿐 아니라 slack으로도 알림을 받으실 수 있습니다. slack 연동 바로가기\n</p>"
                 + "<p>더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.</p>"
                 + "<p>감사합니다.</p>"
                 + "</body></html>";
