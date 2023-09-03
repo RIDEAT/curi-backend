@@ -1,11 +1,14 @@
 package com.backend.curi.notification.service;
 
+import com.backend.curi.exception.CuriException;
+import com.backend.curi.exception.ErrorType;
 import com.backend.curi.notification.controller.dto.NotificationResponse;
 import com.backend.curi.notification.repository.NotificationRepository;
 import com.backend.curi.notification.repository.entity.Notifications;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.jni.Local;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,5 +40,12 @@ public class NotificationService {
 
     public void deleteNotification(ObjectId notificationId) {
         notificationRepository.deleteById(notificationId);
+    }
+
+    public NotificationResponse markNotificationAsRead(ObjectId notificationId) {
+        Notifications notification = notificationRepository.findById(notificationId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.NOTIFICATION_NOT_EXISTS));
+        notification.setRead(true);
+        notificationRepository.save(notification);
+        return NotificationResponse.of(notification);
     }
 }

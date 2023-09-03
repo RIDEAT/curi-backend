@@ -19,6 +19,7 @@ public class Notifications {
     private Object content;
 
     @Builder.Default
+    @Setter
     private boolean isRead = false;
 
     private Long workspaceId;
