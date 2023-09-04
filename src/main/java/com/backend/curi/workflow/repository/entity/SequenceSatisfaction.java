@@ -26,8 +26,7 @@ public class SequenceSatisfaction {
 
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "launched_sequence_id")
+    @OneToOne(mappedBy = "sequenceSatisfaction", fetch = FetchType.LAZY)
     private LaunchedSequence launchedSequence;
 
     @ManyToOne(fetch = FetchType.LAZY)
