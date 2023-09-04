@@ -23,7 +23,7 @@ public class NotificationService {
     public List<NotificationResponse> getNotifications(Long workspaceId) {
         List<Notifications> notifications = notificationRepository.findAllByWorkspaceId(workspaceId);
         return notifications.stream()
-                .map(notification -> NotificationResponse.of(notification))
+                .map(NotificationResponse::of)
                 .collect(Collectors.toList());
     }
 
