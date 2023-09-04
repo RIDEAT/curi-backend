@@ -1,14 +1,12 @@
 package com.backend.curi.dashboard.controller.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DashboardManagerAlertResponse {
     private String name;
     private Long overdue;
