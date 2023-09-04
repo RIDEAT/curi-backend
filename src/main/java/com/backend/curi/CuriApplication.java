@@ -1,5 +1,6 @@
 package com.backend.curi;
 
+import com.backend.curi.dashboard.repository.OverdueAlertRepository;
 import com.backend.curi.notification.repository.NotificationRepository;
 import com.backend.curi.workflow.repository.ContentRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -18,9 +19,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import java.io.IOException;
 
 @EnableJpaRepositories(excludeFilters ={
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ContentRepository.class),
-		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = NotificationRepository.class)}
-)
+		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ContentRepository.class),
+		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = NotificationRepository.class),
+		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = OverdueAlertRepository.class)
+})
 @OpenAPIDefinition(servers = {@Server(url="/", description = "Default Server Url")})
 @SpringBootApplication
 public class CuriApplication {

@@ -34,8 +34,8 @@ public class LaunchedSequenceService {
                 .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.SEQUENCE_NOT_EXISTS));
     }
 
-    public List<LaunchedSequence> getLaunchedSequenceList(Long workspaceId){
-        List<LaunchedSequence> launchedSequenceListInProgress = launchedSequenceRepository.findAllByStatusAndWorkspaceId(LaunchedStatus.IN_PROGRESS, workspaceId);
+    public List<LaunchedSequence> getLaunchedSequenceList(Long workspaceId, LaunchedStatus status){
+        List<LaunchedSequence> launchedSequenceListInProgress = launchedSequenceRepository.findAllByStatusAndWorkspaceId(status, workspaceId);
         return launchedSequenceListInProgress.stream().filter(launchedSequence -> launchedSequence.getApplyDate().plusWeeks(1).isBefore(LocalDate.now())).collect(Collectors.toList());
     }
 

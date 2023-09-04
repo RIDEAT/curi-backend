@@ -1,10 +1,12 @@
 package com.backend.curi.dashboard.service;
 
 import com.backend.curi.dashboard.controller.dto.*;
+import com.backend.curi.dashboard.repository.OverdueAlertRepository;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.controller.dto.LaunchedSequenceResponse;
 import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
+import com.backend.curi.launched.repository.LaunchedSequenceRepository;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -18,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,8 @@ public class DashboardService {
     private final WorkflowService workflowService;
     private final LaunchedWorkflowService launchedWorkflowService;
     private final LaunchedSequenceService launchedSequenceService;
+    private final OverdueAlertRepository overdueAlertRepository;
+    private final LaunchedSequenceRepository launchedSequenceRepository;
     public List<DashboardWorkflowResponse> getDashboardWorkflowResponseList(Long workspaceId) {
 
         List<DashboardWorkflowResponse> dashboardWorkflowResponseList = new ArrayList<>();
@@ -108,13 +114,13 @@ public class DashboardService {
         return 100* completedCnt / launchedWorkflowResponse.getLaunchedSequences().size();
     }
 
-//    public DashboardAlertResponse getDashboardAlertResponse(Long workspaceId) {
-//        List<LaunchedSequence> launchedSequenceList = launchedSequenceService.getLaunchedSequenceList(workspaceId);
-//        List<DashboardEmployeeAlertResponse> employeeAlertList = getEmployeeAlertList(launchedSequenceList);
-//        List<DashboardManagerAlertResponse> managerAlertList = getManagerAlertList(launchedSequenceList);
-//
-//        return DashboardAlertResponse.of(employeeAlertList, managerAlertList);
-//    }
+    @Transactional
+    public DashboardAlertResponse getDashboardAlertResponse(Long workspaceId) {
+        List<MemberAlertResponse> employeeAlertList = getMemberAlerts(MemberType.employee, workspaceId);
+        List<MemberAlertResponse> managerAlertList = getMemberAlerts(MemberType.manager, workspaceId);
+
+        return DashboardAlertResponse.of(employeeAlertList, managerAlertList);
+    }
 
     private List<DashboardEmployeeAlertResponse> getEmployeeAlertList(List<LaunchedSequence> launchedSequenceList){
         List<DashboardEmployeeAlertResponse> employeeAlertList = new ArrayList<>();
@@ -148,6 +154,23 @@ public class DashboardService {
 
         return managerAlertList;
 
+    }
+
+    @Transactional
+    public List<MemberAlertResponse> getMemberAlerts(MemberType type, Long workspaceId){
+        var overdueAlerts = overdueAlertRepository.findAllByMemberTypeAndWorkspaceId(type, workspaceId);
+        var sequenceStatusMap = launchedSequenceRepository.findAllByWorkspaceId(workspaceId).stream()
+                .collect(Collectors.toMap(LaunchedSequence::getId, LaunchedSequence::getStatus));
+        var completedAlerts = overdueAlerts.stream()
+                .filter(alert -> {
+                    var alertStatus = sequenceStatusMap.get(alert.getLaunchedSequenceId());
+                    return alertStatus.compareTo(LaunchedStatus.COMPLETED) >= 0;
+                }).collect(Collectors.toList());
+        overdueAlertRepository.deleteAll(completedAlerts);
+        return overdueAlerts.stream()
+                .filter(alert -> sequenceStatusMap.get(alert.getLaunchedSequenceId()) == LaunchedStatus.OVERDUE)
+                .map(MemberAlertResponse::of)
+                .collect(Collectors.toList());
     }
 
 }
