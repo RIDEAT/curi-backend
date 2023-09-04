@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.1'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.1'
@@ -46,6 +48,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.batch:spring-batch-test'
 	testImplementation 'junit:junit:4.13.1'
 	testImplementation 'io.rest-assured:rest-assured:4.4.0'
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
