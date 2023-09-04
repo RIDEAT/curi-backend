@@ -108,13 +108,13 @@ public class DashboardService {
         return 100* completedCnt / launchedWorkflowResponse.getLaunchedSequences().size();
     }
 
-    public DashboardAlertResponse getDashboardAlertResponse(Long workspaceId) {
-        List<LaunchedSequence> launchedSequenceList = launchedSequenceService.getLaunchedSequenceList(workspaceId);
-        List<DashboardEmployeeAlertResponse> employeeAlertList = getEmployeeAlertList(launchedSequenceList);
-        List<DashboardManagerAlertResponse> managerAlertList = getManagerAlertList(launchedSequenceList);
-
-        return DashboardAlertResponse.of(employeeAlertList, managerAlertList);
-    }
+//    public DashboardAlertResponse getDashboardAlertResponse(Long workspaceId) {
+//        List<LaunchedSequence> launchedSequenceList = launchedSequenceService.getLaunchedSequenceList(workspaceId);
+//        List<DashboardEmployeeAlertResponse> employeeAlertList = getEmployeeAlertList(launchedSequenceList);
+//        List<DashboardManagerAlertResponse> managerAlertList = getManagerAlertList(launchedSequenceList);
+//
+//        return DashboardAlertResponse.of(employeeAlertList, managerAlertList);
+//    }
 
     private List<DashboardEmployeeAlertResponse> getEmployeeAlertList(List<LaunchedSequence> launchedSequenceList){
         List<DashboardEmployeeAlertResponse> employeeAlertList = new ArrayList<>();

@@ -33,32 +33,32 @@ public class DashboardController {
         mockResponse.setEmployeeAlertCnt(2L);
         mockResponse.setManagerAlertCnt(2L);
         mockResponse.setEmployeeAlerts(List.of(
-                DashboardEmployeeAlertResponse.builder()
-                        .name("김철수")
-                        .overdue(3L)
-                        .sequence("코드 분석")
-                        .workflow("IT 워크플로우")
-                        .build(),
-                DashboardEmployeeAlertResponse.builder()
-                        .name("박희수")
-                        .overdue(5L)
-                        .sequence("사내 성희롱 예방 교육")
-                        .workflow("공통 워크플로우")
-                        .build()));
+                MemberAlertResponse.mock(
+                        "김철수",
+                        "코드 분석",
+                        "IT 워크플로우",
+                "신입사원",
+                3),
+                MemberAlertResponse.mock(
+                        "박희수",
+                        "사내 성희롱 예방 교육",
+                        "공통 워크플로우",
+                        "신입사원",
+                        5)));
 
         mockResponse.setManagerAlerts(List.of(
-                DashboardManagerAlertResponse.builder()
-                        .name("김영희")
-                        .overdue(3L)
-                        .sequence("코드 리뷰")
-                        .workflow("IT 워크플로우")
-                        .build(),
-                DashboardManagerAlertResponse.builder()
-                        .name("박영수")
-                        .overdue(5L)
-                        .sequence("신입사원과 식사시간")
-                        .workflow("공통 워크플로우")
-                        .build())
+                MemberAlertResponse.mock(
+                        "김영희",
+                        "코드 분석",
+                        "IT 워크플로우",
+                        "담당사수",
+                        3),
+                MemberAlertResponse.mock(
+                        "박영수",
+                        "신입사원과 식사 시간",
+                        "공통 워크플로우",
+                        "매니저",
+                        5))
         );
 
 
