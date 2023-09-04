@@ -125,8 +125,9 @@ public class FrontOfficeService {
         var satisfaction = SequenceSatisfaction.builder()
                 .score(request.getScore())
                 .comment(request.getComment())
-                .sequence(launchedSequence.getSequence())
+                .sequence(launchedSequence)
                 .member(launchedSequence.getMember())
+                .workspace(launchedSequence.getWorkspace())
                 .build();
         sequenceSatisfactionRepository.save(satisfaction);
         launchedSequence.setSequenceSatisfaction(satisfaction);

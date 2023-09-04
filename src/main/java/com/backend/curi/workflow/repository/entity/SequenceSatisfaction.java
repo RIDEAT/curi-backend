@@ -1,7 +1,9 @@
 package com.backend.curi.workflow.repository.entity;
 
 
+import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.member.repository.entity.Member;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,17 +27,22 @@ public class SequenceSatisfaction {
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sequence_id")
-    private Sequence sequence;
+    @JoinColumn(name = "launched_sequence_id")
+    private LaunchedSequence launchedSequence;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id")
+    private Workspace workspace;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memeber_id")
     private Member member;
     @Builder
-    public SequenceSatisfaction(Long score, String comment, Sequence sequence, Member member) {
+    public SequenceSatisfaction(Long score, String comment, LaunchedSequence sequence, Member member, Workspace workspace) {
         this.score = score;
         this.comment = comment;
-        this.sequence = sequence;
+        this.launchedSequence = sequence;
         this.member = member;
+        this.workspace = workspace;
     }
 }

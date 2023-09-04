@@ -38,7 +38,7 @@ public class OverdueAlert {
     public static OverdueAlert of(LaunchedSequence sequence){
         var member = sequence.getMember();
         var role = sequence.getRole();
-        var workflow = sequence.getSequence().getWorkflow();
+        var workflow = sequence.getLauchedWorkflow();
         return OverdueAlert.builder()
                 .workspaceId(sequence.getWorkspace().getId())
                 .memberId(member.getId())

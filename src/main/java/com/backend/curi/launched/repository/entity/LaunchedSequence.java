@@ -66,15 +66,12 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "LaunchedWorkflowId")
     private LaunchedWorkflow lauchedWorkflow;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sequenceId")
-    private Sequence sequence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspaceId")
     private Workspace workspace;
 
-    @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "launchedSequence", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LaunchedModule> launchedModules = new ArrayList<>();
 
@@ -86,7 +83,7 @@ public class LaunchedSequence extends BaseEntity {
      public static LaunchedSequence of (Sequence sequence, LaunchedWorkflow launchedWorkflow, Member member, Workspace workspace){
         return LaunchedSequence.builder().name(sequence.getName()).status(LaunchedStatus.TO_DO)
                 .lauchedWorkflow(launchedWorkflow).role(sequence.getRole())
-                .member(member).workspace(workspace).sequence(sequence)
+                .member(member).workspace(workspace)
                 .checkSatisfaction(sequence.getCheckSatisfaction()).
                 applyDate(launchedWorkflow.getKeyDate().plusDays(sequence.getDayOffset())).build();
      }
