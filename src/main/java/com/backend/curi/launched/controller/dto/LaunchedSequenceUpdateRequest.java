@@ -17,4 +17,6 @@ public class LaunchedSequenceUpdateRequest {
 
     @Pattern(regexp = "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\\d|3[0-1])$", message = "applyDate must be in the format YYYY-MM-DD and represent a valid date.")
     private LocalDate applyDate;
+
+    private Boolean checkSatisfaction;
 }

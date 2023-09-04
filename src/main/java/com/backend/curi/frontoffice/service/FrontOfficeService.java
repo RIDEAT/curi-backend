@@ -120,7 +120,7 @@ public class FrontOfficeService {
         var launchedSequence = frontOffice.getLaunchedSequence();
         if(launchedSequence.getIsScored())
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_ALREADY_SATISFACTION);
-        if(!launchedSequence.getSequence().getCheckSatisfaction())
+        if(!launchedSequence.getCheckSatisfaction())
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SEQUENCE_CAN_NOT_SATISFACTION);
         var satisfaction = SequenceSatisfaction.builder()
                 .score(request.getScore())

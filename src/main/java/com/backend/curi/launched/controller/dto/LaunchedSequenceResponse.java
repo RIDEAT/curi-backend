@@ -44,7 +44,7 @@ public class LaunchedSequenceResponse {
         return new LaunchedSequenceResponse(
                 launchedSequence.getId(),
                 launchedSequence.getName(),
-                launchedSequence.getSequence().getCheckSatisfaction(),
+                launchedSequence.getCheckSatisfaction(),
                 launchedSequence.getStatus(),
                 launchedSequence.getApplyDate(),
                 MemberResponse.of(launchedSequence.getMember()),

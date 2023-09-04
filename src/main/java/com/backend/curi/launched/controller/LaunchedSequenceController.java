@@ -41,7 +41,7 @@ public class LaunchedSequenceController {
 
     @PatchMapping("/{sequenceId}")
     public ResponseEntity<LaunchedSequenceResponse> updateLaunchedSequence(@PathVariable Long workspaceId, @PathVariable Long launchedworkflowId, @RequestBody @Validated(ValidationSequence.class) LaunchedSequenceUpdateRequest request, @PathVariable Long sequenceId){
-        LaunchedSequenceResponse updatedLaunchedSequence = launchedSequenceService.updateLaunchedSeqeunce(request, sequenceId);
+        LaunchedSequenceResponse updatedLaunchedSequence = launchedSequenceService.updateLaunchedSequence(request, sequenceId);
         return ResponseEntity.ok(updatedLaunchedSequence);
     }
 

@@ -22,8 +22,7 @@ public class SequenceRequest {
 
     private Integer dayOffset;
 
-    @Builder.Default
-    private Boolean checkSatisfaction = false;
+    private Boolean checkSatisfaction;
 
     private Long prevSequenceId = 0L;
 }

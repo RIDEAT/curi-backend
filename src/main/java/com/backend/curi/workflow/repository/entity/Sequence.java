@@ -30,8 +30,8 @@ public class Sequence extends BaseEntity {
     private Integer dayOffset;
 
     @Setter
-    @ColumnDefault("false")
-    private Boolean checkSatisfaction = false;
+    @ColumnDefault("true")
+    private Boolean checkSatisfaction = true;
 
     @Setter
     @OneToOne(fetch = FetchType.LAZY)

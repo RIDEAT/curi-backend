@@ -59,13 +59,14 @@ public class LaunchedSequenceService {
     }
 
     @Transactional
-    public LaunchedSequenceResponse updateLaunchedSeqeunce(LaunchedSequenceUpdateRequest request, Long launchedSequenceId) {
+    public LaunchedSequenceResponse updateLaunchedSequence(LaunchedSequenceUpdateRequest request, Long launchedSequenceId) {
         var launchedSequence = getLaunchedSequenceEntity(launchedSequenceId);
         if(request.getStatus() != null)
             launchedSequence.setStatus(request.getStatus());
         if(request.getApplyDate() != null)
             launchedSequence.setApplyDate(request.getApplyDate());
-
+        if(request.getCheckSatisfaction() != null)
+            launchedSequence.setCheckSatisfaction(request.getCheckSatisfaction());
 
         return LaunchedSequenceResponse.of(launchedSequence);
     }
