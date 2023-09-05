@@ -19,7 +19,7 @@ public class SequenceSatisfactionResponse {
     private String comment;
     private Boolean isScored;
     public static SequenceSatisfactionResponse of(SequenceSatisfaction satisfaction){
-        return new SequenceSatisfactionResponse(satisfaction.getId(), satisfaction.getScore(), satisfaction.getComment(), true);
+        return new SequenceSatisfactionResponse(satisfaction.getId(), satisfaction.getScore(), satisfaction.getComment(), satisfaction.getIsScored());
     }
 
     public static SequenceSatisfactionResponse isNone(){

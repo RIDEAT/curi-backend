@@ -24,6 +24,8 @@ public class SequenceSatisfaction {
     @Column(nullable = false)
     private Long score;
 
+    private Boolean isScored;
+
     private String comment;
 
     @OneToOne(mappedBy = "sequenceSatisfaction", fetch = FetchType.LAZY)
@@ -37,15 +39,16 @@ public class SequenceSatisfaction {
     @JoinColumn(name = "memeber_id")
     private Member member;
     @Builder
-    public SequenceSatisfaction(Long score, String comment, LaunchedSequence sequence, Member member, Workspace workspace) {
+    public SequenceSatisfaction(Long score, String comment, LaunchedSequence sequence, Member member, Workspace workspace, Boolean isScored){
         this.score = score;
         this.comment = comment;
         this.launchedSequence = sequence;
         this.member = member;
         this.workspace = workspace;
+        this.isScored = isScored;
     }
 
     public static SequenceSatisfaction isNone(LaunchedSequence launchedSequence, Member member, Workspace workspace){
-        return new SequenceSatisfaction(0L, "comment", launchedSequence, member, workspace);
+        return new SequenceSatisfaction(0L, "comment", launchedSequence, member, workspace, false);
     }
 }
