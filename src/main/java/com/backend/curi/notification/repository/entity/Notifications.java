@@ -4,12 +4,14 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
+import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
+@Entity
 public class Notifications {
     @Id
     private ObjectId id;
