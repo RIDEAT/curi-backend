@@ -1,6 +1,7 @@
 package com.backend.curi.message.service;
 
 
+import com.backend.curi.common.configuration.Constants;
 import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -34,6 +35,7 @@ public class MessageService {
     private final SlackService slackService;
     private final AwsSMTPService awsSMTPService;
     private final NotificationService notificationService;
+    private final Constants constants;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
 
@@ -53,7 +55,7 @@ public class MessageService {
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
 
-        notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " +launchedWorkflow.getKeyDate().format(formatter));
+        if(constants.getENV().equals("cloud")) notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " +launchedWorkflow.getKeyDate().format(formatter));
 
         log.info ("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
