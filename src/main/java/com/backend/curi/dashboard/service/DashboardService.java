@@ -93,7 +93,7 @@ public class DashboardService {
     public DashboardMemberResponse getDashboardMemberResponse (LaunchedWorkflowResponse launchedWorkflowResponse){
         DashboardMemberResponse dashboardMemberResponse = new DashboardMemberResponse();
 
-        dashboardMemberResponse.setName(launchedWorkflowResponse.getEmployee().getName());
+        dashboardMemberResponse.setMember(launchedWorkflowResponse.getEmployee());
 
         dashboardMemberResponse.setStartDate(launchedWorkflowResponse.getEmployee().getStartDate());
       //  dashboardMemberResponse.setENPS(launchedWorkflow.getMember().getEnps);
