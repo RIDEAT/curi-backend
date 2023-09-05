@@ -4,6 +4,7 @@ import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.launched.controller.dto.*;
 import com.backend.curi.launched.repository.LaunchedSequenceRepository;
+import com.backend.curi.launched.repository.LaunchedWorkflowRepository;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class LaunchedSequenceService {
 
     private final LaunchedSequenceRepository launchedSequenceRepository;
+    private final LaunchedWorkflowRepository launchedWorkflowRepository;
 
     public LaunchedSequenceResponse getLaunchedSequence(Long sequenceId) {
         Optional<LaunchedSequence> launchedSequence = launchedSequenceRepository.findById(sequenceId);
@@ -82,6 +84,15 @@ public class LaunchedSequenceService {
 
     public void completeLaunchedSequence(LaunchedSequence launchedSequence) {
         launchedSequence.setStatus(LaunchedStatus.COMPLETED);
+        checkIfAllSequencesCompleted(launchedSequence);
         launchedSequenceRepository.save(launchedSequence);
+    }
+
+    private void checkIfAllSequencesCompleted(LaunchedSequence launchedSequence) {
+        LaunchedWorkflow launchedWorkflow = launchedSequence.getLauchedWorkflow();
+        if (launchedWorkflow.getLaunchedSequences().stream().allMatch(launchedSequence1 -> launchedSequence1.getStatus().equals(LaunchedStatus.COMPLETED))) {
+            launchedWorkflow.setStatus(LaunchedStatus.COMPLETED);
+            launchedWorkflowRepository.save(launchedWorkflow);
+        }
     }
 }
