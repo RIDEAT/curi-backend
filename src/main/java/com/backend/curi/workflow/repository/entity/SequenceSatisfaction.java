@@ -44,4 +44,8 @@ public class SequenceSatisfaction {
         this.member = member;
         this.workspace = workspace;
     }
+
+    public static SequenceSatisfaction isNone(LaunchedSequence launchedSequence, Member member, Workspace workspace){
+        return new SequenceSatisfaction(0L, "comment", launchedSequence, member, workspace);
+    }
 }

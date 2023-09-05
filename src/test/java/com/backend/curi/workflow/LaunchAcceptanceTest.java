@@ -189,7 +189,7 @@ public class LaunchAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-/*
+
     @DisplayName("특정 워크플로우를 launch 시킬 수 있다.")
     @Test
     public void launchWorkflow(){
@@ -200,7 +200,7 @@ public class LaunchAcceptanceTest {
         LaunchedWorkflowsResponse launchedWorkflowResponse = response.as(LaunchedWorkflowsResponse.class);
 
         launchService.sendLaunchedSequenceNotification(launchedWorkflowResponse.getLaunchedSequenceResponses().get(0).getId());
-    }*/
+    }
 
 
 /*
