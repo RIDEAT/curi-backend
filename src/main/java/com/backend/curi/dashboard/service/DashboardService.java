@@ -62,9 +62,9 @@ public class DashboardService {
 
             if(launchedWorkflow.getStatus().equals(LaunchedStatus.SKIPPED)) continue;
 
-            if (launchedWorkflow.getStatus().equals(LaunchedStatus.TO_DO) || launchedWorkflow.getStatus().equals(LaunchedStatus.OVERDUE)) {
+            if (launchedWorkflow.getStatus().equals(LaunchedStatus.TO_DO) ) {
                 dashboardWorkflowResponse.setPendingCnt(dashboardWorkflowResponse.getPendingCnt() + 1);
-            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.IN_PROGRESS)){
+            } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.IN_PROGRESS) || launchedWorkflow.getStatus().equals(LaunchedStatus.OVERDUE)){
                 dashboardWorkflowResponse.setInProgressCnt(dashboardWorkflowResponse.getInProgressCnt() + 1);
             } else if (launchedWorkflow.getStatus().equals(LaunchedStatus.COMPLETED) || launchedWorkflow.getStatus().equals(LaunchedStatus.MARKED_AS_COMPLETED)){
                 dashboardWorkflowResponse.setCompletedCnt(dashboardWorkflowResponse.getCompletedCnt()+1);
