@@ -29,8 +29,6 @@ public class LaunchedSequenceResponse {
 
     private Boolean checkSatisfaction;
 
-    private SequenceSatisfactionResponse sequenceSatisfactionResponse;
-
     private LaunchedStatus status;
 
     private LocalDate applyDate;
@@ -48,7 +46,6 @@ public class LaunchedSequenceResponse {
                 launchedSequence.getId(),
                 launchedSequence.getName(),
                 launchedSequence.getCheckSatisfaction(),
-                SequenceSatisfactionResponse.of(launchedSequence.getSequenceSatisfaction()),
                 launchedSequence.getStatus(),
                 launchedSequence.getApplyDate(),
                 MemberResponse.of(launchedSequence.getMember()),
