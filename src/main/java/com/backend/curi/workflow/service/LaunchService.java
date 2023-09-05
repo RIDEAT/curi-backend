@@ -19,9 +19,11 @@ import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.message.service.MessageService;
 import com.backend.curi.workflow.controller.dto.*;
+import com.backend.curi.workflow.repository.SequenceSatisfactionRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Module;
 
+import com.backend.curi.workflow.repository.entity.SequenceSatisfaction;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
@@ -60,6 +62,8 @@ public class LaunchService {
     private final WorkspaceService workspaceService;
     private final FrontOfficeService frontofficeService;
     private final MessageService messageService;
+    private final SequenceSatisfactionRepository satisfactionRepository;
+
 
     private final ContentService contentService;
 
@@ -116,6 +120,9 @@ public class LaunchService {
         var role = sequence.getRole();
         Member assignedMember = memberMap.get(role);
         var launchedSequence = LaunchedSequence.of(sequence, launchedWorkflow, assignedMember, workspace);
+        var satisfaction = SequenceSatisfaction.isNone(launchedSequence, member,workspace);
+        satisfactionRepository.save(satisfaction);
+        launchedSequence.setSequenceSatisfaction(satisfaction);
 
         var modules = sequence.getModules();
         for (var module : modules) {
