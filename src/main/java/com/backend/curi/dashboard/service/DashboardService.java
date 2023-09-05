@@ -73,8 +73,27 @@ public class DashboardService {
             }
         }
 
-        dashboardWorkflowResponse.setProgress(100 * dashboardWorkflowResponse.getCompletedCnt() / launchedWorkflowList.size());
+        dashboardWorkflowResponse.setProgress(getProgress(launchedWorkflowList));
         return dashboardWorkflowResponse;
+    }
+
+    public Long getProgress (List<LaunchedWorkflow> launchedWorkflowList){
+        Long completedCnt = 0L;
+        Long totalCnt = 0L;
+
+        for (LaunchedWorkflow launchedWorkflow : launchedWorkflowList){
+            List<LaunchedSequence> launchedSequences = launchedWorkflow.getLaunchedSequences();
+            for (LaunchedSequence launchedSequence : launchedSequences){
+                if (launchedSequence.getStatus().equals(LaunchedStatus.COMPLETED) || launchedSequence.getStatus().equals(LaunchedStatus.MARKED_AS_COMPLETED)){
+                    completedCnt ++;
+                }
+                totalCnt ++;
+            }
+        }
+
+        if (totalCnt.equals(0L)) return 0L;
+        return 100* completedCnt / totalCnt;
+
     }
 
     public DashboardMemberListResponse getDashboardMemberListResponse(Long workflowId) {
