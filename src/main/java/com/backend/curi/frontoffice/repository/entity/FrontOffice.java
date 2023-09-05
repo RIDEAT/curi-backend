@@ -17,13 +17,11 @@ public class FrontOffice {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "BYTEA(16)")
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "launchedSequenceId")
     private LaunchedSequence launchedSequence;
 
-    @Column(columnDefinition = "BYTEA(16)")
     private UUID accessToken;
 }
