@@ -118,13 +118,8 @@ public class DashboardService {
 
     public DashboardMemberResponse getDashboardMemberResponse (LaunchedWorkflowResponse launchedWorkflowResponse){
         DashboardMemberResponse dashboardMemberResponse = new DashboardMemberResponse();
-
-        dashboardMemberResponse.setMember(launchedWorkflowResponse.getEmployee());
-
-        dashboardMemberResponse.setStartDate(launchedWorkflowResponse.getEmployee().getStartDate());
+        dashboardMemberResponse.setLaunchedWorkflowResponse(launchedWorkflowResponse);
       //  dashboardMemberResponse.setENPS(launchedWorkflow.getMember().getEnps);
-        dashboardMemberResponse.setLaunchedStatus(launchedWorkflowResponse.getStatus());
-        dashboardMemberResponse.setLaunchedSequences(launchedWorkflowResponse.getLaunchedSequences());
         dashboardMemberResponse.setProgress(getProgress(launchedWorkflowResponse));
         return dashboardMemberResponse;
     }

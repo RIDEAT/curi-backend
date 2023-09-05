@@ -1,6 +1,7 @@
 package com.backend.curi.dashboard.controller.dto;
 
 import com.backend.curi.launched.controller.dto.LaunchedSequenceResponse;
+import com.backend.curi.launched.controller.dto.LaunchedWorkflowResponse;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.member.controller.dto.MemberResponse;
 import lombok.AllArgsConstructor;
@@ -16,10 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardMemberResponse {
-    private MemberResponse member;
-    private LocalDate startDate;
-    private LaunchedStatus launchedStatus;
+    private LaunchedWorkflowResponse launchedWorkflowResponse;
     private Long progress;
     private Long eNPS;
-    private List<LaunchedSequenceResponse> launchedSequences;
 }
