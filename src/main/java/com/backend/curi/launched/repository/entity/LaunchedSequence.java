@@ -41,7 +41,7 @@ public class LaunchedSequence extends BaseEntity {
 
     @Setter
     @Builder.Default
-    private LocalDate applyDate = LocalDate.of(2000,10,9);
+    private LocalDate applyDate = LocalDate.of(2024,1,1);
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "satisfactionId")
