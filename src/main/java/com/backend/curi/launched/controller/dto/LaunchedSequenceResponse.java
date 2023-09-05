@@ -1,5 +1,6 @@
 package com.backend.curi.launched.controller.dto;
 
+import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionResponse;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.member.controller.dto.MemberResponse;
@@ -28,6 +29,8 @@ public class LaunchedSequenceResponse {
 
     private Boolean checkSatisfaction;
 
+    private SequenceSatisfactionResponse sequenceSatisfactionResponse;
+
     private LaunchedStatus status;
 
     private LocalDate applyDate;
@@ -45,6 +48,7 @@ public class LaunchedSequenceResponse {
                 launchedSequence.getId(),
                 launchedSequence.getName(),
                 launchedSequence.getCheckSatisfaction(),
+                SequenceSatisfactionResponse.of(launchedSequence.getSequenceSatisfaction()),
                 launchedSequence.getStatus(),
                 launchedSequence.getApplyDate(),
                 MemberResponse.of(launchedSequence.getMember()),
