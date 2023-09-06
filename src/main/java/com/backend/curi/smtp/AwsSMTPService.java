@@ -2,6 +2,7 @@ package com.backend.curi.smtp;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
+import com.backend.curi.common.Common;
 import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -22,14 +23,17 @@ public class AwsSMTPService {
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     private static Logger log = LoggerFactory.getLogger(AwsSMTPService.class);
 
+    private final Common common;
 
     private final String from;
 
     public AwsSMTPService(
             AmazonSimpleEmailService amazonSimpleEmailService,
+            Common common,
             @Value("${cloud.aws.ses.from}") String from
     ) {
         this.amazonSimpleEmailService = amazonSimpleEmailService;
+        this.common = common;
         this.from = "no-reply@curiboard.com";
     }
 
@@ -175,7 +179,7 @@ public class AwsSMTPService {
                 + "<h2 style='color: #0084ff;'>🌟 오늘 할당된 시퀀스가 있습니다! 🌟</h2>"
                 + "<p>안녕하세요, " + name + " 님! </행p>"
                 + "<p>오늘 할당된 시퀀스를 안내드립니다. 아래 링크를 통해 시퀀스 상세 내용을 확인하실 수 있습니다.</p>"
-                + "<p><strong>URL:</strong> <a href='" + getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + "'>시퀀스 보기</a></p>"
+                + "<p><strong>URL:</strong> <a href='" + common.getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + "'>시퀀스 보기</a></p>"
                 + "<p>시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.</p>"
                 + "<p>slack 연동을 하신 경우, 메일뿐 아니라 slack으로도 알림을 받으실 수 있습니다. slack 연동 바로가기\n</p>"
                 + "<p>더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.</p>"
@@ -185,7 +189,5 @@ public class AwsSMTPService {
         send("오늘 할당된 시퀀스가 있습니다!", emailContent, memberTo);
     }
 
-    private String getFrontOfficeUrl(UUID id, UUID accessToken) {
-        return "https://view.dev.onbird.team/" + id +"?token=" + accessToken;
-    }
+
 }

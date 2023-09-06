@@ -1,5 +1,6 @@
 package com.backend.curi.slack.service;
 
+import com.backend.curi.common.Common;
 import com.backend.curi.common.configuration.Constants;
 import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.exception.CuriException;
@@ -82,8 +83,9 @@ public class SlackService {
     @Value("${slack.bot-token}")
     private String botToken;
 
-    @Value("${workplug.view.url}")
-    private String viewPath;
+
+
+    private final Common common;
 
     private final Slack slack = Slack.getInstance();
     private final Constants constants;
@@ -305,7 +307,7 @@ public class SlackService {
             // Add a link to the Front Office URL
             blocks.add(SectionBlock.builder()
                     .text(MarkdownTextObject.builder()
-                            .text("🔗 [프론트 오피스에서 시퀀스 확인하기](" + getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + ")")
+                            .text("🔗 [프론트 오피스에서 시퀀스 확인하기](" + common.getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + ")")
                             .build())
                     .build());
 
@@ -670,9 +672,7 @@ public class SlackService {
     }
 
 
-    private String getFrontOfficeUrl(UUID id, UUID accessToken) {
-        return viewPath + "/"+ id + "?token=" + accessToken;
-    }
+
 
     public Boolean isAuthorized() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
