@@ -80,6 +80,6 @@ public class MessageService {
 
     public void sendWorkspaceCreateMessage(Workspace savedWorkspace, CurrentUser currentUser) {
         String userName = (currentUser.getName() != null) ? currentUser.getName() : "워크플러그 유저";
-        notificationService.createNotification(savedWorkspace.getId(), "워크스페이스 생성 완료", userName +"님 동료와 연결되는 새로운 방식 '워크플러그'를 사용해주셔서 감사합니다! 먼저 좌측바의 상단에 있는 워크플로우 탭을 눌러 예시 워크플로우를 확인해보세요!");
+        if (constants.getENV().equals("cloud")) notificationService.createNotification(savedWorkspace.getId(), "워크스페이스 생성 완료", userName +"님 동료와 연결되는 새로운 방식 '워크플러그'를 사용해주셔서 감사합니다! 먼저 좌측바의 상단에 있는 워크플로우 탭을 눌러 예시 워크플로우를 확인해보세요!");
     }
 }
