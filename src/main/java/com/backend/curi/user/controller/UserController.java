@@ -26,16 +26,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping(value = "/{workspaceId}")
-    @Operation(summary = "get user List", description = "워크스페이스 내의 유저리스트를 반환합니다.")
-    public ResponseEntity<List<UserResponse>> getUserList(@PathVariable Long workspaceId) {
-
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
-        var userList = userService.getAllUsersInWorkspace(workspaceId, currentUser);
-        return new ResponseEntity<>(userList, HttpStatus.OK);
-    }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers() {
