@@ -1,5 +1,6 @@
 package com.backend.curi.slack.service;
 
+import com.backend.curi.common.configuration.Constants;
 import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
@@ -81,7 +82,11 @@ public class SlackService {
     @Value("${slack.bot-token}")
     private String botToken;
 
+    @Value("${workplug.view.url}")
+    private String viewPath;
+
     private final Slack slack = Slack.getInstance();
+    private final Constants constants;
     private final SlackRepository slackRepository;
     private final SlackMemberRepository slackMemberRepository;
 
@@ -666,7 +671,7 @@ public class SlackService {
 
 
     private String getFrontOfficeUrl(UUID id, UUID accessToken) {
-        return "https://view.dev.onbird.team/" + id + "?token=" + accessToken;
+        return viewPath + id + "?token=" + accessToken;
     }
 
     public Boolean isAuthorized() {
