@@ -3,6 +3,8 @@ package com.backend.curi.workspace.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.message.service.MessageService;
+import com.backend.curi.notification.service.NotificationService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.user.repository.entity.User_;
@@ -37,6 +39,7 @@ public class WorkspaceService {
     private final UserworkspaceService userworkspaceService;
     private final RoleRepository roleRepository;
     private final AwsS3Service amazonS3Service;
+    private final MessageService messageService;
     private final WorkflowRepository workflowRepository;
   
     public WorkspaceResponse getWorkspaceById(Long id){
@@ -56,6 +59,7 @@ public class WorkspaceService {
 
     public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
         var savedWorkspace = createWorkspaceEntity(request, currentUser);
+        messageService.sendWorkspaceCreateMessage(savedWorkspace, currentUser);
         savedWorkspace.setLogoUrl(amazonS3Service.getSignedUrl(savedWorkspace.getLogoUrl()));
         return WorkspaceResponse.of(savedWorkspace);
     }

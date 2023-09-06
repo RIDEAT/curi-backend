@@ -14,6 +14,7 @@ import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.smtp.AwsSMTPService;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workspace.repository.entity.Role;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -39,15 +40,15 @@ public class MessageService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
 
-    public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence){
+    public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence) {
         log.info("런치드 시퀀스 전송");
         awsSMTPService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, memberTo);
         slackService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, launchedSequence.getMember().getId());
-        notificationService.createNotification(launchedSequence.getWorkspace().getId(), "시퀀스 메일 발송", launchedSequence.getMember().getName()+"님에게 할당된 시퀀스(" + launchedSequence.getName() + ") 메일이 발송되었습니다." );
+        notificationService.createNotification(launchedSequence.getWorkspace().getId(), "시퀀스 메일 발송", launchedSequence.getMember().getName() + "님에게 할당된 시퀀스(" + launchedSequence.getName() + ") 메일이 발송되었습니다.");
 
     }
 
-    public void sendWorkflowLaunchedMessage (LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap){
+    public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap) {
         // send to Admin user
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -55,14 +56,15 @@ public class MessageService {
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
 
-        if(constants.getENV().equals("cloud")) notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName()+"님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " +launchedWorkflow.getKeyDate().format(formatter));
+        if (constants.getENV().equals("cloud"))
+            notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter));
 
-        log.info ("send workflow launch alarm to employee");
+        log.info("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
         slackService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow);
         awsSMTPService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow, employee);
 
-        log.info ("send workflow launch alarm to related managers");
+        log.info("send workflow launch alarm to related managers");
         for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
             Role role = entry.getKey();
             Member member = entry.getValue();
@@ -76,4 +78,8 @@ public class MessageService {
     }
 
 
+    public void sendWorkspaceCreateMessage(Workspace savedWorkspace, CurrentUser currentUser) {
+        String userName = (currentUser.getName() != null) ? currentUser.getName() : "워크플러그 유저";
+        notificationService.createNotification(savedWorkspace.getId(), "워크스페이스 생성 완료", userName +"님 동료와 연결되는 새로운 방식 '워크플러그'를 사용해주셔서 감사합니다! 먼저 좌측바의 상단에 있는 워크플로우 탭을 눌러 예시 워크플로우를 확인해보세요!");
+    }
 }
