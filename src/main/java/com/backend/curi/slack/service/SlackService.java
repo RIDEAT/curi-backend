@@ -80,9 +80,11 @@ public class SlackService {
     @Value("${slack.member-redirect-uri}")
     private String memberRedirectUri;
 
+    @Value("${slack.rideat-bot-token}")
+    private String rideatBotToken;
+
     @Value("${slack.bot-token}")
     private String botToken;
-
 
 
     private final Common common;
@@ -210,6 +212,34 @@ public class SlackService {
         ConversationsInviteRequest conversationsInviteRequest = ConversationsInviteRequest.builder().channel(inviteRequest.getChannel()).token(accessToken).users(users).build();
         var response = methods.conversationsInvite(conversationsInviteRequest);
         return response;
+    }
+
+    public ChatPostMessageResponse sendMessageToRideat(SlackMessageRequest slackMessageRequest) {
+        try {
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                    .channel("#workplug-error-alarm") // Use a channel ID `C1234567` is preferable
+                    .text(slackMessageRequest.getTexts())
+                    .build();
+
+
+            String accessToken = rideatBotToken;
+            MethodsClient methods = slack.methods(accessToken);
+            var response = methods.chatPostMessage(request);
+
+            return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+
+        } catch (SlackApiException e) {
+            log.error(e.getMessage());
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
     }
 
     public ChatPostMessageResponse sendMessage(SlackMessageRequest slackMessageRequest) {

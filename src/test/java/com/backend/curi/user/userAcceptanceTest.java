@@ -8,6 +8,8 @@ import com.backend.curi.common.feign.SchedulerOpenFeign;
 import com.backend.curi.member.controller.dto.EmployeeManagerDetail;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.controller.dto.UserRequest;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
@@ -64,6 +66,7 @@ public class userAcceptanceTest {
     @Autowired
     private WorkflowService workflowService;
 
+
     @Autowired
     private SequenceService sequenceService;
 
@@ -74,6 +77,10 @@ public class userAcceptanceTest {
 
     @Autowired
     private ModuleService moduleService;
+
+    @Autowired
+    private SlackService slackService;
+
     @LocalServerPort
     public int port;
 
@@ -112,8 +119,8 @@ public class userAcceptanceTest {
     @DisplayName("유저를 등록할 수 있다. ")
     @Test
     public void getRequiredRoles(){
-        ExtractableResponse<Response> response = 유저_생성();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+      ExtractableResponse<Response> response = 유저_생성();
+      assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
 
