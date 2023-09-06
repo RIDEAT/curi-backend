@@ -1,6 +1,7 @@
 package com.backend.curi.common.configuration;
 
 import com.backend.curi.security.filter.JwtFilter;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class AuthenticationConfig{
 
     private final UserService userService;
     private final Constants constants;
+    private final SlackService slackService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -41,7 +43,7 @@ public class AuthenticationConfig{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtFilter(userService,constants), UsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore(new JwtFilter(userService,slackService, constants), UsernamePasswordAuthenticationFilter.class )
 
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(

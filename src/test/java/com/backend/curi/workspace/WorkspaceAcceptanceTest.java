@@ -53,7 +53,7 @@ public class WorkspaceAcceptanceTest {
     private Long workspaceId;
 
     @BeforeEach
-    public void setup() {
+    public void setup(){
         RestAssured.port = port;
 
         userService.dbStore(userId, userName);
