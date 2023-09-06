@@ -27,16 +27,18 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<List<UserResponse>> getUsers() {
         var userList = userService.getUsers();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
 
-    @GetMapping(value = "/{userId}")
+    @GetMapping
     @Operation(summary = "get user", description = "유저 정보를 반환합니다.")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
+    public ResponseEntity<UserResponse> getUser() {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = currentUser.getUserId();
         var user = userService.getUserResponseByUserId(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
