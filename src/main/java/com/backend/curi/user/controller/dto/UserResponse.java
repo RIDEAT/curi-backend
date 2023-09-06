@@ -12,8 +12,9 @@ import java.util.Date;
 @Setter
 public class UserResponse {
     private String userId;
+    private String name;
 
     public static UserResponse of(User_ user) {
-        return new UserResponse(user.getUserId());
+        return new UserResponse(user.getUserId(), user.getName());
     }
 }
