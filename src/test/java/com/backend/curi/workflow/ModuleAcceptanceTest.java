@@ -84,6 +84,8 @@ public class ModuleAcceptanceTest {
 
     private final String userId = Constants.userEmail;
     private final String userEmail = Constants.userEmail;
+    private final String userName = Constants.userName;
+
     private final String workspaceName = Constants.workspaceName;
     private final String workspaceEmail = Constants.workspaceEmail;
     private final String workflowName = Constants.workflowName;
@@ -106,7 +108,7 @@ public class ModuleAcceptanceTest {
 
         RestAssured.port = port;
 
-        userService.dbStore(userId);
+        userService.dbStore(userId, userName);
         WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         WorkspaceResponse workspaceResponse2 = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
 

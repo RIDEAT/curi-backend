@@ -44,6 +44,7 @@ public class WorkspaceAcceptanceTest {
     public int port;
 
     private final String userId = Constants.userEmail;
+    private final String userName = Constants.userName;
     private final String userEmail = Constants.userEmail;
     private final String workspaceName = Constants.workspaceName;
     private final String workspaceEmail = Constants.workspaceEmail;
@@ -55,7 +56,7 @@ public class WorkspaceAcceptanceTest {
     public void setup() {
         RestAssured.port = port;
 
-        userService.dbStore(userId);
+        userService.dbStore(userId, userName);
         WorkspaceResponse workspace = workspaceService.createWorkspace(getWorkspaceRequest(), getCurrentUser());
         workspaceId = workspace.getId();
     }

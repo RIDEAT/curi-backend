@@ -101,6 +101,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 CurrentUser currentUser = new CurrentUser();
                 currentUser.setUserId(userId);
+                currentUser.setName("mock name");
                 currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
@@ -169,13 +170,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Extract userId
         String userId = "8514199@gmail.com";
+        String userName = "jiseung";
         //String userEmail = jsonNode.get("userEmail").asText();
 
-        userService.dbStore(userId);
+        userService.dbStore(userId, userName);
 
 
         CurrentUser currentUser = new CurrentUser();
         currentUser.setUserId(userId);
+        currentUser.setName(userName);
         //currentUser.setUserEmail(getUserEmail(userId));
         currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 

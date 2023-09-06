@@ -17,6 +17,8 @@ public class User_ {
     @Id
     private String userId;
 
+    private String name;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;
@@ -24,8 +26,9 @@ public class User_ {
     public User_(){}
 
     @Builder
-    public User_(String userId){
+    public User_(String userId, String name){
         this.userId = userId;
+        this.name = name;
     }
 
     @Override
