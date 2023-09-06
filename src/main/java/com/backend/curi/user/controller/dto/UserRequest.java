@@ -15,5 +15,7 @@ public class UserRequest {
     @Schema(description = "email")
     private String email;
 
+    private String name;
+
 
 }

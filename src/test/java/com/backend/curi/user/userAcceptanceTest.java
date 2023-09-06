@@ -135,6 +135,7 @@ public class userAcceptanceTest {
     private UserRequest getUserRequest(){
         UserRequest userRequest = new UserRequest();
         userRequest.setEmail("8514199@gmail.com");
+        userRequest.setName("jiseung");
         return userRequest;
     }
 
