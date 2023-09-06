@@ -671,7 +671,7 @@ public class SlackService {
 
 
     private String getFrontOfficeUrl(UUID id, UUID accessToken) {
-        return viewPath + id + "?token=" + accessToken;
+        return viewPath + "/"+ id + "?token=" + accessToken;
     }
 
     public Boolean isAuthorized() {
