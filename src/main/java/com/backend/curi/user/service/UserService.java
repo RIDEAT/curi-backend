@@ -7,10 +7,7 @@ import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
-import com.backend.curi.workspace.service.WorkspaceService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +26,8 @@ public class UserService {
         return userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
     }
 
-    public List<UserResponse> getAllUsers(Long workspaceId, CurrentUser currentUser){
+
+    public List<UserResponse> getAllUsersInWorkspace(Long workspaceId, CurrentUser currentUser){
         var user = getUserByUserId(currentUser.getUserId());
         List<User_> userList = userworkspaceService.getUserListByWorkspaceId(workspaceId);
 
@@ -66,4 +64,8 @@ public class UserService {
     }
 
 
+    public List<UserResponse> getUsers() {
+        List<User_> userList = userRepository.findAll();
+        return userList.stream().map(UserResponse::of).collect(Collectors.toList());
+    }
 }

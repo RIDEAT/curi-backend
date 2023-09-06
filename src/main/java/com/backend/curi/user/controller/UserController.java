@@ -33,7 +33,13 @@ public class UserController {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
-        var userList = userService.getAllUsers(workspaceId, currentUser);
+        var userList = userService.getAllUsersInWorkspace(workspaceId, currentUser);
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUsers() {
+        var userList = userService.getUsers();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
