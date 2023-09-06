@@ -44,6 +44,13 @@ public class UserController {
     }
 
 
+    @GetMapping(value = "/{userId}")
+    @Operation(summary = "get user", description = "유저 정보를 반환합니다.")
+    public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
+        var user = userService.getUserResponseByUserId(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
 
 
     // 회원가입 하고 보내야함 . 유저 디비에 등록
