@@ -5,6 +5,7 @@ import com.backend.curi.common.configuration.Constants;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.service.WorkflowService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -101,7 +102,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 CurrentUser currentUser = new CurrentUser();
                 currentUser.setUserId(userId);
-                currentUser.setName("mock name");
+                currentUser.setName(getUserName(userId));
+
                 currentUser.setNewAuthToken(responseEntity.getHeaders().get("AuthToken").get(0));
 
 
@@ -192,6 +194,16 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
+    private String getUserName(String userId){
+        try{
+            UserResponse user = userService.getUserResponseByUserId(userId);
+            return user.getName();
+        } catch(CuriException e){
+            return "not-registed-user";
+        } catch (Exception e){
+            return "not-registed-user";
+        }
+    }
 
 
 }

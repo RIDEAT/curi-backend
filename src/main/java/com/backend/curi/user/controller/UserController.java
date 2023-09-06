@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserRequest userForm) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getUserId();
-        String userName = currentUser.getName();
+        String userName = userForm.getName();
 
         UserResponse userResponse = userService.dbStore(userId, userName);
 
