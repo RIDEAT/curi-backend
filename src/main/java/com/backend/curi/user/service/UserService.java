@@ -27,17 +27,6 @@ public class UserService {
     }
 
 
-    public List<UserResponse> getAllUsersInWorkspace(Long workspaceId, CurrentUser currentUser){
-        var user = getUserByUserId(currentUser.getUserId());
-        List<User_> userList = userworkspaceService.getUserListByWorkspaceId(workspaceId);
-
-        if (!userList.contains(user)) {
-            throw new CuriException(HttpStatus.FORBIDDEN, ErrorType.UNAUTHORIZED_WORKSPACE);
-        }
-
-        return userList.stream().map(UserResponse::of).collect(Collectors.toList());
-    }
-
     public UserResponse getUserResponseByUserId (String userId){
         User_ user =  userRepository.findByUserId(userId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.USER_NOT_EXISTS));
         return UserResponse.of(user);
