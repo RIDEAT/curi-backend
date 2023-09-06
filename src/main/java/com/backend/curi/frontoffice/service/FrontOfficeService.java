@@ -128,6 +128,7 @@ public class FrontOfficeService {
                 .sequence(launchedSequence)
                 .member(launchedSequence.getMember())
                 .workspace(launchedSequence.getWorkspace())
+                .isScored(true)
                 .build();
         sequenceSatisfactionRepository.save(satisfaction);
         launchedSequence.setSequenceSatisfaction(satisfaction);
