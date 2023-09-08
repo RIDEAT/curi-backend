@@ -75,6 +75,7 @@ public class Content {
                 return new NotionContent();
             case notification:
             case contents:
+                return new ContentsContent();
             case survey:
             case finished:
             case slack:
