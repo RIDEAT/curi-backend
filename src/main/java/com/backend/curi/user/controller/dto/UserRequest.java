@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -16,6 +17,10 @@ public class UserRequest {
     private String email;
 
     private String name;
+
+    private Optional<String> phoneNum;
+
+    private Optional<String> company;
 
 
 }

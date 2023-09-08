@@ -6,6 +6,7 @@ import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
 
+import feign.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,13 @@ public class UserController {
         return new ResponseEntity(userResponse, HttpStatus.CREATED);
     }
 
+    @PutMapping
+    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UserRequest userForm){
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = currentUser.getUserId();
+        UserResponse updatedUser = userService.updateUser(userId, userForm);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 //    @PutMapping(value = "/{userId}")
 //    @Operation(summary = "update user", description = "유저 정보를 업데이트합니다.")
 //    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody @Valid UserRequest userForm) {

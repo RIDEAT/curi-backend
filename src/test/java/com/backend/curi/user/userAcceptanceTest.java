@@ -11,6 +11,7 @@ import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.controller.dto.UserRequest;
+import com.backend.curi.user.repository.UserRepository;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.entity.ModuleType;
@@ -80,6 +81,9 @@ public class userAcceptanceTest {
 
     @Autowired
     private SlackService slackService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @LocalServerPort
     public int port;
