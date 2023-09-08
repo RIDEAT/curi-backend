@@ -19,6 +19,10 @@ public class User_ {
 
     private String name;
 
+    private String phoneNum;
+
+    private String company;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Userworkspace> userworkspaces;
@@ -26,9 +30,11 @@ public class User_ {
     public User_(){}
 
     @Builder
-    public User_(String userId, String name){
+    public User_(String userId, String name, String phoneNum, String company){
         this.userId = userId;
         this.name = name;
+        this.phoneNum = phoneNum;
+        this.company = company;
     }
 
     @Override

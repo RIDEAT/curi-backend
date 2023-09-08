@@ -13,8 +13,10 @@ import java.util.Date;
 public class UserResponse {
     private String userId;
     private String name;
+    private String phoneNum;
+    private String company;
 
     public static UserResponse of(User_ user) {
-        return new UserResponse(user.getUserId(), user.getName());
+        return new UserResponse(user.getUserId(), user.getName(), user.getPhoneNum(), user.getCompany());
     }
 }
