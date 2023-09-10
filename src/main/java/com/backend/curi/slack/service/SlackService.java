@@ -380,7 +380,12 @@ public class SlackService {
             MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(getSlackId(currentUser.getUserId()))
-                    .blocks(buildBlocks(launchedWorkflow))
+                    .attachments(Collections.singletonList(
+                            com.slack.api.model.Attachment.builder()
+                                    .blocks(buildBlocks(launchedWorkflow))
+                                    .color("#36a64f")
+                                    .build()
+                    ))
             );
 
             return response;
