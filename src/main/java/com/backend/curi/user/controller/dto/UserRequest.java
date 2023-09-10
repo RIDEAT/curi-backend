@@ -22,5 +22,7 @@ public class UserRequest {
 
     private Optional<String> company;
 
+    private Optional<Boolean> agreeWithMarketing;
+
 
 }

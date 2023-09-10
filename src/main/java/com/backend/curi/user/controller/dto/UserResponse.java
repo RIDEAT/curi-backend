@@ -15,8 +15,9 @@ public class UserResponse {
     private String name;
     private String phoneNum;
     private String company;
+    private Boolean agreeWithMarketing;
 
     public static UserResponse of(User_ user) {
-        return new UserResponse(user.getUserId(), user.getName(), user.getPhoneNum(), user.getCompany());
+        return new UserResponse(user.getUserId(), user.getName(), user.getPhoneNum(), user.getCompany(), user.getAgreeWithMarketing()
     }
 }
