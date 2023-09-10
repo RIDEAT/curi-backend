@@ -120,7 +120,7 @@ public class SlackService {
                 slackMemberRepository.save(slackMemberInfo);
 
                 SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-                slackMessageRequest.setTexts("온버드 알람이 추가되었습니다."); // needs to change
+                slackMessageRequest.setTexts("워크플러그 알람이 추가되었습니다."); // needs to change
 
                 sendMessageToMember(slackMessageRequest, memberId);
             }
@@ -163,7 +163,7 @@ public class SlackService {
                 slackRepository.save(slackInfo);
 
                 SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
-                slackMessageRequest.setTexts("온버드 알람이 추가되었습니다.");
+                slackMessageRequest.setTexts("워크플러그 알람이 추가되었습니다.");
                 sendMessage(slackMessageRequest);
 
             } else {
@@ -306,6 +306,7 @@ public class SlackService {
 
     public ChatPostMessageResponse sendLaunchedSequenceMessageToMember(LaunchedSequence launchedSequence, FrontOffice frontOffice, Long memberId) {
         try {
+
             SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
             String accessToken = slackMemberInfo.getAccessToken();
 
@@ -344,7 +345,7 @@ public class SlackService {
             // Add a closing message
             blocks.add(SectionBlock.builder()
                     .text(MarkdownTextObject.builder()
-                            .text("시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.\n더 많은 정보와 도움이 필요하신 경우, 온버드 웹사이트 또는 지원팀에 문의해 주세요.\n감사합니다. 😊")
+                            .text("시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.\n더 많은 정보와 도움이 필요하신 경우, 워크플러그 웹사이트 또는 지원팀에 문의해 주세요.\n감사합니다. 😊")
                             .build())
                     .build());
 
