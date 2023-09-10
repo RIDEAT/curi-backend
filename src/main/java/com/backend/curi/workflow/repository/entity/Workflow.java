@@ -6,6 +6,7 @@ import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,9 @@ public class Workflow extends BaseEntity {
     public void modify(WorkflowRequest request){
         this.name = request.getName();
     }
-    
+    public void updateUpdatedDate() {
+        this.updatedDate = LocalDateTime.now();
+    }
 
 
 }

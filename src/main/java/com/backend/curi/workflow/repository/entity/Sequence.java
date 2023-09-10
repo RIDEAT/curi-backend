@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,9 +62,16 @@ public class Sequence extends BaseEntity {
                 build();
     }
 
+
+    public void updateUpdatedDate() {
+        this.updatedDate = LocalDateTime.now();
+        this.workflow.updateUpdatedDate();
+    }
+
     public void modify(SequenceRequest request, Role role){
         this.name = request.getName();
         this.role = role;
         this.dayOffset = request.getDayOffset();
+        updateUpdatedDate();
     }
 }
