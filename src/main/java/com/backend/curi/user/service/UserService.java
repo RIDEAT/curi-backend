@@ -39,6 +39,7 @@ public class UserService {
         user.setName (userRequest.getName());
         if (userRequest.getPhoneNum().isPresent()) user.setPhoneNum(userRequest.getPhoneNum().get());
         if (userRequest.getCompany().isPresent()) user.setCompany(userRequest.getCompany().get());
+        if (userRequest.getAgreeWithMarketing().isPresent()) user.setAgreeWithMarketing(userRequest.getAgreeWithMarketing().get());
 
         User_ updatedUser = userRepository.save(user);
         UserResponse userResponse = UserResponse.of(updatedUser);
