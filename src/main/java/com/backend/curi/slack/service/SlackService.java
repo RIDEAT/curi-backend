@@ -351,7 +351,12 @@ public class SlackService {
 
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(slackMemberInfo.getMemberSlackId()) // Use a channel ID `C1234567` is preferable
-                    .blocks(blocks)
+                    .attachments(Collections.singletonList(
+                            com.slack.api.model.Attachment.builder()
+                                    .blocks(blocks)
+                                    .color("#36a64f")
+                                    .build()
+                    ))
                     .text("오늘 할당된 시퀀스가 도착했습니다! 🚀")
                     .build();
 
@@ -444,9 +449,12 @@ public class SlackService {
             MethodsClient methods = slack.methods(accessToken);
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(slackMemberInfo.getMemberSlackId())
-                    .blocks(buildManagerBlocks(launchedWorkflow, role, member))
-                    .text("default")
-            );
+                    .attachments(Collections.singletonList(
+                                    com.slack.api.model.Attachment.builder()
+                                            .blocks(buildManagerBlocks(launchedWorkflow, role, member))
+                                            .color("#36a64f")
+                                            .build()
+                    )).text("워크플로우가 실행 예정입니다."));
 
             return response;
         } catch (CuriException e) {
