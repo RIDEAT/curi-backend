@@ -42,6 +42,7 @@ public class Module extends BaseEntity {
     private ObjectId contentId;
 
     public static Module of(ModuleRequest request, Workspace workspace,Sequence sequence, ObjectId contentId){
+        sequence.updateUpdatedDate();
         return Module.builder()
                 .name(request.getName())
                 .type(request.getType())
