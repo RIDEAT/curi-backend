@@ -92,7 +92,7 @@ public class AwsSMTPService {
         }
 
         // Footer of the email
-        message += "<p>slack 연동을 하신 경우, 메일뿐 아니라 slack으로도 알림을 받으실 수 있습니다. <a href="+ slackUrl+ "slack 연동 바로가기</a></p>";
+        message += "<p>slack 연동을 하신 경우, 메일뿐 아니라 slack으로도 알림을 받으실 수 있습니다. <a href="+ slackUrl+ "> slack 연동 바로가기</a></p>";
         message += "<p>더 많은 정보와 상세 내용은 <a href=\"https://app.workplug.team/\" style=\"color: #007bff;\">워크플러그 웹사이트</a>에서 확인하세요.</p>";
         message += "<p>감사합니다.</p>";
         message += "</div>";
