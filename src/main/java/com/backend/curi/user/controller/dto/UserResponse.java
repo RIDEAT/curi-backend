@@ -18,6 +18,6 @@ public class UserResponse {
     private Boolean agreeWithMarketing;
 
     public static UserResponse of(User_ user) {
-        return new UserResponse(user.getUserId(), user.getName(), user.getPhoneNum(), user.getCompany(), user.getAgreeWithMarketing()
+        return new UserResponse(user.getUserId(), user.getName(), user.getPhoneNum(), user.getCompany(), user.getAgreeWithMarketing());
     }
 }
