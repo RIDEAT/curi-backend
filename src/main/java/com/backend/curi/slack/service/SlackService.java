@@ -522,7 +522,7 @@ public class SlackService {
 
         blocks.add(DividerBlock.builder().build());
 
-        String sequenceHeader = "* 런치된 시퀀스 정보*\n";
+        String sequenceHeader = "*시퀀스 정보*\n";
 
         blocks.add(SectionBlock.builder()
                 .text(MarkdownTextObject.builder().text(sequenceHeader).build())
@@ -531,7 +531,7 @@ public class SlackService {
 
         for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
                 String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
-                        "*시작일: * " + sequence.getApplyDate().toString() +
+                        "*시작일: * " + sequence.getApplyDate().toString() + "\n" +
                         "*대상자: * " + sequence.getMember().getName();
 
                 blocks.add(SectionBlock.builder()
