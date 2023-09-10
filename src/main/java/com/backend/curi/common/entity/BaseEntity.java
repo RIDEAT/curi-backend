@@ -19,7 +19,7 @@ public abstract class BaseEntity {
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updatedDate;
+    protected LocalDateTime updatedDate;
 
     @PrePersist
     public void prePersist() {

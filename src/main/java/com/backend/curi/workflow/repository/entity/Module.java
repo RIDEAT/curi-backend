@@ -7,6 +7,7 @@ import lombok.*;
 import org.bson.types.ObjectId;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -50,9 +51,15 @@ public class Module extends BaseEntity {
                 .contentId(contentId).build();
     }
 
+    public void updateUpdatedDate() {
+        this.updatedDate = LocalDateTime.now();
+        this.sequence.updateUpdatedDate();
+    }
+
     public void modify(ModuleRequest request){
         this.name = request.getName();
         this.type = request.getType();
         this.order = request.getOrder();
+        updateUpdatedDate();
     }
 }
