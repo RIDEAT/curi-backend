@@ -52,6 +52,7 @@ public class Sequence extends BaseEntity {
     private List<Module> modules = new ArrayList<>();
 
     public static Sequence of(SequenceRequest request, Role role, Workspace workspace, Workflow workflow) {
+        workflow.updateUpdatedDate();
         return Sequence.builder().
                 name(request.getName()).
                 role(role).
