@@ -53,6 +53,10 @@ public class UserService {
 
 
     public UserResponse dbStore (String userId, String name) {
+        var existingUser = userRepository.findByUserId(userId);
+        if (existingUser.isPresent()){
+            return UserResponse.of(existingUser.get());
+        }
         User_ user = User_.builder().userId(userId).name(name).build();
         userRepository.save(user);
         UserResponse userResponse = UserResponse.of(user);
