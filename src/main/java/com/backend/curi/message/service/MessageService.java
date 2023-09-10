@@ -54,7 +54,7 @@ public class MessageService {
 
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser.getUserId());
+        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser);
 
         if (constants.getENV().equals("cloud"))
             notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter));
