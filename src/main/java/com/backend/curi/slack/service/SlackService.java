@@ -653,7 +653,7 @@ public class SlackService {
                 .fields(List.of(
                                 Field.builder()
                                         .title("시퀀스 이름")
-                                        .value("<" + frontOfficeUrl + "|`" + launchedSequence.getName() + "`>")
+                                        .value("<" + frontOfficeUrl + "|" + launchedSequence.getName() + ">")
                                         .valueShortEnough(true)
                                         .build(),
                                 Field.builder()
