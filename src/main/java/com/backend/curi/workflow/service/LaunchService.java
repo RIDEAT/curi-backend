@@ -18,6 +18,8 @@ import com.backend.curi.launched.service.LaunchedWorkflowService;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.member.service.MemberService;
 import com.backend.curi.message.service.MessageService;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.repository.SequenceSatisfactionRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
@@ -63,6 +65,7 @@ public class LaunchService {
     private final FrontOfficeService frontofficeService;
     private final MessageService messageService;
     private final SequenceSatisfactionRepository satisfactionRepository;
+    private final SlackService slackService;
 
 
     private final ContentService contentService;
@@ -112,7 +115,7 @@ public class LaunchService {
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, managerMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
-
+        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우가 실행되었습니다. 이름 : " + workflow.getName() + ", 워크스페이스 : " + workspace.getId()));
         return response;
     }
 

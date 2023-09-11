@@ -6,6 +6,8 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.message.service.MessageService;
 import com.backend.curi.notification.service.NotificationService;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.user.repository.entity.User_;
 import com.backend.curi.user.service.UserService;
@@ -41,6 +43,7 @@ public class WorkspaceService {
     private final AwsS3Service amazonS3Service;
     private final MessageService messageService;
     private final WorkflowRepository workflowRepository;
+    private final SlackService slackService;
   
     public WorkspaceResponse getWorkspaceById(Long id){
         log.info("getWorkspaceById");
@@ -72,6 +75,8 @@ public class WorkspaceService {
 
         createDefaultRole(savedWorkspace);
         createDefaultWorkflow(savedWorkspace);
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크스페이스가 생성되었습니다. 이름 : " + request.getName() + ", 유저: "+ currentUser.getUserId()));
+
         return savedWorkspace;
     }
 

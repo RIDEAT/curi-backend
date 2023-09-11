@@ -4,7 +4,6 @@ package com.backend.curi.exception;
 import com.backend.curi.common.Common;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
-import com.slack.api.Slack;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public class GlobalExceptionHandler {
         String unexpectedErrorTrace = ExceptionUtils.getStackTrace(e);
         String errorLog = "userId : "+ common.getCurrentUser().getUserId()+"\nUnexpected ERROR: "+ e.getMessage();
         log.error(errorLog);
-        slackService.sendMessageToRideat(new SlackMessageRequest(errorLog+'\n'+unexpectedErrorTrace));
+        slackService.sendErrorToRideat(new SlackMessageRequest(errorLog+'\n'+unexpectedErrorTrace));
         return ResponseEntity.internalServerError()
                 .body(
                         new ExceptionResponse(
