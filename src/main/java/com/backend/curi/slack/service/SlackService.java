@@ -169,7 +169,7 @@ public class SlackService {
 
             if (response.isOk()) {
                 SlackInfo slackInfo = SlackInfo.builder().userFirebaseId(currentUser.getUserId()).accessToken(response.getAccessToken()).userSlackId(response.getAuthedUser().getId()).build();
-                
+
                 slackRepository.save(slackInfo);
 
                 SlackMessageRequest slackMessageRequest = new SlackMessageRequest();
@@ -316,72 +316,41 @@ public class SlackService {
 
     public ChatPostMessageResponse sendLaunchedSequenceMessageToMember(LaunchedSequence launchedSequence, FrontOffice frontOffice, Long memberId) {
         try {
-
             SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
             String accessToken = slackMemberInfo.getAccessToken();
-
-            List<LayoutBlock> blocks = new ArrayList<>();
-
-            // Add a section block with rich text formatting
-            blocks.add(SectionBlock.builder()
-                    .text(MarkdownTextObject.builder()
-                            .text("🚀 *오늘 할당된 시퀀스가 도착했습니다!* 🎉")
-                            .build())
-                    .build());
-
-            blocks.add(SectionBlock.builder()
-                    .text(MarkdownTextObject.builder()
-                            .text("안녕하세요, " + launchedSequence.getMember().getName() + " 님! 🌼")
-                            .build())
-                    .build());
-
-            // Add a divider block for visual separation
-            blocks.add(DividerBlock.builder().build());
-
-            // Add a section block with detailed information
-            blocks.add(SectionBlock.builder()
-                    .text(MarkdownTextObject.builder()
-                            .text("오늘 할당된 시퀀스에 대한 상세 내용은 아래에서 확인하실 수 있습니다.")
-                            .build())
-                    .build());
-
-            // Add a link to the Front Office URL
-            blocks.add(SectionBlock.builder()
-                    .text(MarkdownTextObject.builder()
-                            .text("🔗 [프론트 오피스에서 시퀀스 확인하기](" + common.getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken()) + ")")
-                            .build())
-                    .build());
-
-            // Add a closing message
-            blocks.add(SectionBlock.builder()
-                    .text(MarkdownTextObject.builder()
-                            .text("시퀀스 내용을 확인하시고 필요한 작업을 진행해 주시기 바랍니다.\n더 많은 정보와 도움이 필요하신 경우, <a href=\"https://app.workplug.team/\" style=\"color: #007bff;\">워크플러그 웹사이트</a>에 문의해 주세요.\n감사합니다. 😊")
-                            .build())
-                    .build());
-
-            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel(slackMemberInfo.getMemberSlackId()) // Use a channel ID `C1234567` is preferable
-                    .attachments(Collections.singletonList(
-                            com.slack.api.model.Attachment.builder()
-                                    .blocks(blocks)
-                                    .color("#36a64f")
-                                    .build()
-                    ))
-                    .text("오늘 할당된 시퀀스가 도착했습니다! 🚀")
-                    .build();
+            String channelId = slackMemberInfo.getMemberSlackId();
+            String frontOfficeUrl = common.getFrontOfficeUrl(frontOffice.getId(), frontOffice.getAccessToken());
+            String preText = "`" + launchedSequence.getMember().getName() + "`님에게 할당된 시퀀스가 실행되었습니다.";
 
             MethodsClient methods = slack.methods(accessToken);
-            var response = methods.chatPostMessage(request);
 
-            return response;
+            long currentTimestamp = Instant.now().getEpochSecond();
+
+
+            Attachment richTextAttachment = Attachment.builder()
+                    .mrkdwnIn(List.of("text"))
+                    .color("#7b3bed")
+                    .pretext("*" + preText + "*").build();
+
+
+
+
+            List<Attachment> attachments = new ArrayList<>();
+            attachments.add(richTextAttachment);
+
+            attachments.add(sequenceInfoWithFrontOffice(launchedSequence, frontOfficeUrl));
+
+            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
+                    .channel(channelId)
+                    .attachments(attachments)
+            );
+
+
         } catch (CuriException e) {
             log.error(e.getMessage());
-        } catch (SlackApiException e) {
-            log.info(e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-
         ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
         chatPostMessageResponse.setOk(false);
         return chatPostMessageResponse;
@@ -392,19 +361,73 @@ public class SlackService {
         try {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String accessToken = getAccessToken(currentUser.getUserId());
+            String channelId = getSlackId(currentUser.getUserId());
+            String preText = "`" + launchedWorkflow.getWorkspace().getName() + "` 에서의 워크플로우가 성공적으로 실행되었습니다.";
+
+            return WorkflowLaunchedMessage(launchedWorkflow, accessToken, channelId, preText);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+    }
+
+    public ChatPostMessageResponse sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow) {
+        try {
+            Long memberId = launchedWorkflow.getMember().getId();
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+            String channelId = slackMemberInfo.getMemberSlackId();
+            String preText = "`" + launchedWorkflow.getMember().getName() + "`님에게 할당된 워크플로우가 실행되었습니다.";
+
+            return WorkflowLaunchedMessageToMember(launchedWorkflow, accessToken, channelId, preText);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+    }
+
+    public ChatPostMessageResponse sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Role role, Member member) {
+        try {
+            Long memberId = member.getId();
+            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
+            String accessToken = slackMemberInfo.getAccessToken();
+            String channelId = slackMemberInfo.getMemberSlackId();
+            String preText = "`" + member.getName() + "`님! `" + launchedWorkflow.getMember().getName() + "`님의 `" + role.getName() + "` 로서 할당된 워크플로우가 있습니다.";
+            return WorkflowLaunchedMessageToMember(launchedWorkflow, accessToken, channelId, preText);
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+
+    }
+
+
+    public ChatPostMessageResponse WorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, String accessToken, String channelId, String preText) {
+        try {
             MethodsClient methods = slack.methods(accessToken);
-            String workspaceUrl = appUrl + "/workspace/"  + launchedWorkflow.getWorkspace().getId();
-            String memberUrl = appUrl + "/workspace/"  + launchedWorkflow.getWorkspace().getId() +"/member";
-            String workflowUrl = workspaceUrl+"/management/"+ launchedWorkflow.getWorkflow().getId();
+            String workspaceUrl = appUrl + "/workspace/" + launchedWorkflow.getWorkspace().getId();
+            String memberUrl = appUrl + "/workspace/" + launchedWorkflow.getWorkspace().getId() + "/member";
+            String workflowUrl = workspaceUrl + "/management/" + launchedWorkflow.getWorkflow().getId();
 
             long currentTimestamp = Instant.now().getEpochSecond();
-
 
 
             Attachment richTextAttachment = Attachment.builder()
                     .mrkdwnIn(List.of("text"))
                     .color("#7b3bed")
-                    .pretext("*"+launchedWorkflow.getWorkspace().getName()+ " 에서의 워크플로우가 성공적으로 실행되었습니다.*")/*
+                    .pretext("*" + preText + "*")/*
                     .authorName("author_name")
                     .authorLink("http://flickr.com/bobby/")
                     .authorIcon("https://placeimg.com/16/16/people")
@@ -412,25 +435,25 @@ public class SlackService {
                     .titleLink("https://api.slack.com/")
                     .text("Optional `text` that appears within the attachment")*/
                     .fields(List.of(
-                            Field.builder()
-                                    .title("대상자")
-                                    .value("<"+memberUrl+"|`"+launchedWorkflow.getMember().getName()+"`>")
-                                    .valueShortEnough(false)
-                                    .build(),
-                            Field.builder()
-                                    .title("D-Day")
-                                    .value(launchedWorkflow.getMember().getStartDate().toString())
-                                    .valueShortEnough(true)
-                                    .build(),
-                            Field.builder()
-                                    .title("워크플로우 이름")
-                                    .value("<"+workflowUrl+"|`"+launchedWorkflow.getName()+"`>")
-                                    .valueShortEnough(true)
-                                    .build()
+                                    Field.builder()
+                                            .title("대상자")
+                                            .value("<" + memberUrl + "|`" + launchedWorkflow.getMember().getName() + "`>")
+                                            .valueShortEnough(false)
+                                            .build(),
+                                    Field.builder()
+                                            .title("D-Day")
+                                            .value(launchedWorkflow.getMember().getStartDate().toString())
+                                            .valueShortEnough(true)
+                                            .build(),
+                                    Field.builder()
+                                            .title("워크플로우 이름")
+                                            .value("<" + workflowUrl + "|`" + launchedWorkflow.getName() + "`>")
+                                            .valueShortEnough(true)
+                                            .build()
                             )
                     )
-                  //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
-                    .footer("<"+workspaceUrl+"|"+launchedWorkflow.getWorkspace().getName()+">")
+                    //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                    .footer("<" + workspaceUrl + "|" + launchedWorkflow.getWorkspace().getName() + ">")
                     .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
 
 
@@ -440,7 +463,7 @@ public class SlackService {
 
             Attachment sequenceTitle = Attachment.builder()
                     .mrkdwnIn(List.of("text"))
-                    .pretext("*시퀀스 주요정보*").build();
+                    .pretext("*시퀀스 주요정보 (시퀀스는 D-Day 오전 9시에 메일, slack으로 발송됩니다.)*").build();
 
 
             List<Attachment> attachments = new ArrayList<>();
@@ -452,20 +475,10 @@ public class SlackService {
             }
 
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(getSlackId(currentUser.getUserId()))
+                    .channel(channelId)
                     .attachments(attachments)
             );
-            /*
-            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(getSlackId(currentUser.getUserId()))
-                    .attachments(Collections.singletonList(
-                            com.slack.api.model.Attachment.builder()
-                                    .blocks(buildBlocks(launchedWorkflow))
-                                    .color("#36a64f")
-                                    .build()
-                    ))
-            );*/
-            System.out.println("response" + response);
+
             return response;
         } catch (CuriException e) {
             log.error(e.getMessage());
@@ -483,15 +496,69 @@ public class SlackService {
         return chatPostMessageResponse;
     }
 
-    public ChatPostMessageResponse sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow) {
+    public ChatPostMessageResponse WorkflowLaunchedMessageToMember(LaunchedWorkflow launchedWorkflow, String accessToken, String channelId, String preText) {
         try {
-            Long memberId = launchedWorkflow.getMember().getId();
-            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
-            String accessToken = slackMemberInfo.getAccessToken();
             MethodsClient methods = slack.methods(accessToken);
+            String workspaceUrl = appUrl + "/workspace/" + launchedWorkflow.getWorkspace().getId();
+            String memberUrl = appUrl + "/workspace/" + launchedWorkflow.getWorkspace().getId() + "/member";
+            String workflowUrl = workspaceUrl + "/management/" + launchedWorkflow.getWorkflow().getId();
+
+            long currentTimestamp = Instant.now().getEpochSecond();
+
+
+            Attachment richTextAttachment = Attachment.builder()
+                    .mrkdwnIn(List.of("text"))
+                    .color("#7b3bed")
+                    .pretext("*" + preText + "*")/*
+                    .authorName("author_name")
+                    .authorLink("http://flickr.com/bobby/")
+                    .authorIcon("https://placeimg.com/16/16/people")
+                    .title("title")
+                    .titleLink("https://api.slack.com/")
+                    .text("Optional `text` that appears within the attachment")*/
+                    .fields(List.of(
+                                    Field.builder()
+                                            .title("대상자")
+                                            .value("`" + launchedWorkflow.getMember().getName() + "`")
+                                            .valueShortEnough(false)
+                                            .build(),
+                                    Field.builder()
+                                            .title("D-Day")
+                                            .value(launchedWorkflow.getMember().getStartDate().toString())
+                                            .valueShortEnough(true)
+                                            .build(),
+                                    Field.builder()
+                                            .title("워크플로우 이름")
+                                            .value("`" + launchedWorkflow.getName() + "`")
+                                            .valueShortEnough(true)
+                                            .build()
+                            )
+                    )
+                    //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                    .footer(launchedWorkflow.getWorkspace().getName())
+                    .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
+
+
+//                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
+                    .ts(String.valueOf(currentTimestamp))
+                    .build();
+
+            Attachment sequenceTitle = Attachment.builder()
+                    .mrkdwnIn(List.of("text"))
+                    .pretext("*시퀀스 주요정보 (시퀀스는 D-Day 오전 9시에 메일, slack으로 발송됩니다.)*").build();
+
+
+            List<Attachment> attachments = new ArrayList<>();
+            attachments.add(richTextAttachment);
+            attachments.add(sequenceTitle);
+
+            for (LaunchedSequence launchedSequence : launchedWorkflow.getLaunchedSequences()) {
+                attachments.add(sequenceMemberInfo(launchedSequence));
+            }
+
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(slackMemberInfo.getMemberSlackId())
-                    .blocks(buildEmployeeBlocks(launchedWorkflow))
+                    .channel(channelId)
+                    .attachments(attachments)
             );
 
             return response;
@@ -504,21 +571,21 @@ public class SlackService {
 
         } catch (Exception e) {
             log.error(e.getMessage());
-
-
         }
+
         ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
         chatPostMessageResponse.setOk(false);
         return chatPostMessageResponse;
-
     }
 
-    Attachment sequenceInfo(LaunchedSequence launchedSequence) throws IOException {
-        String workspaceUrl = appUrl + "/workspace/"  + launchedSequence.getWorkspace().getId();
-        String memberUrl = appUrl + "/workspace/"  + launchedSequence.getMember().getWorkspace().getId() +"/member";
-        String workflowUrl = workspaceUrl+"/management/"+ launchedSequence.getLauchedWorkflow().getWorkflow().getId();
-        long currentTimestamp = Instant.now().getEpochSecond();
 
+
+
+    Attachment sequenceInfo(LaunchedSequence launchedSequence) throws IOException {
+        String workspaceUrl = appUrl + "/workspace/" + launchedSequence.getWorkspace().getId();
+        String memberUrl = appUrl + "/workspace/" + launchedSequence.getMember().getWorkspace().getId() + "/member";
+        String workflowUrl = workspaceUrl + "/management/" + launchedSequence.getLauchedWorkflow().getWorkflow().getId();
+        long currentTimestamp = Instant.now().getEpochSecond();
 
 
         return Attachment.builder()
@@ -532,21 +599,21 @@ public class SlackService {
                     .titleLink("https://api.slack.com/")
                     .text("Optional `text` that appears within the attachment")*/
                 .fields(List.of(
-                        Field.builder()
-                                .title("시퀀스 이름")
-                                .value("<"+workflowUrl+"|`"+launchedSequence.getName()+"`>")
-                                .valueShortEnough(true)
-                                .build(),
                                 Field.builder()
-                                        .title("대상자")
-                                        .value("<"+memberUrl+"|`"+launchedSequence.getMember().getName()+"`>")
+                                        .title("시퀀스 이름")
+                                        .value("<" + workflowUrl + "|`" + launchedSequence.getName() + "`>")
                                         .valueShortEnough(true)
                                         .build(),
                                 Field.builder()
-                                .title("상태")
-                                .value(launchedSequence.getStatus().toString())
-                                .valueShortEnough(true)
-                                .build(),
+                                        .title("대상자")
+                                        .value("<" + memberUrl + "|`" + launchedSequence.getMember().getName() + "`>")
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                        .title("상태")
+                                        .value(launchedSequence.getStatus().toString())
+                                        .valueShortEnough(true)
+                                        .build(),
 
                                 Field.builder()
                                         .title("D-Day")
@@ -557,7 +624,7 @@ public class SlackService {
                         )
                 )
                 //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
-                .footer("<"+workspaceUrl+"|"+launchedSequence.getWorkspace().getName()+">")
+                .footer("<" + workspaceUrl + "|" + launchedSequence.getWorkspace().getName() + ">")
                 .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
 
 //                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
@@ -566,39 +633,111 @@ public class SlackService {
 
     }
 
-    public ChatPostMessageResponse sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Role role, Member member) {
-
-        try {
-            Long memberId = member.getId();
-            SlackMemberInfo slackMemberInfo = slackMemberRepository.findByMemberId(memberId).orElseThrow(() -> new CuriException(HttpStatus.UNAUTHORIZED, ErrorType.SLACK_MEMBER_NOT_AUTHORIZED));
-            String accessToken = slackMemberInfo.getAccessToken();
-            MethodsClient methods = slack.methods(accessToken);
-            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
-                    .channel(slackMemberInfo.getMemberSlackId())
-                    .attachments(Collections.singletonList(
-                                    com.slack.api.model.Attachment.builder()
-                                            .blocks(buildManagerBlocks(launchedWorkflow, role, member))
-                                            .color("#36a64f")
-                                            .build()
-                    )).text("워크플로우가 실행 예정입니다."));
-
-            return response;
-        } catch (CuriException e) {
-            log.error(e.getMessage());
+    Attachment sequenceInfoWithFrontOffice(LaunchedSequence launchedSequence, String frontOfficeUrl) throws IOException {
+        String workspaceUrl = appUrl + "/workspace/" + launchedSequence.getWorkspace().getId();
+        String memberUrl = appUrl + "/workspace/" + launchedSequence.getMember().getWorkspace().getId() + "/member";
+        String workflowUrl = workspaceUrl + "/management/" + launchedSequence.getLauchedWorkflow().getWorkflow().getId();
+        long currentTimestamp = Instant.now().getEpochSecond();
 
 
-        } catch (SlackApiException e) {
-            log.error(e.getMessage());
+        return Attachment.builder()
+                .mrkdwnIn(List.of("text"))
+                .color("#7b3bed")
+                /*
+                    .authorName("author_name")
+                    .authorLink("http://flickr.com/bobby/")
+                    .authorIcon("https://placeimg.com/16/16/people")
+                    .title("title")
+                    .titleLink("https://api.slack.com/")
+                    .text("Optional `text` that appears within the attachment")*/
+                .fields(List.of(
+                                Field.builder()
+                                        .title("시퀀스 이름")
+                                        .value("<" + frontOfficeUrl + "|`" + launchedSequence.getName() + "`>")
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                        .title("대상자")
+                                        .value( launchedSequence.getMember().getName() )
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                        .title("상태")
+                                        .value(launchedSequence.getStatus().toString())
+                                        .valueShortEnough(true)
+                                        .build(),
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
+                                Field.builder()
+                                        .title("D-Day")
+                                        .value(launchedSequence.getApplyDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                                        .valueShortEnough(true)
+                                        .build()
 
+                        )
+                )
+                //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                .footer(launchedSequence.getWorkspace().getName() )
+                .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
 
-        }
-        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
-        chatPostMessageResponse.setOk(false);
-        return chatPostMessageResponse;
+//                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
+                .ts(String.valueOf(currentTimestamp))
+                .build();
+
     }
+
+
+    Attachment sequenceMemberInfo(LaunchedSequence launchedSequence) throws IOException {
+        String workspaceUrl = appUrl + "/workspace/" + launchedSequence.getWorkspace().getId();
+        String memberUrl = appUrl + "/workspace/" + launchedSequence.getMember().getWorkspace().getId() + "/member";
+        String workflowUrl = workspaceUrl + "/management/" + launchedSequence.getLauchedWorkflow().getWorkflow().getId();
+        long currentTimestamp = Instant.now().getEpochSecond();
+
+
+        return Attachment.builder()
+                .mrkdwnIn(List.of("text"))
+                .color("#6f6a73")
+                /*
+                    .authorName("author_name")
+                    .authorLink("http://flickr.com/bobby/")
+                    .authorIcon("https://placeimg.com/16/16/people")
+                    .title("title")
+                    .titleLink("https://api.slack.com/")
+                    .text("Optional `text` that appears within the attachment")*/
+                .fields(List.of(
+                                Field.builder()
+                                        .title("시퀀스 이름")
+                                        .value("`" + launchedSequence.getName() + "`")
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                        .title("대상자")
+                                        .value("`" + launchedSequence.getMember().getName() + "`")
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                        .title("상태")
+                                        .value(launchedSequence.getStatus().toString())
+                                        .valueShortEnough(true)
+                                        .build(),
+
+                                Field.builder()
+                                        .title("D-Day")
+                                        .value(launchedSequence.getApplyDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                                        .valueShortEnough(true)
+                                        .build()
+
+                        )
+                )
+                //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                .footer(launchedSequence.getWorkspace().getName())
+                .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
+
+//                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
+                .ts(String.valueOf(currentTimestamp))
+                .build();
+
+    }
+
 
     public ChatPostMessageResponse sendLaunchedWorkflowDashboard(LaunchedWorkflow launchedWorkflow, String userId) {
 
@@ -670,13 +809,13 @@ public class SlackService {
 
 
         for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
-                String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
-                        "*시작일: * " + sequence.getApplyDate().toString() + "\n" +
-                        "*대상자: * " + sequence.getMember().getName();
+            String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
+                    "*시작일: * " + sequence.getApplyDate().toString() + "\n" +
+                    "*대상자: * " + sequence.getMember().getName();
 
-                blocks.add(SectionBlock.builder()
-                        .text(MarkdownTextObject.builder().text(sequenceDetails).build())
-                        .build());
+            blocks.add(SectionBlock.builder()
+                    .text(MarkdownTextObject.builder().text(sequenceDetails).build())
+                    .build());
 
         }
 
@@ -843,20 +982,18 @@ public class SlackService {
     }
 
 
-
-
     public Boolean isAuthorized() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return !slackRepository.findByUserFirebaseId(currentUser.getUserId()).isEmpty();
     }
 
-    public Boolean isMemberAuthorized(Long memberId){
+    public Boolean isMemberAuthorized(Long memberId) {
         return !slackMemberRepository.findByMemberId(memberId).isEmpty();
     }
 
     public void deleteOauth() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        SlackInfo slackInfo = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.SLACK_ADMIN_USER_NOT_AUTHORIZED));
+        SlackInfo slackInfo = slackRepository.findByUserFirebaseId(currentUser.getUserId()).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.SLACK_ADMIN_USER_NOT_AUTHORIZED));
         slackRepository.delete(slackInfo);
     }
 }

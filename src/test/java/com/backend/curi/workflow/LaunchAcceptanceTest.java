@@ -14,6 +14,10 @@ import com.backend.curi.member.service.MemberService;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.repository.SlackMemberRepository;
+import com.backend.curi.slack.repository.SlackRepository;
+import com.backend.curi.slack.repository.entity.SlackInfo;
+import com.backend.curi.slack.repository.entity.SlackMemberInfo;
 import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.service.UserService;
 import com.backend.curi.workflow.controller.dto.*;
@@ -93,6 +97,12 @@ public class LaunchAcceptanceTest {
 
     @Autowired
     private SlackService slackService;
+
+    @Autowired
+    private SlackRepository slackRepository;
+
+    @Autowired
+    private SlackMemberRepository slackMemberRepository;
 
     @Autowired
     private LaunchService launchService;
@@ -182,8 +192,31 @@ public class LaunchAcceptanceTest {
         moduleService.createModule(workspaceId, sequenceId, getModuleRequest2());
         moduleService.createModule(workspaceId, sequenceId, getModuleRequest3());
 
+        slackIntegrate();
+        slackMemberIntegrate();
     }
 
+    void slackIntegrate(){
+        slackRepository.deleteAll();
+        if (slackRepository.findByUserFirebaseId("8514199@gmail.com").isPresent()) return;
+
+        SlackInfo slackInfo = new SlackInfo();
+        slackInfo.setAccessToken("xoxb-5305401263955-5840330224791-tw0wVVxZYpzPszJ17KnkaulQ");
+        slackInfo.setUserFirebaseId("8514199@gmail.com");
+        slackInfo.setUserSlackId("U059C4ZTK41");
+        slackRepository.save(slackInfo);
+    }
+
+    void slackMemberIntegrate(){
+        slackMemberRepository.deleteAll();
+        if (slackMemberRepository.findByMemberId(employeeId).isPresent()) return;
+
+        SlackMemberInfo slackMemberInfo = new SlackMemberInfo();
+        slackMemberInfo.setAccessToken("xoxb-5305401263955-5840330224791-tw0wVVxZYpzPszJ17KnkaulQ");
+        slackMemberInfo.setMemberId(employeeId);
+        slackMemberInfo.setMemberSlackId("U059C4ZTK41");
+        slackMemberRepository.save(slackMemberInfo);
+    }
     @DisplayName("워크플로우 launch 전 필요한 role 정보를 받을 수 있다.")
     @Test
     public void getRequiredRoles(){
