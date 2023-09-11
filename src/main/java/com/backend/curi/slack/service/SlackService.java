@@ -403,8 +403,8 @@ public class SlackService {
 
             Attachment richTextAttachment = Attachment.builder()
                     .mrkdwnIn(List.of("text"))
-                    .color("#9933CC")
-                    .pretext("워크플로우가 런치 예정입니다.")/*
+                    .color("#7b3bed")
+                    .pretext("*"+launchedWorkflow.getWorkspace().getName()+ " 에서의 워크플로우가 성공적으로 실행되었습니다.*")/*
                     .authorName("author_name")
                     .authorLink("http://flickr.com/bobby/")
                     .authorIcon("https://placeimg.com/16/16/people")
@@ -438,8 +438,15 @@ public class SlackService {
                     .ts(String.valueOf(currentTimestamp))
                     .build();
 
+            Attachment sequenceTitle = Attachment.builder()
+                    .mrkdwnIn(List.of("text"))
+                    .pretext("*시퀀스 주요정보*").build();
+
+
             List<Attachment> attachments = new ArrayList<>();
             attachments.add(richTextAttachment);
+            attachments.add(sequenceTitle);
+
             for (LaunchedSequence launchedSequence : launchedWorkflow.getLaunchedSequences()) {
                 attachments.add(sequenceInfo(launchedSequence));
             }
@@ -516,8 +523,7 @@ public class SlackService {
 
         return Attachment.builder()
                 .mrkdwnIn(List.of("text"))
-                .color("#36a64f")
-                .pretext("시퀀스 주요정보")
+                .color("#6f6a73")
                 /*
                     .authorName("author_name")
                     .authorLink("http://flickr.com/bobby/")
@@ -640,7 +646,7 @@ public class SlackService {
         List<LayoutBlock> blocks = new ArrayList<>();
 
         blocks.add(SectionBlock.builder()
-                .text(MarkdownTextObject.builder().text("워크플로우 런치 알림").build())
+                .text(MarkdownTextObject.builder().text("워크플로우 실행 알림").build())
                 .build());
         // Workflow Details
         blocks.add(SectionBlock.builder()
