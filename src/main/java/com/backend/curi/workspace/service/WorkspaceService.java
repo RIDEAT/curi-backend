@@ -74,7 +74,7 @@ public class WorkspaceService {
         userworkspaceService.create(currentUser, savedWorkspace);
 
         createDefaultRole(savedWorkspace);
-        createDefaultWorkflow(savedWorkspace);
+        //createDefaultWorkflow(savedWorkspace);
         slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크스페이스가 생성되었습니다. 이름 : " + request.getName() + ", 유저: "+ currentUser.getUserId()));
 
         return savedWorkspace;
