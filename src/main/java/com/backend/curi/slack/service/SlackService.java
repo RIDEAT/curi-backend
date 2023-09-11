@@ -876,48 +876,7 @@ public class SlackService {
         return blocks;
     }
 
-    private List<LayoutBlock> buildManagerBlocks(LaunchedWorkflow launchedWorkflow, Role role, Member manager) {
-        List<LayoutBlock> blocks = new ArrayList<>();
-        Member employee = launchedWorkflow.getMember();
 
-
-        String message = "*안녕하세요. " + manager.getName() + "님 ! 당신은 " +
-                employee.getName() + "님의 " + role.getName() + " 입니다. *\n" +
-                employee.getName() + "님의 성공적인 온보딩을 함께 해주세요!\n";
-
-        blocks.add(SectionBlock.builder()
-                .text(MarkdownTextObject.builder().text(message).build())
-                .build());
-
-        blocks.add(DividerBlock.builder().build());
-
-        String employeeInfoHeader = "*신규 입사자 정보*\n" + "이름 : " + employee.getName() + "\n" + "부서 : " + employee.getDepartment() + "\n" + "입사일자: " + employee.getStartDate();
-
-        blocks.add(SectionBlock.builder()
-                .text(MarkdownTextObject.builder().text(employeeInfoHeader).build())
-                .build());
-
-        blocks.add(DividerBlock.builder().build());
-
-        String sequenceHeader = "*" + manager.getName() + "님이 " + employee.getName() + "님의 " + role.getName() + "으로서 참여할 활동*\n";
-
-        blocks.add(SectionBlock.builder()
-                .text(MarkdownTextObject.builder().text(sequenceHeader).build())
-                .build());
-
-        for (LaunchedSequence sequence : launchedWorkflow.getLaunchedSequences()) {
-            if (sequence.getMember().equals(manager)) {
-                String sequenceDetails = "*시퀀스이름: * " + sequence.getName() + "\n" +
-                        "*시작일: * " + sequence.getApplyDate().toString();
-
-                blocks.add(SectionBlock.builder()
-                        .text(MarkdownTextObject.builder().text(sequenceDetails).build())
-                        .build());
-            }
-        }
-
-        return blocks;
-    }
 
     private List<LayoutBlock> buildDashBoardBlocks(LaunchedWorkflow launchedWorkflow) {
         List<LayoutBlock> blocks = new ArrayList<>();
