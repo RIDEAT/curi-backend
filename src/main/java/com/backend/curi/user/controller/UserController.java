@@ -28,11 +28,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("/list")
-    public ResponseEntity<List<UserResponse>> getUsers() {
-        var userList = userService.getUsers();
-        return new ResponseEntity<>(userList, HttpStatus.OK);
-    }
+
 
 
     @GetMapping
@@ -78,15 +74,7 @@ public class UserController {
 //        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 //    }
 
-    @DeleteMapping(value = "/{userId}")
-    @Operation(summary = "delete user", description = "유저를 삭제합니다.")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable String userId) {
-        User_ existingUser = userService.getUserByUserId(userId);
 
-        UserResponse deletedUser = userService.deleteUser(existingUser);
-
-        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
-    }
 
 
 
