@@ -38,7 +38,7 @@ public class AwsSMTPService {
     ) {
         this.amazonSimpleEmailService = amazonSimpleEmailService;
         this.common = common;
-        this.from = "no-reply@curiboard.com";
+        this.from = "no-reply@" + from;
     }
 
     public void send(String subject, String content, String... to) {
