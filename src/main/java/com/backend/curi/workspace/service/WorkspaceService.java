@@ -106,7 +106,7 @@ public class WorkspaceService {
     private void createDefaultRole(Workspace workspace) {
         var employeeRole = Role.builder().workspace(workspace).name("대상자").build();
         var directManagerRole = Role.builder().workspace(workspace).name("버디").build();
-        var hrManagerRole = Role.builder().workspace(workspace).name("HR매니저").build();
+        var hrManagerRole = Role.builder().workspace(workspace).name("HR").build();
 
         roleRepository.save(employeeRole);
         roleRepository.save(directManagerRole);
