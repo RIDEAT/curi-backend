@@ -9,17 +9,14 @@ import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.service.UserService;
-import com.backend.curi.workflow.service.WorkflowService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,7 +28,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -124,7 +120,7 @@ public class JwtFilter extends OncePerRequestFilter {
         catch (JsonMappingException e) {
             String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendMessageToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage() + "\n" + stackTrace));
+            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage() + "\n" + stackTrace));
 
             response.setHeader(HttpStatus.UNAUTHORIZED.name(), e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -135,7 +131,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendMessageToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
+            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
 
         }
 
@@ -152,7 +148,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.getWriter().write(ErrorType.AUTH_SERVER_ERROR.getMessage());
             String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendMessageToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
+            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
 
             return;
         } catch(CuriException e){
@@ -163,7 +159,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendMessageToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
+            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
 
             return;
         } catch (Exception e){
@@ -180,7 +176,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.getWriter().write(ErrorType.UNEXPECTED_SERVER_ERROR.getMessage());
             String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendMessageToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" +stackTrace));
+            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" +stackTrace));
             return;
         }
     }

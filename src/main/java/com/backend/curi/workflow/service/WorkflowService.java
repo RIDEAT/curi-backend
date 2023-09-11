@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
@@ -26,6 +28,7 @@ import javax.transaction.Transactional;
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final WorkspaceService workspaceService;
+    private final SlackService slackService;
     private static Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Transactional
@@ -37,6 +40,7 @@ public class WorkflowService {
                 .workspace(workspace)
                 .build();
         workflowRepository.save(workflow);
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크플로우가 생성되었습니다. 이름 : " + request.getName() + ", 워크스페이스 : " + workspace.getId()));
 
         return WorkflowResponse.of(workflow);
     }

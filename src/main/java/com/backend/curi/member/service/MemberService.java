@@ -7,6 +7,8 @@ import com.backend.curi.member.controller.dto.*;
 import com.backend.curi.member.repository.MemberRepository;
 import com.backend.curi.member.repository.entity.*;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final WorkspaceService workspaceService;
     private final UserworkspaceService userworkspaceService;
+    private final SlackService slackService;
 
 
     public MemberResponse deleteMember(Long memberId) throws DataIntegrityViolationException {
@@ -77,6 +80,8 @@ public class MemberService {
     public MemberResponse createMember(MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
         var member = Member.of(request, workspace);
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 멤버를 추가했습니다. 이름 : " + member.getName() + ", 워크스페이스: "+ request.getWid() ));
+
         return MemberResponse.of(memberRepository.save(member));
     }
 

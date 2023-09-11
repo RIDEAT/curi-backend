@@ -2,11 +2,9 @@ package com.backend.curi.slack.service;
 
 import com.backend.curi.common.Common;
 import com.backend.curi.common.configuration.Constants;
-import com.backend.curi.common.configuration.LoggingAspect;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.frontoffice.repository.entity.FrontOffice;
-import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
@@ -37,34 +35,23 @@ import com.slack.api.model.Field;
 import com.slack.api.model.block.*;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 
-import com.slack.api.model.block.composition.PlainTextObject;
-import com.slack.api.model.block.element.BlockElement;
-import com.slack.api.model.block.element.ButtonElement;
-import com.slack.api.model.block.element.ImageElement;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
-import static com.slack.api.model.block.Blocks.*;
 import static com.slack.api.model.block.composition.BlockCompositions.markdownText;
 import static com.slack.api.model.block.composition.BlockCompositions.plainText;
-import static com.slack.api.model.block.element.BlockElements.asElements;
-import static com.slack.api.model.block.element.BlockElements.button;
 import static org.apache.http.client.utils.DateUtils.formatDate;
 
 @Service
@@ -225,6 +212,33 @@ public class SlackService {
     }
 
     public ChatPostMessageResponse sendMessageToRideat(SlackMessageRequest slackMessageRequest) {
+        try {
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                    .channel("#workplug-alarm") // Use a channel ID `C1234567` is preferable
+                    .text(slackMessageRequest.getTexts())
+                    .build();
+
+
+            String accessToken = rideatBotToken;
+            MethodsClient methods = slack.methods(accessToken);
+            var response = methods.chatPostMessage(request);
+
+            return response;
+        } catch (CuriException e) {
+            log.error(e.getMessage());
+
+        } catch (SlackApiException e) {
+            log.error(e.getMessage());
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
+        chatPostMessageResponse.setOk(false);
+        return chatPostMessageResponse;
+    }
+    public ChatPostMessageResponse sendErrorToRideat(SlackMessageRequest slackMessageRequest) {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel("#workplug-error-alarm") // Use a channel ID `C1234567` is preferable

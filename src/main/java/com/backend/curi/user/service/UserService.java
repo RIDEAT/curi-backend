@@ -3,6 +3,8 @@ package com.backend.curi.user.service;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.security.dto.CurrentUser;
+import com.backend.curi.slack.controller.dto.SlackMessageRequest;
+import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.user.controller.dto.UserRequest;
 import com.backend.curi.user.controller.dto.UserResponse;
 import com.backend.curi.user.repository.UserRepository;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class UserService {
 
+    private final SlackService slackService;
     private final UserRepository userRepository;
     private final UserworkspaceService userworkspaceService;
 
@@ -58,6 +61,8 @@ public class UserService {
         if (existingUser.isPresent()){
             return UserResponse.of(existingUser.get());
         }
+
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 유저가 가입했습니다. 이름 : " + name + ", 이메일 : " + userId));
         User_ user = User_.builder().userId(userId).name(name).build();
         userRepository.save(user);
         UserResponse userResponse = UserResponse.of(user);
