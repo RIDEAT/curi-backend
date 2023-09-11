@@ -32,6 +32,8 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.methods.response.conversations.ConversationsCreateResponse;
 import com.slack.api.methods.response.conversations.ConversationsInviteResponse;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
+import com.slack.api.model.Attachment;
+import com.slack.api.model.Field;
 import com.slack.api.model.block.*;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 
@@ -43,16 +45,19 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 import static com.slack.api.model.block.Blocks.*;
@@ -67,6 +72,8 @@ import static org.apache.http.client.utils.DateUtils.formatDate;
 public class SlackService {
 
     private static Logger log = LoggerFactory.getLogger(SlackService.class);
+
+    private final ResourceLoader resourceLoader;
 
     @Value("${slack.client-id}")
     private String clientId;
@@ -86,6 +93,9 @@ public class SlackService {
     @Value("${slack.bot-token}")
     private String botToken;
 
+
+    @Value("${workplug.app.url}")
+    private String appUrl;
 
     private final Common common;
 
@@ -383,6 +393,62 @@ public class SlackService {
             CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String accessToken = getAccessToken(currentUser.getUserId());
             MethodsClient methods = slack.methods(accessToken);
+            String workspaceUrl = appUrl + "/workspace/"  + launchedWorkflow.getWorkspace().getId();
+            String memberUrl = appUrl + "/workspace/"  + launchedWorkflow.getWorkspace().getId() +"/member";
+            String workflowUrl = workspaceUrl+"/management/"+ launchedWorkflow.getWorkflow().getId();
+
+            long currentTimestamp = Instant.now().getEpochSecond();
+
+
+
+            Attachment richTextAttachment = Attachment.builder()
+                    .mrkdwnIn(List.of("text"))
+                    .color("#9933CC")
+                    .pretext("워크플로우가 런치 예정입니다.")/*
+                    .authorName("author_name")
+                    .authorLink("http://flickr.com/bobby/")
+                    .authorIcon("https://placeimg.com/16/16/people")
+                    .title("title")
+                    .titleLink("https://api.slack.com/")
+                    .text("Optional `text` that appears within the attachment")*/
+                    .fields(List.of(
+                            Field.builder()
+                                    .title("대상자")
+                                    .value("<"+memberUrl+"|`"+launchedWorkflow.getMember().getName()+"`>")
+                                    .valueShortEnough(false)
+                                    .build(),
+                            Field.builder()
+                                    .title("D-Day")
+                                    .value(launchedWorkflow.getMember().getStartDate().toString())
+                                    .valueShortEnough(true)
+                                    .build(),
+                            Field.builder()
+                                    .title("워크플로우 이름")
+                                    .value("<"+workflowUrl+"|`"+launchedWorkflow.getName()+"`>")
+                                    .valueShortEnough(true)
+                                    .build()
+                            )
+                    )
+                  //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                    .footer("<"+workspaceUrl+"|"+launchedWorkflow.getWorkspace().getName()+">")
+                    .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
+
+
+//                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
+                    .ts(String.valueOf(currentTimestamp))
+                    .build();
+
+            List<Attachment> attachments = new ArrayList<>();
+            attachments.add(richTextAttachment);
+            for (LaunchedSequence launchedSequence : launchedWorkflow.getLaunchedSequences()) {
+                attachments.add(sequenceInfo(launchedSequence));
+            }
+
+            ChatPostMessageResponse response = methods.chatPostMessage(req -> req
+                    .channel(getSlackId(currentUser.getUserId()))
+                    .attachments(attachments)
+            );
+            /*
             ChatPostMessageResponse response = methods.chatPostMessage(req -> req
                     .channel(getSlackId(currentUser.getUserId()))
                     .attachments(Collections.singletonList(
@@ -391,8 +457,8 @@ public class SlackService {
                                     .color("#36a64f")
                                     .build()
                     ))
-            );
-
+            );*/
+            System.out.println("response" + response);
             return response;
         } catch (CuriException e) {
             log.error(e.getMessage());
@@ -437,6 +503,60 @@ public class SlackService {
         ChatPostMessageResponse chatPostMessageResponse = new ChatPostMessageResponse();
         chatPostMessageResponse.setOk(false);
         return chatPostMessageResponse;
+
+    }
+
+    Attachment sequenceInfo(LaunchedSequence launchedSequence) throws IOException {
+        String workspaceUrl = appUrl + "/workspace/"  + launchedSequence.getWorkspace().getId();
+        String memberUrl = appUrl + "/workspace/"  + launchedSequence.getMember().getWorkspace().getId() +"/member";
+        String workflowUrl = workspaceUrl+"/management/"+ launchedSequence.getLauchedWorkflow().getWorkflow().getId();
+        long currentTimestamp = Instant.now().getEpochSecond();
+
+
+
+        return Attachment.builder()
+                .mrkdwnIn(List.of("text"))
+                .color("#36a64f")
+                .pretext("시퀀스 주요정보")
+                /*
+                    .authorName("author_name")
+                    .authorLink("http://flickr.com/bobby/")
+                    .authorIcon("https://placeimg.com/16/16/people")
+                    .title("title")
+                    .titleLink("https://api.slack.com/")
+                    .text("Optional `text` that appears within the attachment")*/
+                .fields(List.of(
+                        Field.builder()
+                                .title("시퀀스 이름")
+                                .value("<"+workflowUrl+"|`"+launchedSequence.getName()+"`>")
+                                .valueShortEnough(true)
+                                .build(),
+                                Field.builder()
+                                        .title("대상자")
+                                        .value("<"+memberUrl+"|`"+launchedSequence.getMember().getName()+"`>")
+                                        .valueShortEnough(true)
+                                        .build(),
+                                Field.builder()
+                                .title("상태")
+                                .value(launchedSequence.getStatus().toString())
+                                .valueShortEnough(true)
+                                .build(),
+
+                                Field.builder()
+                                        .title("D-Day")
+                                        .value(launchedSequence.getApplyDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                                        .valueShortEnough(true)
+                                        .build()
+
+                        )
+                )
+                //  .footer("<https://app.dev.workplug.team/workspace/330|rideat>" )
+                .footer("<"+workspaceUrl+"|"+launchedSequence.getWorkspace().getName()+">")
+                .footerIcon("https://workplug-logo.s3.ap-northeast-2.amazonaws.com/workplug.png")
+
+//                  .footer("<a href='" + workspaceUrl + "'>" + launchedWorkflow.getWorkspace().getName() + "</a>")
+                .ts(String.valueOf(currentTimestamp))
+                .build();
 
     }
 
@@ -520,7 +640,7 @@ public class SlackService {
         List<LayoutBlock> blocks = new ArrayList<>();
 
         blocks.add(SectionBlock.builder()
-                .text(MarkdownTextObject.builder().text(":tada: *워크플로우 런치 알림* :tada:").build())
+                .text(MarkdownTextObject.builder().text("워크플로우 런치 알림").build())
                 .build());
         // Workflow Details
         blocks.add(SectionBlock.builder()
@@ -531,6 +651,7 @@ public class SlackService {
                                         "*입사 일자:* " + launchedWorkflow.getKeyDate()
                         )
                         .build())
+
                 .build());
 
         blocks.add(DividerBlock.builder().build());
