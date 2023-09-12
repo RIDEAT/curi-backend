@@ -77,8 +77,8 @@ public class WorkspaceService {
         userworkspaceService.create(currentUser, savedWorkspace);
 
         createDefaultRole(savedWorkspace);
-        //createDefaultWorkflow(savedWorkspace);
-        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크스페이스가 생성되었습니다. 이름 : " + request.getName() + ", 유저: "+ currentUser.getUserId()));
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크스페이스가 생성되었습니다. 이름 : " + request.getName() + ", 유저: "+ currentUser.getUserId() + ", 유저이름: " + currentUser.getName()));
+
 
         return savedWorkspace;
     }
@@ -121,24 +121,6 @@ public class WorkspaceService {
     }
 
 
-
-    private void createDefaultWorkflow(Workspace workspace){
-        var employeeWorkflow = Workflow.builder().workspace(workspace).name("신입 공통 워크플로우").build();
-        var itWorkflow = Workflow.builder().workspace(workspace).name("it 직무 워크플로우").build();
-        var ethicWorkflow = Workflow.builder().workspace(workspace).name("윤리 워크플로우").build();
-
-        workflowRepository.save(employeeWorkflow);
-        workflowRepository.save(itWorkflow);
-        workflowRepository.save(ethicWorkflow);
-
-
-        workspace.getWorkflows().add(employeeWorkflow);
-        workspace.getWorkflows().add(itWorkflow);
-        workspace.getWorkflows().add(ethicWorkflow);
-
-
-
-    }
 
     @Transactional
     public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId, String fileName){

@@ -80,7 +80,7 @@ public class MemberService {
     public MemberResponse createMember(MemberRequest request) {
         var workspace = workspaceService.getWorkspaceEntityById(request.getWid());
         var member = Member.of(request, workspace);
-        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 멤버를 추가했습니다. 이름 : " + member.getName() + ", 워크스페이스: "+ request.getWid() ));
+        slackService.sendMessageToRideat(new SlackMessageRequest("새로운 멤버를 추가했습니다. 이름 : " + member.getName() + ", 워크스페이스 id: "+ request.getWid() + ", 워크스페이스 이름: " +workspace.getName()));
 
         return MemberResponse.of(memberRepository.save(member));
     }

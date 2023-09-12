@@ -115,7 +115,7 @@ public class LaunchService {
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, managerMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
 
-        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우가 실행되었습니다. 이름 : " + workflow.getName() + ", 워크스페이스 : " + workspace.getId()));
+        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우가 실행되었습니다. 이름 : " + workflow.getName() + ", 워크스페이스 id: " + workspace.getId() + "워크스페이스 이름: "+ workspace.getName()));
         return response;
     }
 

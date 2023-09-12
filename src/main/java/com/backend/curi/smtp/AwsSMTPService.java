@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,8 +65,7 @@ public class AwsSMTPService {
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser) {
         String userEmail = currentUser.getUserId();
         String userName = currentUser.getName();
-        String testMessage = launchWorkflowMailTemplate(userName, launchedWorkflow);
-        send("워크플로우 실행 알림", testMessage, userEmail);
+        send("워크플로우 실행 알림", launchWorkflowMailTemplate(userName, launchedWorkflow), userEmail);
 
     }
 
@@ -112,8 +114,6 @@ public class AwsSMTPService {
 
         send("오늘 할당된 시퀀스가 있습니다!", emailContent, memberTo);
     }
-
-
 
     private String launchWorkflowMailTemplate(String userName, LaunchedWorkflow launchedWorkflow){
         return

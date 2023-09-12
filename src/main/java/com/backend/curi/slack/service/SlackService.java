@@ -218,6 +218,8 @@ public class SlackService {
 
     public ChatPostMessageResponse sendMessageToRideat(SlackMessageRequest slackMessageRequest) {
         try {
+            if (!constants.getENV().equals("cloud")) throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.SLACK_OAUTH_FAILED);
+
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel('#'+notifyChannel) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
