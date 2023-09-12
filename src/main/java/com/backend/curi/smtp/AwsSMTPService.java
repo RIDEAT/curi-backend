@@ -65,8 +65,7 @@ public class AwsSMTPService {
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser) {
         String userEmail = currentUser.getUserId();
         String userName = currentUser.getName();
-        String testMessage = stibee();
-        send("워크플로우 실행 알림", testMessage, userEmail);
+        send("워크플로우 실행 알림", launchWorkflowMailTemplate(userName, launchedWorkflow), userEmail);
 
     }
 
@@ -116,21 +115,6 @@ public class AwsSMTPService {
         send("오늘 할당된 시퀀스가 있습니다!", emailContent, memberTo);
     }
 
-
-    private String stibee() {
-        try {
-            String htmlFilePath = "src/main/resources/mail.html";
-
-
-            // HTML 파일을 읽어와 문자열로 저장
-            String htmlCode = new String(Files.readAllBytes(Paths.get(htmlFilePath)));
-
-            // HTML 코드를 출력하거나 변수로 사용
-            return htmlCode;
-        } catch (Exception e){
-            return "fail";
-        }
-    }
     private String launchWorkflowMailTemplate(String userName, LaunchedWorkflow launchedWorkflow){
         return
         "<!doctype html>\n" +

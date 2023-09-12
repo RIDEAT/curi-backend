@@ -52,7 +52,7 @@ public class MessageService {
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap) {
         // send to Admin user
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우 실행 예정" + launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter)));
+        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우 실행 메일 발송" + launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter)));
 
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
