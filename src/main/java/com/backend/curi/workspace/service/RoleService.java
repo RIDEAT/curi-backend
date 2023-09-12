@@ -27,8 +27,8 @@ public class RoleService {
         return roleRepository.findById(roleId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
     }
 
-    public Role getRoleEntity(String name){
-        return roleRepository.findByName(name).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
+    public Role getRoleEntity(String name, Workspace workspace){
+        return roleRepository.findByNameAndWorkspace(name, workspace).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
     }
 
     public RoleResponse getRole(Long roleId){

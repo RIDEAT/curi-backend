@@ -48,7 +48,7 @@ public class SequenceService {
 
     @Transactional
     public Sequence copySequence(Workspace workspace, Workflow workflow, Sequence origin){
-        var role = roleService.getRoleEntity(origin.getRole().getName());
+        var role = roleService.getRoleEntity(origin.getRole().getName(), workspace);
         var newSequence = Sequence.of(origin, role, workspace, workflow);
         sequenceRepository.save(newSequence);
         return newSequence;
