@@ -5,6 +5,7 @@ import com.backend.curi.exception.ErrorType;
 import com.backend.curi.workspace.controller.dto.RoleRequest;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.RoleRepository;
+import com.backend.curi.workspace.repository.WorkspaceRepository;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,14 @@ import java.util.stream.Collectors;
 public class RoleService {
 
     private final RoleRepository roleRepository;
-    private final WorkspaceService workspaceService;
+    private final WorkspaceRepository workspaceRepository;
 
     public Role getRoleEntity(Long roleId){
         return roleRepository.findById(roleId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
+    }
+
+    public Role getRoleEntity(String name){
+        return roleRepository.findByName(name).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
     }
 
     public RoleResponse getRole(Long roleId){
@@ -37,7 +42,7 @@ public class RoleService {
     }
 
     public RoleResponse createRole(Long workspaceId, RoleRequest roleRequest){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var role = Role.builder().workspace(workspace).name(roleRequest.getName()).build();
         roleRepository.save(role);
         return RoleResponse.of(role);
@@ -51,6 +56,8 @@ public class RoleService {
     }
 
 
-
+    private Workspace getWorkspaceEntityById(Long id){
+        return workspaceRepository.findById(id).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+    }
 
 }

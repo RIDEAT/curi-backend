@@ -10,6 +10,8 @@ import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.ModuleRepository;
 import com.backend.curi.workflow.repository.entity.*;
 import com.backend.curi.workflow.repository.entity.Module;
+import com.backend.curi.workspace.repository.WorkspaceRepository;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,37 +29,50 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ModuleService {
 
-    private final WorkspaceService workspaceService;
+    private final WorkspaceRepository workspaceRepository;
     private final SequenceService sequenceService;
     private final ModuleRepository moduleRepository;
     private final ContentRepository contentRepository;
+    private final ContentService contentService;
     private final Common common;
 
     public ModuleResponse getModule (Long workspaceId, Long moduleId){
         log.info("get module");
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var module = getModuleEntity(moduleId);
         // var module = moduleRepository.findByWorkspaceAndId(workspace, moduleId).orElseThrow(()-> new CuriException(HttpStatus.NOT_FOUND, ErrorType.MODULE_NOT_EXISTS));
         return ModuleResponse.of(module);
     }
     public List<ModuleResponse> getModules(Long workspaceId){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var modules = moduleRepository.findAllByWorkspace(workspace);
         return modules.stream().map(ModuleResponse::of).collect(Collectors.toList());
     }
     @Transactional
     public Module createModule(Long workspaceId, Long sequenceId, ModuleRequest request) {
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var sequence = sequenceService.getSequenceEntity(sequenceId);
         var currentUser = common.getCurrentUser();
 
         var content = Content.of(request.getType(), currentUser, workspaceId);
         contentRepository.save(content);
 
-        var module = Module.of(request, workspace, sequence, content.getId());
+        var module = Module. of(request, workspace, sequence, content.getId());
         moduleRepository.save(module);
 
         return module;
+    }
+
+    @Transactional
+    public void copyModule(Workspace workSpace, Sequence sequence, Module origin){
+        var currentUser = common.getCurrentUser();
+        var contentToCopy = contentService.getContent(origin.getContentId());
+
+        var content = Content.of(contentToCopy, currentUser, workSpace.getId());
+        contentRepository.save(content);
+
+        var module = Module.of(origin, workSpace, sequence, content.getId());
+        moduleRepository.save(module);
     }
 
     @Transactional
@@ -107,5 +122,8 @@ public class ModuleService {
 
         contentRepository.save(content);
         return ContentResponse.of(content, module);
+    }
+    private Workspace getWorkspaceEntityById(Long workspaceId) {
+        return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
 }

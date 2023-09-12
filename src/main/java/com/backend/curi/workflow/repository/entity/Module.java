@@ -52,6 +52,17 @@ public class Module extends BaseEntity {
                 .contentId(contentId).build();
     }
 
+    public static Module of(Module origin, Workspace workspace,Sequence sequence, ObjectId contentId){
+        sequence.updateUpdatedDate();
+        return Module.builder()
+                .name(origin.getName())
+                .type(origin.getType())
+                .order(origin.getOrder())
+                .workspace(workspace)
+                .sequence(sequence)
+                .contentId(contentId).build();
+    }
+
     public void updateUpdatedDate() {
         this.updatedDate = LocalDateTime.now();
         this.sequence.updateUpdatedDate();

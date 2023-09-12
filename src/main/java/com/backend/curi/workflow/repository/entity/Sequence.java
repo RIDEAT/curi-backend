@@ -63,6 +63,18 @@ public class Sequence extends BaseEntity {
                 build();
     }
 
+    public static Sequence of(Sequence origin, Role role, Workspace workspace, Workflow workflow) {
+        workflow.updateUpdatedDate();
+        return Sequence.builder().
+                name(origin.getName()).
+                role(role).
+                dayOffset(origin.getDayOffset()).
+                checkSatisfaction(origin.getCheckSatisfaction()).
+                workspace(workspace).
+                workflow(workflow).
+                build();
+    }
+
 
     public void updateUpdatedDate() {
         this.updatedDate = LocalDateTime.now();

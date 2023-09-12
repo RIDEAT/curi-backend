@@ -219,7 +219,7 @@ public class SlackService {
     public ChatPostMessageResponse sendMessageToRideat(SlackMessageRequest slackMessageRequest) {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel(notifyChannel) // Use a channel ID `C1234567` is preferable
+                    .channel('#'+notifyChannel) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
                     .build();
 
@@ -246,7 +246,7 @@ public class SlackService {
     public ChatPostMessageResponse sendErrorToRideat(SlackMessageRequest slackMessageRequest) {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel(errorChannel) // Use a channel ID `C1234567` is preferable
+                    .channel('#'+errorChannel) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
                     .build();
 

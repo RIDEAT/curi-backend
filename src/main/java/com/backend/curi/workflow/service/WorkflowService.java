@@ -11,9 +11,12 @@ import com.backend.curi.slack.service.SlackService;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
+import com.backend.curi.workflow.repository.SequenceRepository;
 import com.backend.curi.workflow.repository.WorkflowRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workspace.repository.WorkspaceRepository;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,23 +29,35 @@ import javax.transaction.Transactional;
 @Service
 @RequiredArgsConstructor
 public class WorkflowService {
+    private final WorkspaceRepository workspaceRepository;
     private final WorkflowRepository workflowRepository;
-    private final WorkspaceService workspaceService;
     private final SlackService slackService;
+    private final SequenceRepository sequenceRepository;
     private static Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Transactional
     public WorkflowResponse createWorkflow (Long workspaceId, WorkflowRequest request){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
 
         var workflow = Workflow.builder()
                 .name(request.getName())
                 .workspace(workspace)
                 .build();
         workflowRepository.save(workflow);
+        createDefaultSequence(workspace, workflow);
         slackService.sendMessageToRideat(new SlackMessageRequest("새로운 워크플로우가 생성되었습니다. 이름 : " + request.getName() + ", 워크스페이스 : " + workspace.getId()));
 
         return WorkflowResponse.of(workflow);
+    }
+
+    @Transactional
+    public Workflow copyWorkflow(Workspace workspace, Workflow origin){
+        var workflow = Workflow.builder()
+                .name(origin.getName())
+                .workspace(workspace)
+                .build();
+        workflowRepository.save(workflow);
+        return workflow;
     }
 
     public WorkflowResponse getWorkflow(Long workflowId){
@@ -53,7 +68,7 @@ public class WorkflowService {
 
     @Transactional
     public List<WorkflowResponse> getWorkflows(Long workspaceId){
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var workflowList = workflowRepository.findAllByWorkspace(workspace);
         return workflowList.stream().map(WorkflowResponse::of).collect(Collectors.toList());
     }
@@ -83,7 +98,21 @@ public class WorkflowService {
     }
 
 
+    @Transactional
+    public void createDefaultSequence(Workspace workspace, Workflow workflow){
+        var role = workspace.getRoles().get(0);
+        var sequence = Sequence.builder()
+                .name("기본 시퀀스")
+                .role(role)
+                .workspace(workspace)
+                .workflow(workflow)
+                .dayOffset(0)
+                .build();
+        sequenceRepository.save(sequence);
+    }
 
-
+    private Workspace getWorkspaceEntityById(Long workspaceId) {
+        return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+    }
 
 }

@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByIdAndWorkspace(Long id, Workspace workspace);
     List<Role> findAllByWorkspaceId(Long workspaceId);
+    Optional<Role> findByName(String name);
 }

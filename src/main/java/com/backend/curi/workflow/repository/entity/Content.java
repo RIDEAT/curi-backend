@@ -69,6 +69,18 @@ public class Content {
                 .updatedBy(contentToCopy.getUpdatedBy())
                 .build();
     }
+
+    public static Content of(Content contentToCopy, CurrentUser currentUser, Long workspaceId){
+        return Content.builder()
+                .type(contentToCopy.getType())
+                .content(contentToCopy.getContent())
+                .workspaceId(workspaceId)
+                .createdDate(contentToCopy.getCreatedDate())
+                .updatedDate(contentToCopy.getUpdatedDate())
+                .createdBy(currentUser.getUserId())
+                .updatedBy(currentUser.getUserId())
+                .build();
+    }
     private static Object specificContent(ModuleType type){
         switch (type){
             case notion:

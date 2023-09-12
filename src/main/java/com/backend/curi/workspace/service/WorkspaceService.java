@@ -15,6 +15,7 @@ import com.backend.curi.userworkspace.service.UserworkspaceService;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.WorkflowRepository;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workflow.service.WorkflowCopyService;
 import com.backend.curi.workspace.controller.dto.LogoPreSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.LogoSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
@@ -44,6 +45,7 @@ public class WorkspaceService {
     private final MessageService messageService;
     private final WorkflowRepository workflowRepository;
     private final SlackService slackService;
+    private final WorkflowCopyService workflowCopyService;
   
     public WorkspaceResponse getWorkspaceById(Long id){
         log.info("getWorkspaceById");
@@ -62,6 +64,7 @@ public class WorkspaceService {
 
     public WorkspaceResponse createWorkspace(WorkspaceRequest request, CurrentUser currentUser){
         var savedWorkspace = createWorkspaceEntity(request, currentUser);
+        workflowCopyService.copyTemplateWorkflows(savedWorkspace);
         messageService.sendWorkspaceCreateMessage(savedWorkspace, currentUser);
         savedWorkspace.setLogoUrl(amazonS3Service.getSignedUrl(savedWorkspace.getLogoUrl()));
         return WorkspaceResponse.of(savedWorkspace);
@@ -136,7 +139,7 @@ public class WorkspaceService {
 
 
     }
-  
+
     @Transactional
     public LogoPreSignedUrlResponse setWorkspaceLogo(Long workspaceId, String fileName){
         amazonS3Service.isValidimageName(fileName);

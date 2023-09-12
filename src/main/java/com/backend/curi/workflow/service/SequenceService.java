@@ -9,6 +9,8 @@ import com.backend.curi.workflow.controller.dto.SequenceUpdateRequest;
 import com.backend.curi.workflow.repository.SequenceRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
+import com.backend.curi.workspace.repository.WorkspaceRepository;
+import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SequenceService {
+    private final WorkspaceRepository workspaceRepository;
     private final SequenceRepository sequenceRepository;
-    private final WorkspaceService workspaceService;
     private final RoleService roleService;
     private final WorkflowService workflowService;
 
@@ -32,14 +34,24 @@ public class SequenceService {
         return SequenceResponse.of(sequence);
     }
 
+    @Transactional
     public Sequence createSequence(Long workspaceId, Long workflowId, SequenceRequest request) {
-        var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
+        var workspace = getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
         var role = roleService.getRoleEntity(request.getRoleId());
         var sequence = Sequence.of(request, role, workspace, workflow);
         sequenceRepository.save(sequence);
 
         return sequence;
+    }
+
+
+    @Transactional
+    public Sequence copySequence(Workspace workspace, Workflow workflow, Sequence origin){
+        var role = roleService.getRoleEntity(origin.getRole().getName());
+        var newSequence = Sequence.of(origin, role, workspace, workflow);
+        sequenceRepository.save(newSequence);
+        return newSequence;
     }
 
     public Sequence modifySequence(Long sequenceId, SequenceRequest request) {
@@ -84,5 +96,9 @@ public class SequenceService {
         if(request.getCheckSatisfaction()!=null)
             sequence.setCheckSatisfaction(request.getCheckSatisfaction());
         return SequenceResponse.of(sequence);
+    }
+
+    private Workspace getWorkspaceEntityById(Long workspaceId) {
+        return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
 }
