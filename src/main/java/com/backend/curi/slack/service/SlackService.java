@@ -84,6 +84,11 @@ public class SlackService {
     @Value("${workplug.app.url}")
     private String appUrl;
 
+    @Value("${rideat.slack.channel.error}")
+    private String errorChannel;
+    @Value("${rideat.slack.channel.notify}")
+    private String notifyChannel;
+
     private final Common common;
 
     private final Slack slack = Slack.getInstance();
@@ -214,7 +219,7 @@ public class SlackService {
     public ChatPostMessageResponse sendMessageToRideat(SlackMessageRequest slackMessageRequest) {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel("#workplug-alarm") // Use a channel ID `C1234567` is preferable
+                    .channel(notifyChannel) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
                     .build();
 
@@ -241,7 +246,7 @@ public class SlackService {
     public ChatPostMessageResponse sendErrorToRideat(SlackMessageRequest slackMessageRequest) {
         try {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                    .channel("#workplug-error-alarm") // Use a channel ID `C1234567` is preferable
+                    .channel(errorChannel) // Use a channel ID `C1234567` is preferable
                     .text(slackMessageRequest.getTexts())
                     .build();
 
