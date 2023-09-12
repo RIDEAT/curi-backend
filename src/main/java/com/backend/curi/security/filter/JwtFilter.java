@@ -42,47 +42,42 @@ public class JwtFilter extends OncePerRequestFilter {
     private final SlackService slackService;
 
     private final Constants constants;
+
     // 권한을 부여.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            if (request.getRequestURI().startsWith("/h2-console")){
+            if (request.getRequestURI().startsWith("/h2-console")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if (request.getRequestURI().startsWith("/swagger-ui") ){
+            if (request.getRequestURI().startsWith("/swagger-ui")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if (request.getRequestURI().startsWith("/backend-api-docs") ){
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-
-            if (request.getRequestURI().startsWith("/front-offices") ){
+            if (request.getRequestURI().startsWith("/backend-api-docs")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
 
-            if (request.getRequestURI().startsWith("/health") ){
+            if (request.getRequestURI().startsWith("/front-offices")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
 
+            if (request.getRequestURI().startsWith("/health")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
 
-
-
-
-            if(constants.getENV().equals("local") || constants.getENV().equals("data-local") || constants.getENV().equals("data-build")) {
+            if (constants.getENV().equals("local") || constants.getENV().equals("data-local") || constants.getENV().equals("data-build")) {
                 pretendTobeAuthorized(request, response, filterChain);
-            }
-            else {
+            } else {
                 ResponseEntity<String> responseEntity = communicateWithAuthServer(request);
 
                 // 여기서 authToken 이랑 refresh Token 담아서 줘야 하나.
@@ -116,12 +111,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
             return;
-        }
-        catch (JsonMappingException e) {
-            String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
-
-            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage() + "\n" + stackTrace));
-
+        } catch (JsonMappingException e) {
             response.setHeader(HttpStatus.UNAUTHORIZED.name(), e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
@@ -129,13 +119,8 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setHeader(HttpStatus.UNAUTHORIZED.name(), e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-            String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
-
-        }
-
-        catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
 
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
@@ -146,23 +131,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 에러 메시지를 응답 본문에 작성
             response.getWriter().write(ErrorType.AUTH_SERVER_ERROR.getMessage());
-            String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
 
             return;
-        } catch(CuriException e){
+        } catch (CuriException e) {
 
 
-            Map<String, Object> errorBody= new HashMap<>();
+            Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", e.getMessage());
             filterChain.doFilter(request, response);
-            String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" + stackTrace));
 
             return;
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Unexpected ERROR: {}", e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -174,9 +155,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 에러 메시지를 응답 본문에 작성
             response.getWriter().write(ErrorType.UNEXPECTED_SERVER_ERROR.getMessage());
-            String stackTrace = ExceptionUtils.getStackTrace(e); // Apache Commons Lang 라이브러리를 사용하여 스택 트레이스 문자열로 변환
 
-            slackService.sendErrorToRideat(new SlackMessageRequest("JWTFilter Unexpected ERROR: "+ e.getMessage()+"\n" +stackTrace));
             return;
         }
     }
@@ -200,8 +179,8 @@ public class JwtFilter extends OncePerRequestFilter {
         return responseEntity;
     }
 
-    private void pretendTobeAuthorized (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        response.setHeader("AuthToken",  "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
+    private void pretendTobeAuthorized(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        response.setHeader("AuthToken", "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
         // Parse the responseBody JSON string
         ObjectMapper objectMapper = new ObjectMapper();
@@ -218,7 +197,7 @@ public class JwtFilter extends OncePerRequestFilter {
         currentUser.setUserId(userId);
         currentUser.setName(userName);
         //currentUser.setUserEmail(getUserEmail(userId));
-        currentUser.setNewAuthToken( "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
+        currentUser.setNewAuthToken("eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJmbG9OM1BZanhiUTlFM01RSm1pSGh3RHhCd2IyIiwiaWF0IjoxNjkwMTg2NDgxLCJleHAiOjE4MTAxODY0ODF9.rUrshoegZWhHyo1m6xQQyrzn7pzuCgDG1TQ_9BpOi2s");
 
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(("USER"))));
@@ -230,13 +209,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    private String getUserName(String userId){
-        try{
+    private String getUserName(String userId) {
+        try {
             UserResponse user = userService.getUserResponseByUserId(userId);
             return user.getName();
-        } catch(CuriException e){
+        } catch (CuriException e) {
             return "not-registed-user";
-        } catch (Exception e){
+        } catch (Exception e) {
             return "not-registed-user";
         }
     }

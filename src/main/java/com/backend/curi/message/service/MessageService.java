@@ -41,6 +41,7 @@ public class MessageService {
 
 
     public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence) {
+        slackService.sendMessageToRideat(new SlackMessageRequest("시퀀스 메일 발송" +launchedSequence.getMember().getName() + "님에게 할당된 시퀀스(" + launchedSequence.getName() + ") 메일이 발송되었습니다."));
         log.info("런치드 시퀀스 전송");
         awsSMTPService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, memberTo);
         slackService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, launchedSequence.getMember().getId());
@@ -51,6 +52,7 @@ public class MessageService {
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, Map<Role, Member> memberMap) {
         // send to Admin user
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        slackService.sendMessageToRideat(new SlackMessageRequest("워크플로우 실행 예정" + launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter)));
 
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);

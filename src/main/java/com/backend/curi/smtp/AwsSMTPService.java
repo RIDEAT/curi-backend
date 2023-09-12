@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,7 +65,7 @@ public class AwsSMTPService {
     public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser) {
         String userEmail = currentUser.getUserId();
         String userName = currentUser.getName();
-        String testMessage = launchWorkflowMailTemplate(userName, launchedWorkflow);
+        String testMessage = stibee();
         send("워크플로우 실행 알림", testMessage, userEmail);
 
     }
@@ -114,7 +117,20 @@ public class AwsSMTPService {
     }
 
 
+    private String stibee() {
+        try {
+            String htmlFilePath = "src/main/resources/mail.html";
 
+
+            // HTML 파일을 읽어와 문자열로 저장
+            String htmlCode = new String(Files.readAllBytes(Paths.get(htmlFilePath)));
+
+            // HTML 코드를 출력하거나 변수로 사용
+            return htmlCode;
+        } catch (Exception e){
+            return "fail";
+        }
+    }
     private String launchWorkflowMailTemplate(String userName, LaunchedWorkflow launchedWorkflow){
         return
         "<!doctype html>\n" +
