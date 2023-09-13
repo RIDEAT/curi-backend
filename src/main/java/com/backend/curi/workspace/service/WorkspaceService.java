@@ -1,5 +1,6 @@
 package com.backend.curi.workspace.service;
 
+import com.amazonaws.Response;
 import com.amazonaws.services.s3.AmazonS3;
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
 
@@ -43,7 +45,6 @@ public class WorkspaceService {
     private final RoleRepository roleRepository;
     private final AwsS3Service amazonS3Service;
     private final MessageService messageService;
-    private final WorkflowRepository workflowRepository;
     private final SlackService slackService;
     private final WorkflowCopyService workflowCopyService;
   
@@ -148,6 +149,15 @@ public class WorkspaceService {
     public LogoSignedUrlResponse getWorkspaceLogo(Long workspaceId){
         var workspace = getWorkspaceEntityById(workspaceId);
         return new LogoSignedUrlResponse(amazonS3Service.getSignedUrl(workspace.getLogoUrl()));
+    }
+
+    public List<WorkflowResponse> getTemplateWorkflows(){
+        return workflowCopyService.getTemplateWorkflows();
+    }
+
+    public WorkflowResponse copyTemplateWorkflows(Long workspaceId, Long workflowId){
+        var workspace = getWorkspaceEntityById(workspaceId);
+        return workflowCopyService.copyWorkflow(workspace, workflowId);
     }
 
 }

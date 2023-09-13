@@ -3,6 +3,7 @@ package com.backend.curi.workspace.controller;
 
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.smtp.AwsS3Service;
+import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workspace.controller.dto.LogoPreSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.LogoSignedUrlResponse;
 import com.backend.curi.workspace.controller.dto.WorkspaceRequest;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
-    private final AwsS3Service awsS3Service;
+
     @GetMapping("/workspaces/{workspaceId}")
     public ResponseEntity<WorkspaceResponse> getWorkspace(@PathVariable Long workspaceId) {
         var response = workspaceService.getWorkspaceById(workspaceId);
@@ -86,5 +87,16 @@ public class WorkspaceController {
     public ResponseEntity<Void> deleteWorkspaceLogo(@PathVariable Long workspaceId){
         workspaceService.deleteWorkspaceLogo(workspaceId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/templates")
+    public ResponseEntity<List<WorkflowResponse>> getTemplateWorkflows() {
+        return ResponseEntity.ok(workspaceService.getTemplateWorkflows());
+    }
+
+    @PostMapping("workspaces/{workspaceId}/templates/{templateId}")
+    public ResponseEntity<WorkflowResponse> createTemplateWorkflows(@PathVariable Long workspaceId, @PathVariable Long templateId) {
+        var response = workspaceService.copyTemplateWorkflows(workspaceId, templateId);
+        return ResponseEntity.ok(response);
     }
 }
