@@ -46,6 +46,11 @@ public class UserService {
 
         User_ updatedUser = userRepository.save(user);
         UserResponse userResponse = UserResponse.of(updatedUser);
+
+        if (userRequest.getPhoneNum().isPresent() && userRequest.getCompany().isPresent()){
+            slackService.sendMessageToRideat(new SlackMessageRequest("유저 세부 정보가 추가되었습니다. 이름 : " + userRequest.getName() + ", 이메일 : " + userId + ", 전화번호 : " + userRequest.getPhoneNum().get() + ", 회사 : " + userRequest.getCompany().get()));
+        }
+
         return userResponse;
     }
 
