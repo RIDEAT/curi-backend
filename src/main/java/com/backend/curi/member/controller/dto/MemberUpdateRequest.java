@@ -15,7 +15,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberUpdateRequest {
-    @Pattern(regexp = "^[a-zA-Z가-힣]{2,20}$",
+    @Pattern(regexp = "^[a-zA-Z가-힣0-9]{2,20}$",
             message = "이름 형식이 올바르지 않습니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String name;
