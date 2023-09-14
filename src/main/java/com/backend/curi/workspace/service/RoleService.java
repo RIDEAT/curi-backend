@@ -38,7 +38,7 @@ public class RoleService {
     }
 
     public List<RoleResponse> getRoles(Long workspaceId){
-        List <Role> roles = roleRepository.findAllByWorkspaceId(workspaceId);
+        List <Role> roles = roleRepository.findAllByWorkspaceIdOrderById(workspaceId);
         return roles.stream().map(RoleResponse::of).collect(Collectors.toList());
     }
 

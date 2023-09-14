@@ -27,6 +27,7 @@ import com.backend.curi.workflow.repository.entity.Module;
 
 import com.backend.curi.workflow.repository.entity.SequenceSatisfaction;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
+import com.backend.curi.workspace.repository.RoleRepository;
 import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.RoleService;
@@ -70,7 +71,7 @@ public class LaunchService {
 
     private final ContentService contentService;
 
-    private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
     private final SchedulerOpenFeign schedulerOpenFeign;
 
@@ -95,14 +96,14 @@ public class LaunchService {
 
         var workspace = workspaceService.getWorkspaceEntityById(workspaceId);
         var workflow = workflowService.getWorkflowEntity(workflowId);
-        var employeeRole = workspace.getRoles().get(0);
+        var employeeRole = roleRepository.findAllByWorkspaceIdOrderById(workspaceId).get(0);
         var member = memberService.getMember(launchRequest.getMemberId());
         var launchedWorkflow = LaunchedWorkflow.of(launchRequest, workflow, member, workspace);
 
         memberMap.put(employeeRole, member);
         for (MemberRoleRequest members : launchRequest.getMembers()){
             Member manager = memberService.getMember(members.getMemberId());
-            Role role = roleService.getRoleEntity(members.getRoleId());
+            Role role = roleRepository.findById(members.getRoleId()).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
             memberMap.put(role, manager);
             managerMap.put(role, manager);
         }
