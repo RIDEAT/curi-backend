@@ -10,6 +10,7 @@ import com.backend.curi.workflow.repository.SequenceRepository;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
+import com.backend.curi.workspace.repository.entity.Role;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import com.backend.curi.workspace.service.RoleService;
 import com.backend.curi.workspace.service.WorkspaceService;
@@ -48,7 +49,9 @@ public class SequenceService {
 
     @Transactional
     public Sequence copySequence(Workspace workspace, Workflow workflow, Sequence origin){
-        var role = roleService.getRoleEntity(origin.getRole().getName(), workspace);
+        var role = roleService.getRoleEntity(origin.getRole().getName(), workspace)
+                .orElseGet(() -> roleService.copyRole(workspace, origin.getRole()));
+
         var newSequence = Sequence.of(origin, role, workspace, workflow);
         sequenceRepository.save(newSequence);
         return newSequence;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,8 +28,8 @@ public class RoleService {
         return roleRepository.findById(roleId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
     }
 
-    public Role getRoleEntity(String name, Workspace workspace){
-        return roleRepository.findByNameAndWorkspace(name, workspace).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.ROLE_NOT_EXISTS));
+    public Optional<Role> getRoleEntity(String name, Workspace workspace){
+        return roleRepository.findByNameAndWorkspace(name, workspace);
     }
 
     public RoleResponse getRole(Long roleId){
@@ -46,6 +47,11 @@ public class RoleService {
         var role = Role.builder().workspace(workspace).name(roleRequest.getName()).build();
         roleRepository.save(role);
         return RoleResponse.of(role);
+    }
+
+    public Role copyRole(Workspace workspace, Role role){
+        var roleCopy = Role.builder().workspace(workspace).name(role.getName()).build();
+        return roleRepository.save(roleCopy);
     }
 
     @Transactional
