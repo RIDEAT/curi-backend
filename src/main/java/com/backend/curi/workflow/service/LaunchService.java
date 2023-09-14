@@ -112,7 +112,7 @@ public class LaunchService {
             launchSequence(launchedWorkflow, sequence, workspace, member, memberMap);
         }
 
-        //launchedWorkflow.getLaunchedSequences().sort(Comparator.comparing(LaunchedSequence::getApplyDate));
+        launchedWorkflow.getLaunchedSequences().sort(Comparator.comparing(LaunchedSequence::getApplyDate));
 
         var response = launchedWorkflowService.saveLaunchedWorkflow(launchedWorkflow, managerMap);
         messageService.sendWorkflowLaunchedMessage(launchedWorkflow, memberMap);
