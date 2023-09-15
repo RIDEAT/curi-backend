@@ -9,10 +9,14 @@ import com.backend.curi.launched.repository.entity.LaunchedWorkflow;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.security.dto.CurrentUser;
 import com.backend.curi.workflow.service.LaunchService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +33,7 @@ public class AwsSMTPService {
 
     private final Common common;
 
+    private final TemplateEngine templateEngine;
     @Value("${workplug.app.url}")
     private String appUrl;
 
@@ -37,16 +42,25 @@ public class AwsSMTPService {
     public AwsSMTPService(
             AmazonSimpleEmailService amazonSimpleEmailService,
             Common common,
-            @Value("${cloud.aws.ses.from}") String from
+            @Value("${cloud.aws.ses.from}") String from,
+            TemplateEngine templateEngine
     ) {
         this.amazonSimpleEmailService = amazonSimpleEmailService;
         this.common = common;
         this.from = "no-reply@" + from;
+        this.templateEngine = templateEngine;
     }
 
     public void send(String subject, String content, String... to) {
 
         var sendEmailRequest = createSendEmailRequest(subject, content, to);
+
+        amazonSimpleEmailService.sendEmail(sendEmailRequest);
+    }
+
+    public void sendThymeleaf(String subject, String content, CurrentUser currentUser, Member member, LaunchedWorkflow launchedWorkflow, String... to) {
+
+        var sendEmailRequest = createSendThymeleafRequest(subject, content, currentUser, member, launchedWorkflow, to);
 
         amazonSimpleEmailService.sendEmail(sendEmailRequest);
     }
@@ -62,10 +76,33 @@ public class AwsSMTPService {
                 );
     }
 
-    public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser) {
+    public SendEmailRequest createSendThymeleafRequest(String subject, String templateName, CurrentUser currentUser, Member member, LaunchedWorkflow launchedWorkflow, String... to) {
+        // Thymeleaf를 사용하여 HTML 템플릿을 렌더링
+        Context context = new Context();
+        //context.setVariable("name", "JiSeung"); // 사용자 이름 또는 데이터를 설정
+        context.setVariable("user", currentUser);
+        context.setVariable("workflow", launchedWorkflow);
+        context.setVariable("member", member);
+
+        String emailContent = templateEngine.process(templateName, context);
+
+        // SendEmailRequest 생성
+        SendEmailRequest sendEmailRequest = new SendEmailRequest()
+                .withDestination(new Destination().withToAddresses(to))
+                .withSource(from)
+                .withMessage(new Message()
+                        .withSubject(new Content().withCharset(StandardCharsets.UTF_8.name()).withData(subject))
+                        .withBody(new Body().withHtml(new Content().withCharset(StandardCharsets.UTF_8.name()).withData(emailContent)))
+                );
+
+        return sendEmailRequest;
+    }
+
+    public void sendWorkflowLaunchedMessage(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser, Member member) {
         String userEmail = currentUser.getUserId();
         String userName = currentUser.getName();
-        send("워크플로우 실행 알림", launchWorkflowMailTemplate(userName, launchedWorkflow), userEmail);
+        sendThymeleaf("워크플로우 실행 알림", "launch-workflow-to-admin", currentUser,member, launchedWorkflow, userEmail);
+      //  send("워크플로우 실행 알림", launchWorkflowMailTemplate(userName, launchedWorkflow), userEmail);
 
     }
 
@@ -90,14 +127,17 @@ public class AwsSMTPService {
         return message;
     }
 
-    public void sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow, Member employee) {
+    public void sendWorkflowLaunchedMessageToEmployee(LaunchedWorkflow launchedWorkflow,CurrentUser currentUser, Member employee) {
         String employeeEmail = employee.getEmail();
-        send("워크플로우 할당 알림", launchWorkflowMailTemplate(employee.getName(), launchedWorkflow), employeeEmail);
+        sendThymeleaf("워크플로우 할당 알림", "launch-workflow-to-member", currentUser, employee, launchedWorkflow, employeeEmail);
     }
 
-    public void sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, Member member) {
-        send("워크플로우 실행 알림", launchWorkflowMailTemplate(member.getName(), launchedWorkflow), member.getEmail());
+    public void sendWorkflowLaunchedMessageToManagers(LaunchedWorkflow launchedWorkflow, CurrentUser currentUser, Member member) {
+        String managerEmail = member.getEmail();
+        sendThymeleaf("워크플로우 할당 알림", "launch-workflow-to-member", currentUser, member, launchedWorkflow, managerEmail);
     }
+
+
 
     public void sendLaunchedSequenceMessageToMember(LaunchedSequence launchedSequence, FrontOffice frontOffice, String memberTo) {
 

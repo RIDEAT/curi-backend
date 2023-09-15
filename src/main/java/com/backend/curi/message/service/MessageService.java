@@ -56,7 +56,7 @@ public class MessageService {
 
         log.info("send workflow launch alarm to admin");
         slackService.sendWorkflowLaunchedMessage(launchedWorkflow);
-        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser);
+        awsSMTPService.sendWorkflowLaunchedMessage(launchedWorkflow, currentUser, launchedWorkflow.getMember());
 
         if (constants.getENV().equals("cloud"))
             notificationService.createNotification(launchedWorkflow.getWorkspace().getId(), "워크플로우 실행 예정", launchedWorkflow.getMember().getName() + "님에게 할당된 워크플로우(" + launchedWorkflow.getName() + ")가 실행 예정 상태입니다. D-Day (D-0) : " + launchedWorkflow.getKeyDate().format(formatter));
@@ -64,7 +64,7 @@ public class MessageService {
         log.info("send workflow launch alarm to employee");
         Member employee = launchedWorkflow.getMember();
         slackService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow);
-        awsSMTPService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow, employee);
+        awsSMTPService.sendWorkflowLaunchedMessageToEmployee(launchedWorkflow, currentUser, employee);
 
         log.info("send workflow launch alarm to related managers");
         for (Map.Entry<Role, Member> entry : memberMap.entrySet()) {
@@ -74,7 +74,7 @@ public class MessageService {
             if (launchedWorkflow.getMember().equals(member)) continue;
 
             slackService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, role, member);
-            awsSMTPService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, member);
+            awsSMTPService.sendWorkflowLaunchedMessageToManagers(launchedWorkflow, currentUser, member);
 
         }
 
