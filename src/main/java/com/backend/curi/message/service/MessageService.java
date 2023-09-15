@@ -40,7 +40,7 @@ public class MessageService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
 
-    public void sendLaunchedSequenceMessage(String memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence) {
+    public void sendLaunchedSequenceMessage(Member memberTo, FrontOffice frontOffice, LaunchedSequence launchedSequence) {
         slackService.sendMessageToRideat(new SlackMessageRequest("시퀀스 메일 발송" +launchedSequence.getMember().getName() + "님에게 할당된 시퀀스(" + launchedSequence.getName() + ") 메일이 발송되었습니다."));
         log.info("런치드 시퀀스 전송");
         awsSMTPService.sendLaunchedSequenceMessageToMember(launchedSequence, frontOffice, memberTo);
