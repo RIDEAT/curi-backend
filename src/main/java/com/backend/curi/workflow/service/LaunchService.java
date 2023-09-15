@@ -174,7 +174,7 @@ public class LaunchService {
         var launchedWorkflow = launchedSequence.getLauchedWorkflow();
         launchedWorkflow.setStatus(LaunchedStatus.IN_PROGRESS);
 
-        var memberTo = launchedSequence.getMember().getEmail();
+        var memberTo = launchedSequence.getMember();
         var frontOffice = frontofficeService.getFrontOfficeByLaunchedSequenceId(launchedSequenceId);
 
         messageService.sendLaunchedSequenceMessage(memberTo, frontOffice, launchedSequence);
