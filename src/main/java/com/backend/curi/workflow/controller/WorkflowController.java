@@ -64,7 +64,7 @@ public class WorkflowController {
 
         // RestTemplate을 사용하여 Flask 애플리케이션에 POST 요청 보내기
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(aiUrl, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(aiUrl+"/text-to-ai", HttpMethod.POST, entity, String.class);
 
         // Flask 애플리케이션으로부터의 응답 확인
         HttpStatus statusCode = response.getStatusCode();
@@ -80,10 +80,10 @@ public class WorkflowController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String jsonRequest = "{\"question\":\"" + question + "\"}";
+        String jsonRequest = "{\"text\":\"" + question + "\"}";
 
         HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
-        ResponseEntity<String> response = restTemplate.exchange(aiUrl, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(aiUrl + "/chat", HttpMethod.POST, entity, String.class);
 
         String responseBody = response.getBody();
         return ResponseEntity.ok(new ChatbotResponse(true, responseBody));
