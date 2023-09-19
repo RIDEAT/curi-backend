@@ -100,6 +100,8 @@ public class Content {
                 return new YoutubeContent();
             case web_url:
                 return new WebContent();
+            case ox_quiz:
+                return new OxQuizContent();
         }
 
         return new DefaultContent();

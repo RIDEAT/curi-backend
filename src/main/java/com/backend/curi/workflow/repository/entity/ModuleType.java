@@ -12,6 +12,7 @@ public enum ModuleType {
     google_form,
     google_drive,
     web_url,
+    ox_quiz,
     sequence_satisfaction,
     employee_adaptability
 }
