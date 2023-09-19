@@ -58,7 +58,7 @@ public class WorkflowController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
 
-        String jsonRequest = "{\"text\":\"" + allText + "\"}";
+        String jsonRequest = "{\"text\":\"" + allText + "\",\n\"workflowId\":\"" + workflowId + "\"}";
 
         HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
 
@@ -74,13 +74,13 @@ public class WorkflowController {
     }
 
     @PostMapping("/{workflowId}/chat")
-    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest){
+    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest, @PathVariable Long workflowId){
         String question = chatbotRequest.getMessage();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String jsonRequest = "{\"text\":\"" + question + "\"}";
+        String jsonRequest = "{\"text\":\"" + question + "\",\n\"workflowId\":\"" + workflowId + "\"}";
 
         HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
         ResponseEntity<String> response = restTemplate.exchange(aiUrl + "/chat", HttpMethod.POST, entity, String.class);
