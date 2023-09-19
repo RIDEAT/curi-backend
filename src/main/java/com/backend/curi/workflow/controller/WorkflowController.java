@@ -47,40 +47,21 @@ public class WorkflowController {
         return ResponseEntity.status(HttpStatus.CREATED).body(launchResponse);
     }
 
-    @PostMapping("/{workflowId}/text-to-ai")
-    public ResponseEntity<ChatbotResponse> textToAi(@PathVariable Long workflowId){
+
+
+    @PostMapping("/{workflowId}/chat")
+    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest, @PathVariable Long workflowId){
         String allText = workflowService.allText(workflowId);
         if (allText.length() < 10) {
             return ResponseEntity.ok(new ChatbotResponse(false, "워크플로우 내용이 너무 짧습니다. 워크플로우 내용을 추가해주세요."));
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-
-        String jsonRequest = "{\"text\":\"" + allText + "\",\n\"workflowId\":\"" + workflowId + "\"}";
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
-
-        // RestTemplate을 사용하여 Flask 애플리케이션에 POST 요청 보내기
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(aiUrl+"/text-to-ai", HttpMethod.POST, entity, String.class);
-
-        // Flask 애플리케이션으로부터의 응답 확인
-        HttpStatus statusCode = response.getStatusCode();
-        String responseBody = response.getBody();
-
-        return ResponseEntity.ok(new ChatbotResponse(true, "안녕하세요. 워크플로우 내용 기반으로 학습된 챗봇입니다. 궁금하신 사항이 있으면 편하게 질문해주세요!"));
-    }
-
-    @PostMapping("/{workflowId}/chat")
-    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest, @PathVariable Long workflowId){
         String question = chatbotRequest.getMessage();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String jsonRequest = "{\"text\":\"" + question + "\",\n\"workflowId\":\"" + workflowId + "\"}";
+        String jsonRequest = "{\"question\":\"" + question + "\",\n\"text\":\"" + allText + "\"}";
 
         HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
         ResponseEntity<String> response = restTemplate.exchange(aiUrl + "/chat", HttpMethod.POST, entity, String.class);
