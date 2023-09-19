@@ -128,9 +128,12 @@ public class WorkflowService {
             for (var module : modules) {
                  if (module.getType().equals(ModuleType.contents)){
                     text += contentService.getContent(module.getContentId()).getContent().toString();
+                    text+="\n";
                  }
             }
         }
+
+        System.out.println(text);
         return text;
     }
 }
