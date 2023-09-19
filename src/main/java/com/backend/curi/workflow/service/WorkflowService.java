@@ -4,15 +4,18 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+
 import com.backend.curi.exception.CuriException;
 import com.backend.curi.exception.ErrorType;
 import com.backend.curi.slack.controller.dto.SlackMessageRequest;
 import com.backend.curi.slack.service.SlackService;
+import com.backend.curi.workflow.controller.dto.ChatbotResponse;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.controller.dto.WorkflowRequest;
 import com.backend.curi.workflow.controller.dto.WorkflowResponse;
 import com.backend.curi.workflow.repository.SequenceRepository;
 import com.backend.curi.workflow.repository.WorkflowRepository;
+import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.Sequence;
 import com.backend.curi.workflow.repository.entity.Workflow;
 import com.backend.curi.workspace.repository.WorkspaceRepository;
@@ -33,10 +36,11 @@ public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final SlackService slackService;
     private final SequenceRepository sequenceRepository;
+    private final ContentService contentService;
     private static Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Transactional
-    public WorkflowResponse createWorkflow (Long workspaceId, WorkflowRequest request){
+    public WorkflowResponse createWorkflow(Long workspaceId, WorkflowRequest request) {
         var workspace = getWorkspaceEntityById(workspaceId);
 
         var workflow = Workflow.builder()
@@ -51,7 +55,7 @@ public class WorkflowService {
     }
 
     @Transactional
-    public Workflow copyWorkflow(Workspace workspace, Workflow origin){
+    public Workflow copyWorkflow(Workspace workspace, Workflow origin) {
         var workflow = Workflow.builder()
                 .name(origin.getName())
                 .workspace(workspace)
@@ -60,46 +64,46 @@ public class WorkflowService {
         return workflow;
     }
 
-    public WorkflowResponse getWorkflow(Long workflowId){
+    public WorkflowResponse getWorkflow(Long workflowId) {
         var workflow = getWorkflowEntity(workflowId);
 
         return WorkflowResponse.of(workflow);
     }
 
     @Transactional
-    public List<WorkflowResponse> getWorkflows(Long workspaceId){
+    public List<WorkflowResponse> getWorkflows(Long workspaceId) {
         var workspace = getWorkspaceEntityById(workspaceId);
         var workflowList = workflowRepository.findAllByWorkspace(workspace);
         return workflowList.stream().map(WorkflowResponse::of).collect(Collectors.toList());
     }
 
     @Transactional
-    public WorkflowResponse updateWorkflow(Long workflowId, WorkflowRequest request){
+    public WorkflowResponse updateWorkflow(Long workflowId, WorkflowRequest request) {
         var workflow = getWorkflowEntity(workflowId);
         workflow.modify(request);
         return WorkflowResponse.of(workflow);
     }
 
-    public void deleteWorkflow (Long workflowId){
+    public void deleteWorkflow(Long workflowId) {
         var workflow = getWorkflowEntity(workflowId);
         workflowRepository.delete(workflow);
     }
 
-    public List<SequenceResponse> getSequences(Long workflowId){
+    public List<SequenceResponse> getSequences(Long workflowId) {
         var workflow = getWorkflowEntity(workflowId);
         var sequenceList = workflow.getSequences();
         sequenceList.sort((o1, o2) -> o1.getDayOffset().compareTo(o2.getDayOffset()));
         return sequenceList.stream().map(SequenceResponse::of).collect(Collectors.toList());
     }
 
-    public Workflow getWorkflowEntity(Long workflowId){
+    public Workflow getWorkflowEntity(Long workflowId) {
         return workflowRepository.findById(workflowId)
-                .orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
+                .orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKFLOW_NOT_EXISTS));
     }
 
 
     @Transactional
-    public void createDefaultSequence(Workspace workspace, Workflow workflow){
+    public void createDefaultSequence(Workspace workspace, Workflow workflow) {
         var role = workspace.getRoles().get(0);
         var sequence = Sequence.builder()
                 .name("기본 시퀀스")
@@ -112,7 +116,21 @@ public class WorkflowService {
     }
 
     private Workspace getWorkspaceEntityById(Long workspaceId) {
-        return workspaceRepository.findById(workspaceId).orElseThrow(()->new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
+        return workspaceRepository.findById(workspaceId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.WORKSPACE_NOT_EXISTS));
     }
 
+    public String allText(Long workflowId) {
+        String text ="";
+        var workflow = getWorkflowEntity(workflowId);
+        var sequences = workflow.getSequences();
+        for (Sequence sequence : sequences) {
+            var modules = sequence.getModules();
+            for (var module : modules) {
+                 if (module.getType().equals(ModuleType.contents)){
+                    text += contentService.getContent(module.getContentId()).getContent().toString();
+                 }
+            }
+        }
+        return text;
+    }
 }
