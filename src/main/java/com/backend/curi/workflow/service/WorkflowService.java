@@ -128,12 +128,12 @@ public class WorkflowService {
             for (var module : modules) {
                  if (module.getType().equals(ModuleType.contents)){
                     text += contentService.getContent(module.getContentId()).getContent().toString();
-                    text+="\n";
+                    System.out.println(contentService.getContent(module.getContentId()).getContent().toString());
+                    //여기 text 에 이상한거들어있다.
                  }
             }
         }
 
-        System.out.println(text);
         return text;
     }
 }
