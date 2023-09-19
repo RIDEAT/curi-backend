@@ -1,8 +1,11 @@
 package com.backend.curi.workflow.service;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.backend.curi.exception.CuriException;
@@ -28,6 +31,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @Service
 @RequiredArgsConstructor
@@ -120,22 +128,66 @@ public class WorkflowService {
     }
 
     public String allText(Long workflowId) {
-        String text ="";
-        var workflow = getWorkflowEntity(workflowId);
-        var sequences = workflow.getSequences();
-        for (Sequence sequence : sequences) {
-            var modules = sequence.getModules();
-            for (var module : modules) {
-                 if (module.getType().equals(ModuleType.contents)){
-                    text += contentService.getContent(module.getContentId()).getContent().toString();
-                    System.out.println(contentService.getContent(module.getContentId()).getContent().toString());
-                     System.out.println(contentService.getContent(module.getContentId()).getContent());
+        try {
 
-                     //여기 text 에 이상한거들어있다.
-                 }
+
+            String text = "";
+            var workflow = getWorkflowEntity(workflowId);
+            var sequences = workflow.getSequences();
+            for (Sequence sequence : sequences) {
+                var modules = sequence.getModules();
+                for (var module : modules) {
+                    log.info(module.getName());
+                    log.info(module.getType().toString());
+                    if (module.getType().equals(ModuleType.contents)) {
+                        JSONObject jsonObject = new JSONObject(contentService.getContent(module.getContentId()).getContent());
+
+
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JsonNode jsonNode = objectMapper.readTree(jsonObject.toString());
+                        List<String> textStartsWithList = new ArrayList<>();
+                        extractTextStartsWith(jsonNode, "text", textStartsWithList);
+                        for (String textStartsWith : textStartsWithList) {
+                            text += textStartsWith;
+                            text += ",";
+                        }
+
+                        log.info(text);
+
+
+                        //여기 text 에 이상한거들어있다.
+                    }
+                }
+            }
+
+            return text;
+        } catch (Exception e) {
+            log.info(e.toString());
+            return "error";
+        }
+    }
+
+    private static void extractTextStartsWith(JsonNode node, String prefix, List<String> result) {
+        if (node.isObject()) {
+            Iterator<String> fieldNames = node.fieldNames();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                JsonNode fieldValue = node.get(fieldName);
+                log.info(fieldValue.toString());
+                if (fieldName.equals(prefix) && fieldValue.isTextual()) {
+                    String text = fieldValue.asText();
+
+                    Pattern pattern = Pattern.compile("[0-9a-zA-Z가-힣\\s]+");
+                    Matcher matcher = pattern.matcher(text);
+                    while (matcher.find()) {
+                        result.add(matcher.group());
+                    }                }
+                extractTextStartsWith(fieldValue, prefix, result);
+            }
+        } else if (node.isArray()) {
+            for (JsonNode element : node) {
+                extractTextStartsWith(element, prefix, result);
             }
         }
-
-        return text;
     }
 }

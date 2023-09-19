@@ -9,7 +9,11 @@ import com.backend.curi.workflow.controller.dto.*;
 import com.backend.curi.workflow.service.LaunchService;
 import com.backend.curi.workflow.service.WorkflowService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -17,9 +21,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+import org.springframework.http.converter.StringHttpMessageConverter;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +35,8 @@ import java.util.List;
 public class WorkflowController {
     @Value("${workplug.ai.url}")
     private String aiUrl;
+    private static Logger log = LoggerFactory.getLogger(WorkflowController.class);
+
 
     private final WorkflowService workflowService;
     private final LaunchedWorkflowService launchedWorkflowService;
@@ -48,9 +58,8 @@ public class WorkflowController {
     }
 
 
-
     @PostMapping("/{workflowId}/chat")
-    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest, @PathVariable Long workflowId){
+    public ResponseEntity<ChatbotResponse> chatWithAi(@RequestBody @Validated(ValidationSequence.class) ChatbotRequest chatbotRequest, @PathVariable Long workflowId) throws UnsupportedEncodingException {
         String allText = workflowService.allText(workflowId);
         if (allText.length() < 10) {
             return ResponseEntity.ok(new ChatbotResponse(false, "워크플로우 내용이 너무 짧습니다. 워크플로우 내용을 추가해주세요."));
@@ -58,17 +67,32 @@ public class WorkflowController {
 
         String question = chatbotRequest.getMessage();
         RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.getMessageConverters()
+                .stream()
+                .filter(converter -> converter instanceof StringHttpMessageConverter)
+                .forEach(converter -> ((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8));
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
-        String jsonRequest = "{\"question\":\"" + question + "\",\n\"text\":\"" + allText + "\"}";
+        // Jackson을 사용하여 JSON 객체 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode jsonRequest = objectMapper.createObjectNode();
+        jsonRequest.put("question", question);
+        jsonRequest.put("text", allText);
 
-        HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
+        // JSON 문자열로 변환
+        String jsonRequestString = jsonRequest.toString();
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonRequestString, headers);
         ResponseEntity<String> response = restTemplate.exchange(aiUrl + "/chat", HttpMethod.POST, entity, String.class);
 
         String responseBody = response.getBody();
+        log.info("responseBody: {}", responseBody);
         return ResponseEntity.ok(new ChatbotResponse(true, responseBody));
     }
+
 
     @PostMapping
     public ResponseEntity<WorkflowResponse> createWorkflow(@RequestBody @Validated(ValidationSequence.class) WorkflowRequest request,
