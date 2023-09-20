@@ -86,7 +86,12 @@ public class WorkflowController {
         String jsonRequestString = jsonRequest.toString();
 
         HttpEntity<String> entity = new HttpEntity<>(jsonRequestString, headers);
+
+        ResponseEntity<String> isOk = restTemplate.exchange(aiUrl + "/health", HttpMethod.GET, entity, String.class);
+        log.info(isOk.getBody().toString());
+
         log.info("aiUrl: {}",aiUrl);
+
         ResponseEntity<String> response = restTemplate.exchange(aiUrl + "/chat", HttpMethod.POST, entity, String.class);
 
         String responseBody = response.getBody();
