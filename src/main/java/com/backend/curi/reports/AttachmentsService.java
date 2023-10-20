@@ -38,7 +38,7 @@ public class AttachmentsService {
 
         var attachmentsInfo = (AttachmentContent) content.getContent();
 
-        if (amazonS3Service.isValidAttachmentName(fileName, attachmentsInfo.getExtensions()))
+        if (!amazonS3Service.isValidAttachmentName(fileName, attachmentsInfo.getExtensions()))
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_EXTENSION);
 
 
