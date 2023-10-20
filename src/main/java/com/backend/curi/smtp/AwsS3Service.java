@@ -29,6 +29,7 @@ import java.net.URL;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -137,7 +138,6 @@ public class AwsS3Service {
         }
         return signedURL;
     }
-
     public boolean isValidimageName(String fileName) {
         // 경로 구분 문자 또는 문제가 될 수 있는 특수 문자가 포함되어 있는지 확인
         Pattern pattern = Pattern.compile("[<>:\"/\\\\|?*]");
@@ -152,6 +152,31 @@ public class AwsS3Service {
         }
 
         String fileExtension = fileName.substring(lastIndex);
+
+        // 확장자가 .jpg 또는 .png인지 확인
+        return ".jpg".equalsIgnoreCase(fileExtension) || ".png".equalsIgnoreCase(fileExtension);
+    }
+
+    public boolean isValidAttachmentName(String fileName, List<String> extensions) {
+        if(extensions.isEmpty())
+            return true;
+        // 경로 구분 문자 또는 문제가 될 수 있는 특수 문자가 포함되어 있는지 확인
+        Pattern pattern = Pattern.compile("[<>:\"/\\\\|?*]");
+        if (pattern.matcher(fileName).find()) {
+            return false;
+        }
+
+        // 파일 확장자를 얻기
+        int lastIndex = fileName.lastIndexOf(".");
+        if (lastIndex == -1) {
+            return false; // 확장자가 없음
+        }
+
+        String fileExtension = fileName.substring(lastIndex);
+
+        for(var extension : extensions)
+            if(extension.equalsIgnoreCase(fileExtension))
+                return true;
 
         // 확장자가 .jpg 또는 .png인지 확인
         return ".jpg".equalsIgnoreCase(fileExtension) || ".png".equalsIgnoreCase(fileExtension);

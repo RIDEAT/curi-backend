@@ -14,10 +14,14 @@ import com.backend.curi.launched.repository.entity.LaunchedSequence;
 import com.backend.curi.launched.repository.entity.LaunchedStatus;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.launched.service.LaunchedSequenceService;
+import com.backend.curi.reports.AttachmentsRequest;
+import com.backend.curi.reports.AttachmentsResponse;
+import com.backend.curi.reports.AttachmentsService;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
 
 import com.backend.curi.slack.service.SlackService;
 
+import com.backend.curi.smtp.dto.PreSignedUrl;
 import com.backend.curi.workflow.controller.dto.ContentResponse;
 import com.backend.curi.workflow.repository.SequenceSatisfactionRepository;
 import com.backend.curi.workflow.repository.entity.Content;
@@ -43,6 +47,7 @@ public class FrontOfficeService {
     private final LaunchedSequenceService launchedSequenceService;
     private final ContentService contentService;
     private final SequenceSatisfactionRepository sequenceSatisfactionRepository;
+    private final AttachmentsService attachmentService;
 
     public FrontOfficeResponse getFrontOffice(UUID frontOfficeId) {
         FrontOffice frontOffice = frontOfficeRepository.findById(frontOfficeId).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.FRONTOFFICE_NOT_EXISTS));
@@ -140,6 +145,21 @@ public class FrontOfficeService {
         Long memberId = frontOffice.getLaunchedSequenceResponse().getAssignedMember().getId();
 
         return slackService.isMemberAuthorized(memberId);
+    }
+
+    public PreSignedUrl getAttachmentPresignedUrl(String fileName, Long launchedModuleId){
+        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        var content = contentService.getContent(launchedModule.getContentId());
+        return attachmentService.getPreSignedUrl(fileName, launchedModule, content);
+    }
+
+    public AttachmentsResponse getAttachments(Long launchedModuleId){
+        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        return attachmentService.getAttachment(launchedModule);
+    }
+    public AttachmentsResponse createAttachments(AttachmentsRequest attachmentsRequest, Long launchedModuleId){
+        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        return attachmentService.createAttachments(attachmentsRequest, launchedModule);
     }
 
 }

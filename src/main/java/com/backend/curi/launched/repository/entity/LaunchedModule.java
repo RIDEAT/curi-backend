@@ -35,6 +35,9 @@ public class LaunchedModule extends BaseEntity {
     @JoinColumn(name = "LaunchedSequenceId")
     private LaunchedSequence launchedSequence;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private Module module;
+
     private ObjectId contentId;
 
     private Integer orderInSequence;
@@ -52,7 +55,7 @@ public class LaunchedModule extends BaseEntity {
 
 
     public static LaunchedModule of (ObjectId launchedContentId, Module module, LaunchedSequence launchedSequence, Workspace workspace){
-        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.TO_DO).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).contentId(launchedContentId).orderInSequence(module.getOrder()).build();
+        return LaunchedModule.builder().name(module.getName()).status(LaunchedStatus.TO_DO).type(module.getType()).launchedSequence(launchedSequence).workspace(workspace).module(module).contentId(launchedContentId).orderInSequence(module.getOrder()).build();
     }
 
     public void modify (LaunchedModuleRequest request){
