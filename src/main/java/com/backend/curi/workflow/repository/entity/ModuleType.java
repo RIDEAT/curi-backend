@@ -14,5 +14,6 @@ public enum ModuleType {
     web_url,
     ox_quiz,
     sequence_satisfaction,
-    employee_adaptability
+    employee_adaptability,
+    attachments
 }

@@ -6,7 +6,10 @@ import com.backend.curi.frontoffice.controller.dto.LaunchedModuleWithContent;
 import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionRequest;
 import com.backend.curi.frontoffice.controller.dto.SequenceSatisfactionResponse;
 import com.backend.curi.frontoffice.service.FrontOfficeService;
+import com.backend.curi.reports.AttachmentsRequest;
+import com.backend.curi.reports.AttachmentsResponse;
 import com.backend.curi.slack.controller.dto.OAuthRequest;
+import com.backend.curi.smtp.dto.PreSignedUrl;
 import com.backend.curi.workflow.repository.entity.SequenceSatisfaction;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.response.oauth.OAuthV2AccessResponse;
@@ -24,7 +27,6 @@ import java.util.UUID;
 public class FrontofficeController {
 
     private final FrontOfficeService frontofficeService;
-
     @GetMapping("/{frontOfficeId}")
     public ResponseEntity<FrontOfficeResponse> getFrontOffice(@PathVariable UUID frontOfficeId){
         FrontOfficeResponse frontofficeResponse =  frontofficeService.getFrontOffice(frontOfficeId);
@@ -58,6 +60,23 @@ public class FrontofficeController {
     public ResponseEntity<LaunchedModuleWithContent> startModule(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
         LaunchedModuleWithContent module =  frontofficeService.startLaunchedModuleWithContent(launchedModuleId);
         return ResponseEntity.ok(module);
+    }
+
+    @GetMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
+    public ResponseEntity<AttachmentsResponse> getAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        AttachmentsResponse attachmentsResponse =  frontofficeService.getAttachments(launchedModuleId);
+        return ResponseEntity.ok(attachmentsResponse);
+    }
+    @PutMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
+    public ResponseEntity<PreSignedUrl> getAttachmentPreSignedUrl(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @RequestParam String fileName){
+        PreSignedUrl preSignedUrl =  frontofficeService.getAttachmentPresignedUrl(fileName, launchedModuleId);
+        return ResponseEntity.ok(preSignedUrl);
+    }
+
+    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
+    public ResponseEntity<AttachmentsResponse> createAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody AttachmentsRequest attachmentsRequest){
+        AttachmentsResponse attachmentsResponse =  frontofficeService.createAttachments(attachmentsRequest, launchedModuleId);
+        return ResponseEntity.ok(attachmentsResponse);
     }
 
     @PostMapping("/{frontOfficeId}/oauth")

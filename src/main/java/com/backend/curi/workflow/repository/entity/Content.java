@@ -102,6 +102,8 @@ public class Content {
                 return new WebContent();
             case ox_quiz:
                 return new OxQuizContent();
+            case attachments:
+                return new AttachmentContent();
         }
 
         return new DefaultContent();
