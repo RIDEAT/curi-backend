@@ -63,7 +63,7 @@ public class AttachmentsService {
         var member = launchedModule.getLaunchedSequence().getMember();
         var content = contentService.getContent(launchedModule.getContentId());
         var attachmentsInfos = (AttachmentContent) content.getContent();
-
+        attachmentsInfos.setAttachments(new ArrayList<>());
         for (var request : attachmentsRequest) {
             var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), launchedModule.getId().toString(), request.getFileName());
             attachmentsInfos.getAttachments().add(
