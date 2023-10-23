@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class AttachmentsService {
     private final ModuleService moduleService;
     private static final String PATH_FORMAT = "workspace/%s/members/%s/modules/%s/%s";
 
-    public PreSignedUrl getPreSignedUrl(String fileName, LaunchedModule launchedModule, Content content){
+    public List<PreSignedUrl> getPreSignedUrls(LaunchedModule launchedModule, Content content) {
         var workspaceId = launchedModule.getWorkspace().getId();
         var memberId = launchedModule.getLaunchedSequence().getMember().getId();
         var module = launchedModule.getModule();
@@ -36,37 +37,53 @@ public class AttachmentsService {
         if (module.getType() != ModuleType.attachments)
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.MODULE_TYPE_NOT_MATCH);
 
-        var attachmentsInfo = (AttachmentContent) content.getContent();
+        var attachmentsInfos = (AttachmentContent) content.getContent();
 
-        if (!amazonS3Service.isValidAttachmentName(fileName, attachmentsInfo.getExtensions()))
+        return attachmentsInfos.getAttachmentsInfos().stream()
+                .map(info -> getPreSignedUrl(workspaceId, memberId, module.getId(), info))
+                .collect(Collectors.toList());
+    }
+
+    private PreSignedUrl getPreSignedUrl(Long workspaceId, Long memberId, Long moduleId, AttachmentsInfo info){
+        var fileName = info.getFileName();
+        var extensions = info.getExtensions();
+        if (!amazonS3Service.isValidAttachmentName(fileName, extensions))
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_EXTENSION);
 
-
-        var path = attachmentFormat(workspaceId.toString(), memberId.toString(), module.getId().toString(), fileName);
+        var path = attachmentFormat(workspaceId.toString(), memberId.toString(), moduleId.toString(), fileName);
         return PreSignedUrl.builder()
                 .preSignedUrl(amazonS3Service.getPreSignedUrl(path))
                 .fileName(fileName).build();
     }
 
     @Transactional
-    public AttachmentsResponse createAttachments(AttachmentsRequest attachmentsRequest, LaunchedModule launchedModule) {
-        var workspaceId =launchedModule.getWorkspace().getId();
+    public List<AttachmentsResponse> createAttachments(List<AttachmentsRequest> attachmentsRequest, LaunchedModule launchedModule) {
+        var workspaceId = launchedModule.getWorkspace().getId();
         var module = launchedModule.getModule();
         var member = launchedModule.getLaunchedSequence().getMember();
-        var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), module.getId().toString(), attachmentsRequest.getFileName());
-        Attachments attachments = Attachments.of(module,launchedModule,member, path, attachmentsRequest.getFileName());
-        attachmentsRepository.save(attachments);
-        var signedUrl = amazonS3Service.getSignedUrl(path);
-        return AttachmentsResponse.of(attachments, signedUrl);
+
+        var responses = new ArrayList<AttachmentsResponse>();
+        for (var request : attachmentsRequest) {
+            var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), module.getId().toString(), request.getFileName());
+            Attachments attachments = Attachments.of(module, launchedModule, member, path, request.getFileName());
+            attachmentsRepository.save(attachments);
+            var signedUrl = amazonS3Service.getSignedUrl(path);
+            responses.add(AttachmentsResponse.of(attachments, signedUrl));
+        }
+        return responses;
     }
 
-    public AttachmentsResponse getAttachment(LaunchedModule launchedModule){
-        var attachments = attachmentsRepository.findByLaunchedModule(launchedModule).orElseThrow(() -> new CuriException(HttpStatus.NOT_FOUND, ErrorType.ATTACHMENTS_NOT_EXISTS));
-        var signedUrl = amazonS3Service.getSignedUrl(attachments.getResourceUrl());
-        return AttachmentsResponse.of(attachments, signedUrl);
+    public List<AttachmentsResponse> getAttachment(LaunchedModule launchedModule) {
+        var attachments = launchedModule.getAttachments();
+        if (attachments.isEmpty())
+            throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.ATTACHMENTS_NOT_EXISTS);
+        return attachments.stream()
+                .map(attachment ->
+                        AttachmentsResponse.of(attachment, amazonS3Service.getSignedUrl(attachment.getResourceUrl())))
+                .collect(Collectors.toList());
     }
 
-    public List<AttachmentsResponse> getAttachments(Long moduleId){
+    public List<AttachmentsResponse> getAttachments(Long moduleId) {
         var module = moduleService.getModuleEntity(moduleId);
         var attachments = attachmentsRepository.findAllByModule(module);
         return attachments.stream().map(attachment -> AttachmentsResponse.of(attachment, "")).collect(Collectors.toList());

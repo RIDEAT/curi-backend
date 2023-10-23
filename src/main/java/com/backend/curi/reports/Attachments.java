@@ -26,7 +26,7 @@ public class Attachments extends BaseEntity {
     @JoinColumn(name = "moudle_id")
     private Module module;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "launched_module_id")
     private LaunchedModule launchedModule;
 

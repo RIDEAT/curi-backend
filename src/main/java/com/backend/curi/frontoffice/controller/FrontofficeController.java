@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -63,20 +64,17 @@ public class FrontofficeController {
     }
 
     @GetMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
-    public ResponseEntity<AttachmentsResponse> getAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
-        AttachmentsResponse attachmentsResponse =  frontofficeService.getAttachments(launchedModuleId);
-        return ResponseEntity.ok(attachmentsResponse);
+    public ResponseEntity<List<AttachmentsResponse>> getAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId){
+        return ResponseEntity.ok(frontofficeService.getAttachments(launchedModuleId));
     }
     @PutMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
-    public ResponseEntity<PreSignedUrl> getAttachmentPreSignedUrl(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @RequestParam String fileName){
-        PreSignedUrl preSignedUrl =  frontofficeService.getAttachmentPresignedUrl(fileName, launchedModuleId);
-        return ResponseEntity.ok(preSignedUrl);
+    public ResponseEntity<List<PreSignedUrl>> getAttachmentPreSignedUrl(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @RequestParam String fileName){
+        return ResponseEntity.ok(frontofficeService.getAttachmentPresignedUrl(launchedModuleId));
     }
 
     @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
-    public ResponseEntity<AttachmentsResponse> createAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody AttachmentsRequest attachmentsRequest){
-        AttachmentsResponse attachmentsResponse =  frontofficeService.createAttachments(attachmentsRequest, launchedModuleId);
-        return ResponseEntity.ok(attachmentsResponse);
+    public ResponseEntity<List<AttachmentsResponse>> createAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody List<AttachmentsRequest> attachmentsRequest){
+        return ResponseEntity.ok(frontofficeService.createAttachments(attachmentsRequest, launchedModuleId));
     }
 
     @PostMapping("/{frontOfficeId}/oauth")

@@ -85,6 +85,18 @@ public class MemberService {
         return MemberResponse.of(memberRepository.save(member));
     }
 
+    @Transactional
+    public List<MemberResponse> createMembers(List<MemberRequest> requests) {
+        var workspace = workspaceService.getWorkspaceEntityById(requests.get(0).getWid());
+        var members = requests.stream()
+                .map(request -> Member.of(request, workspace))
+                .collect(Collectors.toList());
+        slackService.sendMessageToRideat(new SlackMessageRequest("csv로 새로운 멤버를 추가했습니다. 인원수 : " + members.size() + ", 워크스페이스 id: "+ requests.get(0).getWid() + ", 워크스페이스 이름: " +workspace.getName()));
+
+        return memberRepository.saveAll(members).stream()
+                .map(MemberResponse::of)
+                .collect(Collectors.toList());
+    }
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)

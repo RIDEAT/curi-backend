@@ -2,6 +2,7 @@ package com.backend.curi.launched.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.controller.dto.LaunchedModuleRequest;
+import com.backend.curi.reports.Attachments;
 import com.backend.curi.workflow.controller.dto.ModuleResponse;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.Module;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,6 +50,9 @@ public class LaunchedModule extends BaseEntity {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
+    @OneToMany(mappedBy = "launchedModule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Attachments> attachments = new ArrayList<>();
 
 
     public static LaunchedModule of (LaunchedModuleRequest launchedModuleRequest, LaunchedSequence launchedSequence){

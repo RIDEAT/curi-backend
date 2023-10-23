@@ -45,7 +45,8 @@ dependencies {
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.1.RELEASE'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.6.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
+	implementation 'commons-io:commons-io:2.11.0'
+	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
