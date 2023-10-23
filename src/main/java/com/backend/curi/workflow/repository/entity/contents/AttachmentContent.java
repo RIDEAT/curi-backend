@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AttachmentContent {
     @Builder.Default
     private List<AttachmentsInfo> attachments = new ArrayList<>();
