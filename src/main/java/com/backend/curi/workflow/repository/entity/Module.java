@@ -1,6 +1,7 @@
 package com.backend.curi.workflow.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.workflow.controller.dto.ModuleRequest;
 import com.backend.curi.workspace.repository.entity.Workspace;
 import lombok.*;
@@ -8,6 +9,8 @@ import org.bson.types.ObjectId;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +43,10 @@ public class Module extends BaseEntity {
 
     @Column(nullable = false)
     private ObjectId contentId;
+
+    @OneToMany
+    @Builder.Default
+    private List<LaunchedModule> launchedModules = new ArrayList<>();
 
     public static Module of(ModuleRequest request, Workspace workspace,Sequence sequence, ObjectId contentId){
         sequence.updateUpdatedDate();

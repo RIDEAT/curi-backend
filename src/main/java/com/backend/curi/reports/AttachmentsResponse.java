@@ -1,9 +1,12 @@
 package com.backend.curi.reports;
 
+import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.member.controller.dto.MemberResponse;
+import com.backend.curi.member.repository.entity.Member;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,17 +15,14 @@ import java.time.LocalDate;
 @Builder
 public class AttachmentsResponse {
     private Long id;
-    private String signedUrl;
-    private String fileName;
+    private List<AttachmentFilesResponse> attachmentFiles;
     private MemberResponse member;
-    private LocalDate responseDate;
-    public static AttachmentsResponse of(Attachments attachment, String signedUrl){
+
+    public static AttachmentsResponse of(LaunchedModule launchedModule, List<AttachmentFilesResponse> attachmentFiles, Member member){
         return AttachmentsResponse.builder()
-                .id(attachment.getId())
-                .fileName(attachment.getFileName())
-                .member(MemberResponse.of(attachment.getMember()))
-                .signedUrl(signedUrl)
-                .responseDate(attachment.getCreatedDate().toLocalDate())
+                .id(launchedModule.getId())
+                .attachmentFiles(attachmentFiles)
+                .member(MemberResponse.of(member))
                 .build();
     }
 }

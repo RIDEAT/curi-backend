@@ -34,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -147,18 +148,18 @@ public class FrontOfficeService {
         return slackService.isMemberAuthorized(memberId);
     }
 
-    public PreSignedUrl getAttachmentPresignedUrl(String fileName, Long launchedModuleId){
+    public List<PreSignedUrl> getAttachmentPresignedUrl(Long launchedModuleId, List<AttachmentsRequest> presignedRequest){
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
-        var content = contentService.getContent(launchedModule.getContentId());
-        return attachmentService.getPreSignedUrl(fileName, launchedModule, content);
+        return attachmentService.getPreSignedUrls(launchedModule,presignedRequest);
     }
 
     public AttachmentsResponse getAttachments(Long launchedModuleId){
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
         return attachmentService.getAttachment(launchedModule);
     }
-    public AttachmentsResponse createAttachments(AttachmentsRequest attachmentsRequest, Long launchedModuleId){
+    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, Long launchedModuleId){
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+
         return attachmentService.createAttachments(attachmentsRequest, launchedModule);
     }
 

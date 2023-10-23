@@ -32,7 +32,7 @@ public class Sequence extends BaseEntity {
 
     @Setter
     @ColumnDefault("true")
-    private Boolean checkSatisfaction = true;
+    private Boolean checkSatisfaction;
 
     @Setter
     @OneToOne(fetch = FetchType.LAZY)

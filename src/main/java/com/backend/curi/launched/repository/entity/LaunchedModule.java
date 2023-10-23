@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -36,6 +38,7 @@ public class LaunchedModule extends BaseEntity {
     private LaunchedSequence launchedSequence;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "moduleId")
     private Module module;
 
     private ObjectId contentId;
@@ -46,7 +49,6 @@ public class LaunchedModule extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
-
 
 
     public static LaunchedModule of (LaunchedModuleRequest launchedModuleRequest, LaunchedSequence launchedSequence){

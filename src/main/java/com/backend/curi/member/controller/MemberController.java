@@ -36,6 +36,13 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/members/csv")
+    public ResponseEntity<List<MemberResponse>> createMembers(@PathVariable("workspaceId") Long workspaceId,
+            @RequestBody @Validated(ValidationSequence.class) List<MemberRequest> requests){
+        var response = memberService.createMembers(requests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
     @PutMapping("/members/{mid}")
     public ResponseEntity<MemberResponse> modifyManager(@PathVariable("workspaceId") Long workspaceId,
                                                         @PathVariable("mid") Long memberId,
