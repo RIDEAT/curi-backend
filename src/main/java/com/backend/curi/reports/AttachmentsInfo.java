@@ -10,8 +10,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class AttachmentsInfo {
     private String fileName;
-    @Builder.Default
-    private List<String> extensions = new ArrayList<>();
+    private String resourceUrl;
 }

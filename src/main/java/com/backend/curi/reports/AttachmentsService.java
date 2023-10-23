@@ -7,6 +7,8 @@ import com.backend.curi.launched.repository.entity.LaunchedModule;
 import com.backend.curi.launched.service.LaunchedModuleService;
 import com.backend.curi.smtp.AwsS3Service;
 import com.backend.curi.smtp.dto.PreSignedUrl;
+import com.backend.curi.workflow.controller.dto.ContentResponse;
+import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.entity.Content;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.contents.AttachmentContent;
@@ -24,29 +26,28 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AttachmentsService {
-    private final AttachmentsRepository attachmentsRepository;
+    private final ContentService contentService;
     private final AwsS3Service amazonS3Service;
     private final ModuleService moduleService;
     private static final String PATH_FORMAT = "workspace/%s/members/%s/modules/%s/%s";
 
-    public List<PreSignedUrl> getPreSignedUrls(LaunchedModule launchedModule, Content content) {
+    public List<PreSignedUrl> getPreSignedUrls(LaunchedModule launchedModule, List<AttachmentsRequest> presignedRequest) {
         var workspaceId = launchedModule.getWorkspace().getId();
         var memberId = launchedModule.getLaunchedSequence().getMember().getId();
-        var module = launchedModule.getModule();
 
-        if (module.getType() != ModuleType.attachments)
+        if (launchedModule.getType() != ModuleType.attachments)
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.MODULE_TYPE_NOT_MATCH);
 
+        var content = contentService.getContent(launchedModule.getContentId());
         var attachmentsInfos = (AttachmentContent) content.getContent();
 
-        return attachmentsInfos.getAttachmentsInfos().stream()
-                .map(info -> getPreSignedUrl(workspaceId, memberId, module.getId(), info))
+        return presignedRequest.stream()
+                .map(info -> getPreSignedUrl(workspaceId, memberId, launchedModule.getId(), info, attachmentsInfos.getExtensions()))
                 .collect(Collectors.toList());
     }
 
-    private PreSignedUrl getPreSignedUrl(Long workspaceId, Long memberId, Long moduleId, AttachmentsInfo info){
-        var fileName = info.getFileName();
-        var extensions = info.getExtensions();
+    private PreSignedUrl getPreSignedUrl(Long workspaceId, Long memberId, Long moduleId, AttachmentsRequest request, List<String> extensions){
+        var fileName = request.getFileName();
         if (!amazonS3Service.isValidAttachmentName(fileName, extensions))
             throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_EXTENSION);
 
@@ -57,36 +58,41 @@ public class AttachmentsService {
     }
 
     @Transactional
-    public List<AttachmentsResponse> createAttachments(List<AttachmentsRequest> attachmentsRequest, LaunchedModule launchedModule) {
+    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, LaunchedModule launchedModule) {
         var workspaceId = launchedModule.getWorkspace().getId();
-        var module = launchedModule.getModule();
         var member = launchedModule.getLaunchedSequence().getMember();
+        var content = contentService.getContent(launchedModule.getContentId());
+        var attachmentsInfos = (AttachmentContent) content.getContent();
 
-        var responses = new ArrayList<AttachmentsResponse>();
         for (var request : attachmentsRequest) {
-            var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), module.getId().toString(), request.getFileName());
-            Attachments attachments = Attachments.of(module, launchedModule, member, path, request.getFileName());
-            attachmentsRepository.save(attachments);
-            var signedUrl = amazonS3Service.getSignedUrl(path);
-            responses.add(AttachmentsResponse.of(attachments, signedUrl));
+            var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), launchedModule.getId().toString(), request.getFileName());
+            attachmentsInfos.getAttachments().add(
+                    AttachmentsInfo.builder()
+                    .fileName(request.getFileName())
+                    .resourceUrl(path)
+                    .build());
         }
-        return responses;
+        content.setContent(attachmentsInfos);
+        return ContentResponse.of(content, launchedModule);
     }
 
-    public List<AttachmentsResponse> getAttachment(LaunchedModule launchedModule) {
-        var attachments = launchedModule.getAttachments();
-        if (attachments.isEmpty())
-            throw new CuriException(HttpStatus.NOT_FOUND, ErrorType.ATTACHMENTS_NOT_EXISTS);
-        return attachments.stream()
-                .map(attachment ->
-                        AttachmentsResponse.of(attachment, amazonS3Service.getSignedUrl(attachment.getResourceUrl())))
-                .collect(Collectors.toList());
+    private List<AttachmentFilesResponse> getFileResponses(AttachmentContent content){
+        return content.getAttachments().stream().map(info ->{
+            var signedUrl = amazonS3Service.getSignedUrl(info.getResourceUrl());
+            return AttachmentFilesResponse.of(signedUrl, info);
+        }).toList();
     }
 
-    public List<AttachmentsResponse> getAttachments(Long moduleId) {
+    public AttachmentsResponse getAttachment(LaunchedModule launchedModule) {
+        var content = contentService.getContent(launchedModule.getContentId());
+        var attachmentsInfos = (AttachmentContent) content.getContent();
+        return AttachmentsResponse.of(launchedModule, getFileResponses(attachmentsInfos), launchedModule.getLaunchedSequence().getMember());
+    }
+
+    public List<AttachmentsResponse> getAttachmentsByModule(Long moduleId) {
         var module = moduleService.getModuleEntity(moduleId);
-        var attachments = attachmentsRepository.findAllByModule(module);
-        return attachments.stream().map(attachment -> AttachmentsResponse.of(attachment, "")).collect(Collectors.toList());
+        var launchedModules = module.getLaunchedModules();
+        return launchedModules.stream().map(this::getAttachment).toList();
     }
 
     private String attachmentFormat(String workspaceId, String memberId, String moduleId, String fileName) {

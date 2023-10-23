@@ -22,5 +22,9 @@ public class ReportController {
         var response = reportService.getAttachmentReport(workspaceId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+    @GetMapping("/attachments/{launchedModuleId}")
+    public ResponseEntity<AttachmentsResponse> getAttachment(@PathVariable Long workspaceId, @PathVariable Long launchedModuleId){
+        return ResponseEntity.status(HttpStatus.OK).body(reportService.getAttachment(launchedModuleId));
+    }
 
 }

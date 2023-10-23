@@ -39,6 +39,7 @@ public class LaunchedModule extends BaseEntity {
     private LaunchedSequence launchedSequence;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "moduleId")
     private Module module;
 
     private ObjectId contentId;
@@ -49,10 +50,6 @@ public class LaunchedModule extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
-
-    @OneToMany(mappedBy = "launchedModule", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Attachments> attachments = new ArrayList<>();
 
 
     public static LaunchedModule of (LaunchedModuleRequest launchedModuleRequest, LaunchedSequence launchedSequence){

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class ReportService {
     private final AttachmentsService attachmentsService;
     private final ModuleRepository moduleRepository;
+    private final LaunchedModuleService launchedModuleService;
     private final WorkspaceService workspaceService;
 
     public List<AttachmentReportResponse> getAttachmentReport(Long workspaceId){
@@ -23,25 +24,20 @@ public class ReportService {
         var modules = moduleRepository.findAllByWorkspaceAndType(workspace, ModuleType.attachments);
 
         return modules.stream().map(module -> {
-            var attachments = attachmentsService.getAttachments(module.getId());
+            var attachments = attachmentsService.getAttachmentsByModule(module.getId());
             var attachCnt = (long) attachments.size();
-            if(attachCnt == 0)
-                return AttachmentReportResponse.builder()
-                        .id(module.getId())
-                        .workflowTitle(module.getSequence().getWorkflow().getName())
-                        .moduleTitle(module.getName())
-                        .attachments(attachments)
-                        .attachCnt(attachCnt)
-                        .lastAttachDate(null)
-                        .build();
             return AttachmentReportResponse.builder()
                     .id(module.getId())
                     .workflowTitle(module.getSequence().getWorkflow().getName())
                     .moduleTitle(module.getName())
                     .attachments(attachments)
                     .attachCnt(attachCnt)
-                    .lastAttachDate(attachments.get(attachments.size()-1).getResponseDate())
                     .build();
         }).toList();
+    }
+
+    public AttachmentsResponse getAttachment(Long launchedModuleId){
+        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+        return attachmentsService.getAttachment(launchedModule);
     }
 }

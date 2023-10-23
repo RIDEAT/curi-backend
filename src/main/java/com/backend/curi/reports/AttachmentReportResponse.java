@@ -15,7 +15,6 @@ public class AttachmentReportResponse {
     private Long id;
     private String workflowTitle;
     private String moduleTitle;
-    private LocalDate lastAttachDate;
     private Long attachCnt;
     private List<AttachmentsResponse> attachments;
 }
