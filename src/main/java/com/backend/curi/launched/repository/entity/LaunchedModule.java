@@ -2,7 +2,6 @@ package com.backend.curi.launched.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
 import com.backend.curi.launched.controller.dto.LaunchedModuleRequest;
-import com.backend.curi.reports.Attachments;
 import com.backend.curi.workflow.controller.dto.ModuleResponse;
 import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.Module;
