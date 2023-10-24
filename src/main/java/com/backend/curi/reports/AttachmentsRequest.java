@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class AttachmentsRequest {
-    String fileName;
+    private String fileName;
 }

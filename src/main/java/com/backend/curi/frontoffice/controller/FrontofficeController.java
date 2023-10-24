@@ -69,14 +69,14 @@ public class FrontofficeController {
         return ResponseEntity.ok(frontofficeService.getAttachments(launchedModuleId));
     }
     @PutMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
-    public ResponseEntity<List<PreSignedUrl>> getAttachmentPreSignedUrl(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody List<AttachmentsRequest> presignedRequest){
-        return ResponseEntity.ok(frontofficeService.getAttachmentPresignedUrl(launchedModuleId, presignedRequest));
+    public ResponseEntity<PreSignedUrl> getAttachmentPreSignedUrl(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody AttachmentsRequest preSignedRequest){
+        return ResponseEntity.ok(frontofficeService.getAttachmentPresignedUrl(launchedModuleId, preSignedRequest));
     }
 
-    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
-    public ResponseEntity<ContentResponse> createAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody List<AttachmentsRequest> attachmentsRequest){
-        return ResponseEntity.ok(frontofficeService.createAttachments(attachmentsRequest, launchedModuleId));
-    }
+//    @PostMapping("/{frontOfficeId}/launched-modules/{launchedModuleId}/attachments")
+//    public ResponseEntity<ContentResponse> createAttachments(@PathVariable UUID frontOfficeId, @PathVariable Long launchedModuleId, @Valid @RequestBody List<AttachmentsRequest> attachmentsRequest){
+//        return ResponseEntity.ok(frontofficeService.createAttachments(attachmentsRequest, launchedModuleId));
+//    }
 
     @PostMapping("/{frontOfficeId}/oauth")
     public ResponseEntity<OAuthV2AccessResponse> oauthMember(@PathVariable UUID frontOfficeId, @Valid @RequestBody OAuthRequest oAuthRequest) throws SlackApiException, IOException {

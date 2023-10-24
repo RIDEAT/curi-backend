@@ -14,7 +14,5 @@ import java.util.List;
 public class AttachmentContent {
     @Builder.Default
     private List<AttachmentsInfo> attachments = new ArrayList<>();
-    @Builder.Default
-    private List<String> extensions = new ArrayList<>();
     private String description;
 }
