@@ -31,62 +31,53 @@ public class AttachmentsService {
     private final ModuleService moduleService;
     private static final String PATH_FORMAT = "workspace/%s/members/%s/modules/%s/%s";
 
-    public List<PreSignedUrl> getPreSignedUrls(LaunchedModule launchedModule, List<AttachmentsRequest> presignedRequest) {
-        var workspaceId = launchedModule.getWorkspace().getId();
-        var memberId = launchedModule.getLaunchedSequence().getMember().getId();
-
-        if (launchedModule.getType() != ModuleType.attachments)
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.MODULE_TYPE_NOT_MATCH);
-
-        var content = contentService.getContent(launchedModule.getContentId());
-        var attachmentsInfos = (AttachmentContent) content.getContent();
-
-        return presignedRequest.stream()
-                .map(info -> getPreSignedUrl(workspaceId, memberId, launchedModule.getId(), info, attachmentsInfos.getExtensions()))
-                .collect(Collectors.toList());
-    }
-
-    private PreSignedUrl getPreSignedUrl(Long workspaceId, Long memberId, Long moduleId, AttachmentsRequest request, List<String> extensions){
-        var fileName = request.getFileName();
-        if (!amazonS3Service.isValidAttachmentName(fileName, extensions))
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_EXTENSION);
-
-        var path = attachmentFormat(workspaceId.toString(), memberId.toString(), moduleId.toString(), fileName);
+    public PreSignedUrl getPreSignedUrls(LaunchedModule launchedModule, AttachmentsRequest presignedRequest) {
+        var fileName = presignedRequest.getFileName();
+        var path = getResourceUrl(launchedModule, fileName);
         return PreSignedUrl.builder()
                 .preSignedUrl(amazonS3Service.getPreSignedUrl(path))
                 .fileName(fileName).build();
     }
 
-    @Transactional
-    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, LaunchedModule launchedModule) {
-        var workspaceId = launchedModule.getWorkspace().getId();
-        var member = launchedModule.getLaunchedSequence().getMember();
-        var content = contentService.getContent(launchedModule.getContentId());
-        var attachmentsInfos = (AttachmentContent) content.getContent();
-        attachmentsInfos.setAttachments(new ArrayList<>());
-        for (var request : attachmentsRequest) {
-            var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), launchedModule.getId().toString(), request.getFileName());
-            attachmentsInfos.getAttachments().add(
-                    AttachmentsInfo.builder()
-                    .fileName(request.getFileName())
-                    .resourceUrl(path)
-                    .build());
-        }
-        content.setContent(attachmentsInfos);
-        return ContentResponse.of(content, launchedModule);
+    private String getResourceUrl(LaunchedModule module, String fileName){
+        var workspaceId = module.getWorkspace().getId();
+        var memberId = module.getLaunchedSequence().getMember().getId();
+        if (module.getType() != ModuleType.attachments)
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.MODULE_TYPE_NOT_MATCH);
+        return attachmentFormat(workspaceId.toString(), memberId.toString(), module.getId().toString(), fileName);
     }
 
-    private List<AttachmentFilesResponse> getFileResponses(AttachmentContent content){
+//    @Transactional
+//    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, LaunchedModule launchedModule) {
+//        var workspaceId = launchedModule.getWorkspace().getId();
+//        var member = launchedModule.getLaunchedSequence().getMember();
+//        var content = contentService.getContent(launchedModule.getContentId());
+//        var attachmentsInfos = (AttachmentContent) content.getContent();
+//        attachmentsInfos.setAttachments(new ArrayList<>());
+//        for (var request : attachmentsRequest) {
+//            var path = attachmentFormat(workspaceId.toString(), member.getId().toString(), launchedModule.getId().toString(), request.getFileName());
+//            attachmentsInfos.getAttachments().add(
+//                    AttachmentsInfo.builder()
+//                    .fileName(request.getFileName())
+//                    .resourceUrl(path)
+//                    .build());
+//        }
+//        content.setContent(attachmentsInfos);
+//        return ContentResponse.of(content, launchedModule);
+//    }
+
+    private List<AttachmentFilesResponse> getFileResponses(LaunchedModule module, AttachmentContent content){
         return content.getAttachments().stream().map(info ->{
-            var signedUrl = amazonS3Service.getSignedUrl(info.getResourceUrl());
-            return AttachmentFilesResponse.of(signedUrl, info);
+            var signedUrl = amazonS3Service.getSignedUrl(getResourceUrl(module, info.getFileName()));
+            return AttachmentFilesResponse.of(signedUrl, info.getFileName());
         }).toList();
     }
+
 
     public AttachmentsResponse getAttachment(LaunchedModule launchedModule) {
         var content = contentService.getContent(launchedModule.getContentId());
         var attachmentsInfos = (AttachmentContent) content.getContent();
-        return AttachmentsResponse.of(launchedModule, getFileResponses(attachmentsInfos), launchedModule.getLaunchedSequence().getMember());
+        return AttachmentsResponse.of(launchedModule, getFileResponses(launchedModule, attachmentsInfos), launchedModule.getLaunchedSequence().getMember());
     }
 
     public List<AttachmentsResponse> getAttachmentsByModule(Long moduleId) {

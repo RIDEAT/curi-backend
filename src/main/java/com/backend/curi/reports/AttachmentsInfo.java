@@ -1,6 +1,7 @@
 package com.backend.curi.reports;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +14,4 @@ import java.util.List;
 @Builder
 public class AttachmentsInfo {
     private String fileName;
-    private String resourceUrl;
 }

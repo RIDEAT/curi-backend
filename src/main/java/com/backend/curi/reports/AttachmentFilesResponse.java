@@ -10,14 +10,12 @@ import lombok.*;
 @Builder
 public class AttachmentFilesResponse {
     private String signedUrl;
-    private String resourceUrl;
     private String fileName;
 
-    public static AttachmentFilesResponse of (String signedUrl, AttachmentsInfo info) {
+    public static AttachmentFilesResponse of (String signedUrl, String fileName) {
         return AttachmentFilesResponse.builder()
                 .signedUrl(signedUrl)
-                .resourceUrl(info.getResourceUrl())
-                .fileName(info.getFileName())
+                .fileName(fileName)
                 .build();
     }
 }

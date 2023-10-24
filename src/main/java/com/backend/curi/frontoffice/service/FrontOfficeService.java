@@ -148,19 +148,19 @@ public class FrontOfficeService {
         return slackService.isMemberAuthorized(memberId);
     }
 
-    public List<PreSignedUrl> getAttachmentPresignedUrl(Long launchedModuleId, List<AttachmentsRequest> presignedRequest){
+    public PreSignedUrl getAttachmentPresignedUrl(Long launchedModuleId, AttachmentsRequest preSignedRequest){
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
-        return attachmentService.getPreSignedUrls(launchedModule,presignedRequest);
+        return attachmentService.getPreSignedUrls(launchedModule, preSignedRequest);
     }
 
     public AttachmentsResponse getAttachments(Long launchedModuleId){
         var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
         return attachmentService.getAttachment(launchedModule);
     }
-    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, Long launchedModuleId){
-        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
-
-        return attachmentService.createAttachments(attachmentsRequest, launchedModule);
-    }
+//    public ContentResponse createAttachments(List<AttachmentsRequest> attachmentsRequest, Long launchedModuleId){
+//        var launchedModule = launchedModuleService.getLaunchedModuleEntity(launchedModuleId);
+//
+//        return attachmentService.createAttachments(attachmentsRequest, launchedModule);
+//    }
 
 }
