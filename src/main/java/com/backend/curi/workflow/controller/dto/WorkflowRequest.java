@@ -12,6 +12,6 @@ import java.util.List;
 @Setter
 public class WorkflowRequest {
     @NotBlank(message = "워크플로우의 이름을 작성해주세요.")
-    @Size(min = 1, max = 20, message = "이름은 1 ~ 20자 이내여야 합니다!")
+    @Size(min = 1, max = 30, message = "이름은 1 ~ 30자 이내여야 합니다!")
     private String name;
 }
