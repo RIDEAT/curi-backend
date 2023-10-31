@@ -50,6 +50,7 @@ public class ContentService {
                             parseFrom(syntax, member));
                 }
             }
+            content.setContent(stringData);
         }
     }
 
