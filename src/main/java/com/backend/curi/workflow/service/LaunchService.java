@@ -154,8 +154,7 @@ public class LaunchService {
         var contentToCopy = contentService.getContent(module.getContentId());
 
         log.info(contentToCopy.toString());
-
-        var contents = contentService.copyContents(contentToCopy);
+        var contents = contentService.copyContents(contentToCopy, memberMap);
         var launchedModule = LaunchedModule.of(contents.getId(), module, launchedSequence, workspace);
 
         launchedModuleService.saveLaunchedModule(launchedModule);
