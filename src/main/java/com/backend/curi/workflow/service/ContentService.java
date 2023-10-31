@@ -9,6 +9,7 @@ import com.backend.curi.workflow.controller.dto.SequenceResponse;
 import com.backend.curi.workflow.repository.ContentRepository;
 import com.backend.curi.workflow.repository.entity.Content;
 import com.backend.curi.workflow.repository.entity.ModuleType;
+import com.backend.curi.workflow.repository.entity.contents.ContentsContent;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,8 @@ public class ContentService {
     private void parseContent(Content content, Map<Role, Member> memberMap){
         if(content.getType() == ModuleType.contents) {
             var jsonObject = new JSONObject(content.getContent());
-            var stringData = jsonObject.toString();
+            var jsonContent = jsonObject.getJSONObject("content");
+            var stringData = jsonContent.toString();
             for(var entry : memberMap.entrySet()){
                 var role = entry.getKey();
                 var member = entry.getValue();
@@ -50,7 +52,7 @@ public class ContentService {
                             parseFrom(syntax, member));
                 }
             }
-            content.setContent(stringData);
+            content.setContent(new ContentsContent(stringData));
         }
     }
 
