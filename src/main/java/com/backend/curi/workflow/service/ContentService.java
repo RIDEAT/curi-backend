@@ -44,8 +44,7 @@ public class ContentService {
             var data = (ContentsContent)content.getContent();
             if(data.getContent() == null)
                 return;
-            var jsonObject = new JSONObject(data.getContent());
-            var jsonContent = jsonObject.getJSONObject("content");
+            var jsonContent = new JSONObject(data.getContent());
             var stringData = jsonContent.toString();
             for(var entry : memberMap.entrySet()){
                 var role = entry.getKey();
