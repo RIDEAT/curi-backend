@@ -98,6 +98,8 @@ public class FrontOfficeService {
         frontOffice.setAccessToken(UUID.randomUUID());
         frontOfficeRepository.save(frontOffice);
 
+
+
     }
 
     public FrontOffice getFrontOfficeByLaunchedSequenceId(Long launchedSequenceId) {

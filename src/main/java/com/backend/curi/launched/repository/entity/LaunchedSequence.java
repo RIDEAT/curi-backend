@@ -1,6 +1,7 @@
 package com.backend.curi.launched.repository.entity;
 
 import com.backend.curi.common.entity.BaseEntity;
+import com.backend.curi.frontoffice.repository.entity.FrontOffice;
 import com.backend.curi.launched.controller.dto.LaunchedSequenceRequest;
 import com.backend.curi.member.repository.entity.Member;
 import com.backend.curi.workflow.controller.dto.SequenceResponse;
@@ -61,6 +62,8 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "LaunchedSequenceId")
     private LaunchedSequence nextSequence;
 */
+    @OneToOne(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
+    private FrontOffice frontOffice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LaunchedWorkflowId")
