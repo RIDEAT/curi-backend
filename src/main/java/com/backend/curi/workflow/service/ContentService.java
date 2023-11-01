@@ -55,13 +55,9 @@ public class ContentService {
                             parseFrom(syntax, member));
                 }
             }
-            try{
-                ObjectMapper objectMapper = new ObjectMapper();
-                data.setContent(objectMapper.readTree(stringData));
-                content.setContent(data);
-            }catch (Exception e){
-                throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.CONTENT_PARSE_ERROR);
-            }
+
+            data.setContent(new JSONObject(stringData));
+            content.setContent(data);
         }
     }
 
