@@ -12,7 +12,9 @@ import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.contents.ContentsContent;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +47,7 @@ public class ContentService {
             var data = (ContentsContent)content.getContent();
             if(data.getContent() == null)
                 return;
-            var jsonContent = new JSONObject(data.getContent());
+            var jsonContent = new JSONObject(data);
             var stringData = jsonContent.toString();
             for(var entry : memberMap.entrySet()){
                 var role = entry.getKey();
@@ -55,9 +58,14 @@ public class ContentService {
                             parseFrom(syntax, member));
                 }
             }
-
-            data.setContent(new JSONObject(stringData));
-            content.setContent(data);
+            try{
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> linkedHashMap = objectMapper.readValue(stringData, new TypeReference<LinkedHashMap<String, Object>>() {});
+                data.setContent(linkedHashMap.get("content"));
+                content.setContent(data);
+            }catch (Exception e){
+                throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.CONTENT_PARSE_ERROR);
+            }
         }
     }
 
