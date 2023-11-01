@@ -5,7 +5,7 @@
 
     <div style="text-align: center;">워크플러그의 주요기능인 <span style="font-weight: bold;" class="stb-bold">워크플로우</span>를 실행해주셔서 감사합니다!&nbsp;</div>
     <div style="text-align: center;"><br></div>
-    <div style="text-align: center;"><span class="link-edited stb-bold" style="font-size: 20px; font-weight: bold;"><span style="color: #e8aa02;" class="stb-fore-colored" th:text="${workflow.name}"></span> <span style="text-decoration: underline;" class="stb-underline">워크플로우</span>의 주요내용을 살펴보아요! </span></div>
+    <div style="text-align: center;"><span class="link-edited stb-bold" style="font-size: 20px; font-weight: bold;"><span style="color: #e8aa02;" class="stb-fore-colored" th:text="${workflow.name}"></span> <span class="stb-underline">워크플로우</span>의 주요내용을 살펴보아요! </span></div>
     <div style="position: absolute; left: 336px; top: -24.5px;">
         <div><br></div>
     </div>
@@ -18,8 +18,9 @@
 
 
     <p th:each="sequence: ${workflow.launchedSequences}">
-        <span class="stb-bold" style="font-weight: bold;" th:text="${sequence.name}"></span>
-        <br/>
+        <a th:href="${viewUrl + '/' + sequence.frontOffice.id + '?token=' + sequence.frontOffice.accessToken}">
+            <span class="stb-bold" style="font-weight: bold;" th:text="${sequence.name}" ></span>
+        </a>        <br/>
         <span style="font-size: 15px" th:text="${'대상자: '+sequence.member.name}"></span> |
         <span style="font-size: 15px" th:text="${'상태: '+sequence.status.toString()}"></span> |
         <span style="font-size: 15px" th:text="${'D-Day: '+sequence.applyDate}"></span>
@@ -29,7 +30,10 @@
 
     </p>
 
-    <div style="text-align: center;">워크플로우 내 시퀀스는 D-Day 기준 오전 9시에 메일이나 slack으로 발송됩니다.
+    <div style="text-align: center;">워크플로우 내 시퀀스는 D-Day 기준 오전 9시에 발송됩니다.
+        &nbsp;</div>
+    <div style="text-align: center;">
+        D-Day가 지난 시퀀스는 5분 안에 발송됩니다.
         &nbsp;</div>
 
 

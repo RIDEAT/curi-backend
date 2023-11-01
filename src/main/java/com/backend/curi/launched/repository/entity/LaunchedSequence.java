@@ -62,6 +62,7 @@ public class LaunchedSequence extends BaseEntity {
     @JoinColumn(name = "LaunchedSequenceId")
     private LaunchedSequence nextSequence;
 */
+    @Setter
     @OneToOne(mappedBy = "launchedSequence", cascade = CascadeType.ALL)
     private FrontOffice frontOffice;
 

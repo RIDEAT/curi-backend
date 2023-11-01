@@ -98,6 +98,7 @@ public class FrontOfficeService {
         frontOffice.setAccessToken(UUID.randomUUID());
         frontOfficeRepository.save(frontOffice);
 
+        launchedSequence.setFrontOffice(frontOffice);
 
 
     }
