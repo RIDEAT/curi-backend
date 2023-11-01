@@ -18,7 +18,7 @@
 
 
     <p th:each="sequence: ${workflow.launchedSequences}">
-        <a th:href="${viewUrl + '/' + sequence.frontOffice.id + '?token=' + sequence.frontOffice.accessToken">
+        <a th:href="${viewUrl + '/' + sequence.frontOffice.id + '?token=' + sequence.frontOffice.accessToken}">
             <span class="stb-bold" style="font-weight: bold;" th:text="${sequence.name}" ></span>
         </a>
         <br/>
