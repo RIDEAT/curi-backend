@@ -73,7 +73,7 @@ public class ContentController {
     }
 
     @PatchMapping("/contents")
-    public ResponseEntity<ContentResponse> updateContentsContent(@RequestBody ContentUpdateRequest<ContentsContent> request,
+    public ResponseEntity<ContentResponse> updateContentsContent(@RequestBody @Validated(ValidationSequence.class) ContentUpdateRequest<ContentsContent> request,
                                                                 @PathVariable Long workspaceId, @PathVariable Long workflowId,
                                                                 @PathVariable Long sequenceId, @PathVariable Long moduleId) {
         var response = moduleService.updateContent(moduleId, request);
