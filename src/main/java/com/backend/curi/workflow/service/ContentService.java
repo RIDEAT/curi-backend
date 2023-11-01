@@ -12,6 +12,7 @@ import com.backend.curi.workflow.repository.entity.ModuleType;
 import com.backend.curi.workflow.repository.entity.contents.ContentsContent;
 import com.backend.curi.workspace.controller.dto.RoleResponse;
 import com.backend.curi.workspace.repository.entity.Role;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -40,7 +41,10 @@ public class ContentService {
 
     private void parseContent(Content content, Map<Role, Member> memberMap){
         if(content.getType() == ModuleType.contents) {
-            var jsonObject = new JSONObject(content.getContent());
+            var data = (ContentsContent)content.getContent();
+            if(data.getContent() == null)
+                return;
+            var jsonObject = new JSONObject(data.getContent());
             var jsonContent = jsonObject.getJSONObject("content");
             var stringData = jsonContent.toString();
             for(var entry : memberMap.entrySet()){
@@ -52,7 +56,13 @@ public class ContentService {
                             parseFrom(syntax, member));
                 }
             }
-            content.setContent(new ContentsContent(stringData));
+            try{
+                ObjectMapper objectMapper = new ObjectMapper();
+                data.setContent(objectMapper.readTree(stringData));
+                content.setContent(data);
+            }catch (Exception e){
+                throw new CuriException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorType.CONTENT_PARSE_ERROR);
+            }
         }
     }
 
