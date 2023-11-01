@@ -37,6 +37,10 @@ public class AwsSMTPService {
     @Value("${workplug.app.url}")
     private String appUrl;
 
+    @Value("${workplug.view.url}")
+    private String viewUrl;
+
+
     private final String from;
 
     public AwsSMTPService(
@@ -90,6 +94,7 @@ public class AwsSMTPService {
         context.setVariable("user", currentUser);
         context.setVariable("workflow", launchedWorkflow);
         context.setVariable("member", member);
+        context.setVariable("viewUrl", viewUrl);
 
         String emailContent = templateEngine.process(templateName, context);
 

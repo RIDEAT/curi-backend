@@ -5,7 +5,7 @@
 
     <div style="text-align: center;"><span style="font-family: AppleSDGothic, 'apple sd gothic neo', 'noto sans korean', 'noto sans korean regular', 'noto sans cjk kr', 'noto sans cjk', 'nanum gothic', 'malgun gothic', dotum, arial, helvetica, MS Gothic, sans-serif;"><span style="font-weight: bold; color: #e8ab00;" class="stb-bold stb-fore-colored" th:text="${user.name}"></span> 님께서 실행한 워크플로우에 참여 대상자입니다. 일정에 맞게 참여해주시기 바랍니다! </span></div>
     <div style="text-align: center;"><br></div>
-    <div style="text-align: center;"><span class="link-edited stb-bold" style="font-size: 20px; font-weight: bold;"><span style="color: #e8aa02;" class="stb-fore-colored" th:text="${workflow.name}"></span> <span style="text-decoration: underline;" class="stb-underline">워크플로우</span>의 주요내용을 살펴보아요! </span></div>
+    <div style="text-align: center;"><span class="link-edited stb-bold" style="font-size: 20px; font-weight: bold;"><span style="color: #e8aa02;" class="stb-fore-colored" th:text="${workflow.name}"></span> <span class="stb-underline">워크플로우</span>의 주요내용을 살펴보아요! </span></div>
     <div style="position: absolute; left: 336px; top: -24.5px;">
         <div><br></div>
     </div>
@@ -18,7 +18,9 @@
 
 
     <p th:each="sequence: ${workflow.launchedSequences}">
-        <span class="stb-bold" style="font-weight: bold;" th:text="${sequence.name}"></span>
+        <a th:href="{viewUrl + '/' + sequence.frontOffice.id + '?token=' + sequence.frontOffice.accessToken">
+            <span class="stb-bold" style="font-weight: bold;" th:text="${sequence.name}" ></span>
+        </a>
         <br/>
         <span style="font-size: 15px" th:text="${'대상자: '+sequence.member.name}"></span> |
         <span style="font-size: 15px" th:text="${'상태: '+sequence.status.toString()}"></span> |
@@ -30,6 +32,9 @@
     </p>
 
     <div style="text-align: center;">워크플로우 내 시퀀스는 D-Day 기준 오전 9시에 발송됩니다.
+        &nbsp;</div>
+    <div style="text-align: center;">
+        D-Day가 지난 시퀀스는 5분 안에 발송됩니다.
         &nbsp;</div>
 
 
