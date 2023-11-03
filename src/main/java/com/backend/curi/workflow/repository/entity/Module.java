@@ -44,7 +44,7 @@ public class Module extends BaseEntity {
     @Column(nullable = false)
     private ObjectId contentId;
 
-    @OneToMany
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<LaunchedModule> launchedModules = new ArrayList<>();
 
