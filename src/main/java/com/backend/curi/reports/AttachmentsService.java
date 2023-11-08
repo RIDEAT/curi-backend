@@ -87,6 +87,12 @@ public class AttachmentsService {
     }
 
     private String attachmentFormat(String workspaceId, String memberId, String moduleId, String fileName) {
-        return String.format(PATH_FORMAT, workspaceId, memberId, moduleId, fileName);
+        String encoded = fileName;
+        try{
+            encoded = java.net.URLEncoder.encode(fileName, "UTF-8");
+        } catch (Exception e) {
+            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_NAME);
+        }
+        return String.format(PATH_FORMAT, workspaceId, memberId, moduleId, encoded);
     }
 }

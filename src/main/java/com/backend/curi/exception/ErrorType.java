@@ -17,6 +17,7 @@ public enum ErrorType {
     INVALID_URL_ERROR ("COMMON-007", "올바르지 않은 URL입니다."),
     INVALID_DATA_DELETE ("COMMON-008", "데이터 삭제에서 문제가 발생했습니다."),
     CONTENT_PARSE_ERROR("COMMON-009", "컨텐츠 파싱에 실패했습니다."),
+    INVALID_FILE_NAME("COMMON-010", "파일 이름 인코딩에 실패했습니다."),
 
 
     WORKSPACE_NOT_EXISTS("WORKSPACE-001", "존재하지 않는 워크 스페이스입니다."),
@@ -38,7 +39,6 @@ public enum ErrorType {
     CONTENT_NOT_EXISTS("MODULE-003", "존재하지 않는 콘텐츠입니다."),
     MODULE_TYPE_NOT_MATCH("MODULE-004", "모듈의 타입이 일치하지 않습니다."),
     INVALID_FILE_EXTENSION("MODULE-005", "올바르지 않은 파일 확장자입니다."),
-
     SEQUENCE_MODULE_ALREADY_EXISTS("MODULE-004", "시퀀스에 해당 모듈이 이미 존재합니다. 모듈은 중복될 수 없습니다."),
     WORKFLOW_SEQUENCE_NOT_EXISTS("SEQUENCE-001", "워크플로우에 해당 시퀀스가 존재하지 않습니다."),
     SEQUENCE_NOT_EXISTS("SEQUENCE-002", "존재하지 않는 시퀀스 입니다."),
