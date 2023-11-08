@@ -68,7 +68,13 @@ public class AttachmentsService {
 
     private List<AttachmentFilesResponse> getFileResponses(LaunchedModule module, AttachmentContent content){
         return content.getAttachments().stream().map(info ->{
-            var signedUrl = amazonS3Service.getSignedUrl(getResourceUrl(module, info.getFileName()));
+            String encoded;
+            try{
+                encoded = java.net.URLEncoder.encode(info.getFileName(), "UTF-8");
+            } catch (Exception e) {
+                throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_NAME);
+            }
+            var signedUrl = amazonS3Service.getSignedUrl(getResourceUrl(module, encoded));
             return AttachmentFilesResponse.of(signedUrl, info.getFileName());
         }).toList();
     }
@@ -87,12 +93,6 @@ public class AttachmentsService {
     }
 
     private String attachmentFormat(String workspaceId, String memberId, String moduleId, String fileName) {
-        String encoded = fileName;
-        try{
-            encoded = java.net.URLEncoder.encode(fileName, "UTF-8");
-        } catch (Exception e) {
-            throw new CuriException(HttpStatus.BAD_REQUEST, ErrorType.INVALID_FILE_NAME);
-        }
-        return String.format(PATH_FORMAT, workspaceId, memberId, moduleId, encoded);
+        return String.format(PATH_FORMAT, workspaceId, memberId, moduleId, fileName);
     }
 }
